@@ -17,7 +17,10 @@
   </style>
 </head>
 
-<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 text-gray-100 font-sans">
+<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 relative overflow-hidden text-gray-100 font-sans">
+  
+  <!-- CAPA DE FONDO RADIAL SUAVE -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_rgba(0,0,0,0)_70%)] -z-10"></div>
 
   <!-- HEADER -->
   <header class="w-full flex justify-between items-center px-10 py-4 bg-slate-950/40 backdrop-blur-sm border-b border-blue-800/30">
@@ -56,9 +59,6 @@
        class="animate-fade-up px-12 py-5 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold text-xl rounded-full shadow-2xl transform hover:scale-105 transition">
        Comenzar simulación
     </a>
-
-    <!-- (Opcional) Imagen o fondo de tenis -->
-    <!-- <img src="assets/images/tennis_court_bg.jpg" alt="Tennis court" class="absolute inset-0 w-full h-full object-cover opacity-10 -z-10"> -->
   </main>
 
   <!-- FOOTER -->
