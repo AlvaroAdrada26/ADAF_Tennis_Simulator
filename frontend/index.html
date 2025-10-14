@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADAF Tennis Simulator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="assets/images/Logo_ADAF_SinLetras.png">
+  <style>
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up {
+      animation: fade-up 1.2s ease-out forwards;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 text-gray-100 font-sans">
+
+  <!-- HEADER -->
+  <header class="w-full flex justify-between items-center px-10 py-4 bg-slate-950/40 backdrop-blur-sm border-b border-blue-800/30">
+    <!-- LOGO -->
+    <div class="flex items-center space-x-3">
+      <img src="assets/images/Logo_ADAF_SinLetras.png" alt="Logo ADAF Tennis Simulator"
+           class="w-14 h-14 rounded-lg shadow-lg hover:scale-105 transition">
+      <span class="text-xl font-semibold text-yellow-400 tracking-wide hidden sm:block">
+        ADAF Tennis Simulator
+      </span>
+    </div>
+
+    <!-- NAV -->
+    <nav class="hidden md:flex space-x-8 text-sm">
+      <a href="#" class="hover:text-yellow-400 transition">Documentación del modelo</a>
+      <a href="#" class="hover:text-yellow-400 transition">Créditos / Sobre el TFG</a>
+      <a href="#" class="hover:text-yellow-400 transition">Configuraciones guardadas</a>
+    </nav>
+  </header>
+
+  <!-- HERO SECTION -->
+  <main class="flex-1 flex flex-col justify-center items-center text-center px-6">
+    <!-- TITULAR PRINCIPAL -->
+    <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-up text-yellow-400">
+      ADAF Tennis Simulator
+    </h1>
+
+    <!-- DESCRIPCIÓN -->
+    <p class="max-w-2xl text-gray-300 text-lg md:text-xl mb-12 leading-relaxed animate-fade-up">
+      Simulador probabilístico de partidos de tenis basado en atributos reales de los jugadores.  
+      Experimenta cómo los factores técnicos, físicos y mentales influyen en cada punto.
+    </p>
+
+    <!-- BOTÓN PRINCIPAL -->
+    <a href="menu.html"
+       class="animate-fade-up px-12 py-5 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold text-xl rounded-full shadow-2xl transform hover:scale-105 transition">
+       Comenzar simulación
+    </a>
+
+    <!-- (Opcional) Imagen o fondo de tenis -->
+    <!-- <img src="assets/images/tennis_court_bg.jpg" alt="Tennis court" class="absolute inset-0 w-full h-full object-cover opacity-10 -z-10"> -->
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full py-6 text-center text-gray-400 text-sm border-t border-blue-800/30 bg-slate-950/30">
+    © 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · UCM
+  </footer>
+
+</body>
+</html>
