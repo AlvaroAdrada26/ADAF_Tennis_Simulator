@@ -54,13 +54,13 @@
   </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 text-gray-100 font-sans">
+<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 relative text-gray-100 font-sans">
 
   <!-- CAPA DE IMAGEN DE PISTA -->
-  <div class="fixed inset-0 bg-[url('assets/images/homepage_fondo2.jpg')] bg-cover bg-center opacity-15 blur-sm saturate-75 -z-20"></div>
+  <div class="absolute inset-0 bg-[url('assets/images/homepage_fondo2.jpg')] bg-cover bg-center opacity-15 blur-sm saturate-75 -z-20"></div>
 
   <!-- CAPA DE FONDO RADIAL SUAVE -->
-  <div class="fixed inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_rgba(0,0,0,0)_70%)] -z-10"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_rgba(0,0,0,0)_70%)] -z-10"></div>
 
   <div class="flex min-h-screen">
     
@@ -289,8 +289,8 @@
 
         <!-- DESCRIPCIÓN -->
         <p class="max-w-2xl text-gray-300 text-lg md:text-xl mb-12 leading-relaxed animate-fade-up">
-          Simulador probabilístico de partidos de tenis basado en atributos reales de los jugadores.  
-          Experimenta cómo los factores técnicos, físicos y mentales influyen en cada punto.
+          Simulador avanzado de tenis basado en atributos realistas de los jugadores.
+          Explora cómo la técnica, la condición física y la fortaleza mental influyen en cada punto.
         </p>
 
         <!-- BOTÓN PRINCIPAL -->
@@ -307,7 +307,7 @@
         <div class="max-w-6xl mx-auto">
           <h2 class="text-4xl font-bold text-center mb-4 text-yellow-400">Características Principales</h2>
           <p class="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
-            Un simulador completo que considera todos los aspectos del juego profesional
+            Un simulador avanzado que combina estadística, física y psicología del tenis para recrear el juego profesional con realismo.
           </p>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -320,7 +320,7 @@
               </div>
               <h3 class="text-xl font-semibold text-center mb-4 text-yellow-400">Análisis Estadístico</h3>
               <p class="text-gray-300 text-center">
-                Modelo probabilístico basado en datos reales de jugadores profesionales y sus estadísticas de rendimiento.
+                Modelo probabilístico que evalúa el rendimiento punto a punto según factores técnicos, físicos y mentales.
               </p>
             </div>
 
@@ -333,7 +333,7 @@
               </div>
               <h3 class="text-xl font-semibold text-center mb-4 text-yellow-400">Parámetros Ajustables</h3>
               <p class="text-gray-300 text-center">
-                Configura atributos técnicos, físicos y mentales para crear simulaciones personalizadas y realistas.
+                Modifica atributos como saque, consistencia o mentalidad y crea simulaciones personalizadas.
               </p>
             </div>
 
@@ -346,7 +346,7 @@
               </div>
               <h3 class="text-xl font-semibold text-center mb-4 text-yellow-400">Simulación en Tiempo Real</h3>
               <p class="text-gray-300 text-center">
-                Observa cómo se desarrolla cada punto, juego y set con visualizaciones dinámicas e informativas.
+                Observa cada punto, juego y set con visualizaciones dinámicas y métricas instantáneas.
               </p>
             </div>
           </div>
@@ -358,7 +358,7 @@
         <div class="max-w-6xl mx-auto">
           <h2 class="text-4xl font-bold text-center mb-4 text-yellow-400">¿Cómo Funciona?</h2>
           <p class="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
-            Tres pasos sencillos para comenzar tu simulación
+            Tres pasos simples para crear y ejecutar tu simulación.
           </p>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -369,7 +369,7 @@
               </div>
               <h3 class="text-2xl font-semibold mb-4 text-gray-100">Configura los Jugadores</h3>
               <p class="text-gray-400">
-                Introduce los atributos técnicos, físicos y mentales de cada jugador, o selecciona perfiles predefinidos de tenistas profesionales.
+                Define los atributos técnicos, físicos y mentales de cada jugador, o utiliza valores de ejemplo inspirados en tenistas profesionales.
               </p>
             </div>
 
@@ -380,7 +380,7 @@
               </div>
               <h3 class="text-2xl font-semibold mb-4 text-gray-100">Ajusta las Condiciones</h3>
               <p class="text-gray-400">
-                Define el formato del partido, superficie de la pista, condiciones climáticas y otros factores que influyen en el resultado.
+                Elige el formato del partido, tipo de pista y factores externos que influyen en el rendimiento.
               </p>
             </div>
 
@@ -391,7 +391,7 @@
               </div>
               <h3 class="text-2xl font-semibold mb-4 text-gray-100">Observa y Analiza</h3>
               <p class="text-gray-400">
-                Inicia la simulación y observa el desarrollo punto por punto. Analiza estadísticas detalladas al finalizar el partido.
+                Ejecuta la simulación punto a punto y consulta estadísticas detalladas al final del partido.
               </p>
             </div>
           </div>
@@ -401,24 +401,24 @@
       <!-- ESTADÍSTICAS -->
       <section class="w-full py-24 px-6 bg-slate-900/50">
         <div class="max-w-6xl mx-auto">
-          <h2 class="text-4xl font-bold text-center mb-16 text-yellow-400">Impulsado por Datos Reales</h2>
+          <h2 class="text-4xl font-bold text-center mb-16 text-yellow-400">Impulsado por Simulación Realista</h2>
           
           <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div class="text-center">
-              <div class="text-5xl font-bold text-yellow-400 mb-2">150+</div>
-              <p class="text-gray-400">Atributos Analizados</p>
+              <div class="text-5xl font-bold text-yellow-400 mb-2">12+</div>
+              <p class="text-gray-400">Atributos por jugador</p>
             </div>
             <div class="text-center">
-              <div class="text-5xl font-bold text-yellow-400 mb-2">1000+</div>
-              <p class="text-gray-400">Partidos Simulados</p>
+              <div class="text-5xl font-bold text-yellow-400 mb-2">2000+</div>
+              <p class="text-gray-400">Partidos simulados</p>
             </div>
             <div class="text-center">
-              <div class="text-5xl font-bold text-yellow-400 mb-2">95%</div>
-              <p class="text-gray-400">Precisión del Modelo</p>
+              <div class="text-5xl font-bold text-yellow-400 mb-2">Alta</div>
+              <p class="text-gray-400">Consistencia estadística</p>
             </div>
             <div class="text-center">
               <div class="text-5xl font-bold text-yellow-400 mb-2">24/7</div>
-              <p class="text-gray-400">Disponibilidad</p>
+              <p class="text-gray-400">Disponible en cualquier momento</p>
             </div>
           </div>
         </div>
@@ -431,7 +431,7 @@
             ¿Listo para Comenzar?
           </h2>
           <p class="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-            Descubre cómo los factores técnicos, físicos y mentales determinan el resultado de cada partido
+            Descubre cómo los factores técnicos, físicos y mentales influyen en cada punto del partido.
           </p>
           <a href="menu.html"
             class="inline-block px-12 py-5 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold text-xl rounded-full 
@@ -480,7 +480,7 @@
               </li>
 
               <li>
-                <a href="#" rel="noreferrer" target="_blank" class="text-gray-400 transition hover:text-yellow-400">
+                <a href="https://github.com/AlvaroAdrada26/ADAF_Tennis_Simulator" rel="noreferrer" target="_blank" class="text-gray-400 transition hover:text-yellow-400">
                   <span class="sr-only">GitHub</span>
                   <svg class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
@@ -558,7 +558,7 @@
             </div>
           </div>
 
-          <p class="text-xs text-gray-500 text-center">© 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · UCM</p>
+          <p class="text-xs text-gray-500 text-center">© 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · Universidad Complutense de Madrid</p>
         </div>
       </footer>
 
