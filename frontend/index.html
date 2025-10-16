@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,7 @@
     .animate-fade-up {
       animation: fade-up 1.2s ease-out forwards;
     }
-
+    
     @keyframes slide-up {
       from { 
         opacity: 0; 
@@ -25,35 +25,46 @@
         transform: translateY(0); 
       }
     }
-
+    
     .footer-animate {
       opacity: 0;
-      animation: slide-up 1s ease-out forwards; }
-
-    .footer-visible { animation: slide-up 1s ease-out forwards; }
+      animation: slide-up 1s ease-out forwards;
+    }
+    
+    .footer-visible {
+      animation: slide-up 1s ease-out forwards;
+    }
 
     /* Sidebar transitions */
-    .sidebar-expanded { transition: transform 0.3s ease-in-out; }
-
-    .sidebar-hidden { transform: translateX(-100%); }
-
-    .content-expanded { transition: margin-left 0.3s ease-in-out; }
-
-    .content-collapsed { margin-left: 4rem; /* Sidebar icon width */}
+    .sidebar-expanded {
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .sidebar-hidden {
+      transform: translateX(-100%);
+    }
+    
+    .content-expanded {
+      transition: margin-left 0.3s ease-in-out;
+    }
+    
+    .content-collapsed {
+      margin-left: 4rem; /* 64px - solo el ancho del sidebar de iconos */
+    }
   </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 relative text-gray-100 font-sans">
+<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 relative text-gray-100 font-sans">
 
-  <!-- COURT IMAGE LAYER -->
+  <!-- CAPA DE IMAGEN DE PISTA -->
   <div class="absolute inset-0 bg-[url('assets/images/homepage_fondo2.jpg')] bg-cover bg-center opacity-15 blur-sm saturate-75 -z-20"></div>
 
-  <!-- SOFT RADIAL BACKGROUND LAYER -->
+  <!-- CAPA DE FONDO RADIAL SUAVE -->
   <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_rgba(0,0,0,0)_70%)] -z-10"></div>
 
   <div class="flex min-h-screen">
-
-    <!-- SIDEBAR ICONS -->
+    
+    <!-- SIDEBAR DE ICONOS -->
     <div class="fixed left-0 top-0 h-screen w-16 flex flex-col justify-between border-r border-blue-800/30 bg-slate-950/80 backdrop-blur-sm z-50">
       <div>
         <div class="inline-flex size-16 items-center justify-center">
@@ -64,14 +75,14 @@
 
         <div class="border-t border-blue-800/30">
           <div class="px-2">
-            <!-- TOGGLE BUTTON -->
+            <!-- BOTÓN HAMBURGUESA PARA TOGGLE MENU -->
             <div class="py-4">
               <button id="menuToggle" class="group relative flex justify-center rounded-sm px-2 py-1.5 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400 w-full">
                 <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
-                <span class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-                  Menu
+                <span data-i18n="sidebarMenu" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
+                  Menú
                 </span>
               </button>
             </div>
@@ -81,8 +92,8 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
-                <span class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-yellow-400 group-hover:visible border border-yellow-400/30">
-                  Home
+                <span data-i18n="sidebarHome" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-yellow-400 group-hover:visible border border-yellow-400/30">
+                  Inicio
                 </span>
               </a>
             </div>
@@ -94,8 +105,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-                    Simulation
+                  <span data-i18n="sidebarSimulacion" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
+                    Simulación
                   </span>
                 </a>
               </li>
@@ -105,8 +116,8 @@
                   <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  <span class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-                    Players
+                  <span data-i18n="sidebarJugadores" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
+                    Jugadores
                   </span>
                 </a>
               </li>
@@ -116,8 +127,8 @@
                   <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                  <span class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-                    Statistics
+                  <span data-i18n="sidebarEstadisticas" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
+                    Estadísticas
                   </span>
                 </a>
               </li>
@@ -128,8 +139,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-                    Settings
+                  <span data-i18n="sidebarConfiguracion" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
+                    Configuración
                   </span>
                 </a>
               </li>
@@ -143,27 +154,27 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          <span class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-            Exit
+          <span data-i18n="sidebarLogout" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
+            Salir
           </span>
         </a>
       </div>
     </div>
 
-    <!-- EXPANDED SIDEBAR -->
+    <!-- SIDEBAR EXPANDIDO -->
     <div id="expandedSidebar" class="sidebar-expanded sidebar-hidden fixed left-16 top-0 h-screen w-64 flex flex-col justify-between border-r border-blue-800/30 bg-slate-950/70 backdrop-blur-sm z-40">
       <div class="px-4 py-6">
         <ul class="mt-14 space-y-1">
           <li>
-            <a href="#" class="block rounded-lg bg-yellow-400/20 px-4 py-2 text-sm font-medium text-yellow-400">
-              Home
+            <a data-i18n="sidebarHome" href="#" class="block rounded-lg bg-yellow-400/20 px-4 py-2 text-sm font-medium text-yellow-400">
+              Inicio
             </a>
           </li>
 
           <li>
             <details class="group [&_summary::-webkit-details-marker]:hidden">
               <summary class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-                <span class="text-sm font-medium">Simulation</span>
+                <span class="text-sm font-medium" data-i18n="sidebarSimulacion">Simulación</span>
                 <span class="shrink-0 transition duration-300 group-open:-rotate-180">
                   <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -172,13 +183,13 @@
               </summary>
               <ul class="mt-2 space-y-1 px-4">
                 <li>
-                  <a href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
-                    New Simulation
+                  <a data-i18n="sidebarNuevaSimulacion" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
+                    Nueva Simulación
                   </a>
                 </li>
                 <li>
-                  <a href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
-                    History
+                  <a data-i18n="sidebarHistorial" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
+                    Historial
                   </a>
                 </li>
               </ul>
@@ -186,21 +197,21 @@
           </li>
 
           <li>
-            <a href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-              Players
+            <a data-i18n="sidebarJugadores" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
+              Jugadores
             </a>
           </li>
 
           <li>
-            <a href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-              Statistics
+            <a data-i18n="sidebarEstadisticas" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
+              Estadísticas
             </a>
           </li>
 
           <li>
             <details class="group [&_summary::-webkit-details-marker]:hidden">
               <summary class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-                <span class="text-sm font-medium">Settings</span>
+                <span class="text-sm font-medium" data-i18n="sidebarConfiguracion">Configuración</span>
                 <span class="shrink-0 transition duration-300 group-open:-rotate-180">
                   <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -209,18 +220,18 @@
               </summary>
               <ul class="mt-2 space-y-1 px-4">
                 <li>
-                  <a href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
+                  <a data-i18n="sidebarConfiguracionGeneral" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
                     General
                   </a>
                 </li>
                 <li>
-                  <a href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
-                    Advanced
+                  <a data-i18n="sidebarConfiguracionAvanzado" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
+                    Avanzado
                   </a>
                 </li>
                 <li>
-                  <a href="#" class="w-full rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
-                    Exit
+                  <a data-i18n="sidebarConfiguracionLogout" href="#" class="w-full rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
+                    Salir
                   </a>
                 </li>
               </ul>
@@ -230,208 +241,209 @@
       </div>
     </div>
 
-    <!-- MAIN CONTENT -->
+    <!-- CONTENIDO PRINCIPAL -->
     <div id="mainContent" class="content-expanded content-collapsed flex-1 flex flex-col">
 
       <!-- HEADER -->
       <header class="w-full flex justify-between items-center px-10 py-4 bg-slate-950/40 backdrop-blur-sm border-b border-blue-800/30">
-        <!-- TITLE -->
+        <!-- TÍTULO -->
         <div class="flex items-center space-x-3">
-              <span class="text-xl font-semibold text-yellow-400 tracking-wide">
-                ADAF Tennis Simulator
-              </span>
-            </div>
+          <span class="text-xl font-semibold text-yellow-400 tracking-wide">
+            ADAF Tennis Simulator
+          </span>
+        </div>
 
         <!-- NAV + LANGUAGE SELECTOR -->
         <div class="flex items-center space-x-8">
           <!-- NAV -->
           <nav class="hidden md:flex space-x-8 text-sm">
-            <a href="#" class="hover:text-yellow-400 transition">Model Documentation</a>
-            <a href="#" class="hover:text-yellow-400 transition">Credits / About Project</a>
+            <a href="#" class="hover:text-yellow-400 transition" data-i18n="headerDocumentacion">Documentación del modelo</a>
+            <a href="#" class="hover:text-yellow-400 transition" data-i18n="headerCreditos">Créditos / Sobre el TFG</a>
           </nav>
 
           <!-- LANGUAGE SELECTOR -->
           <div class="flex items-center gap-3">
-            <!-- Spanish -->
-            <a href="index_esp.html" title="Spanish version"
-              class="cursor-pointer hover:scale-110 transition">
-              <img src="assets/images/flag_es.png" alt="Spanish"
-                  class="w-8 h-8 rounded-full border border-gray-400 shadow-sm">
-            </a>
+            <!-- Español -->
+            <button id="lang-es" title="Versión en Español"
+                class="cursor-pointer hover:scale-110 transition">
+                <img src="assets/images/flag_es.png" alt="Español"
+                    class="lang-flag w-8 h-8 rounded-full border-2 border-yellow-400 shadow-lg">
+            </button>
 
-            <!-- English (active) -->
-            <a href="index_eng.html" title="English version"
-              class="cursor-pointer hover:scale-110 transition">
-              <img src="assets/images/flag_uk.png" alt="English"
-                  class="w-8 h-8 rounded-full border-2 border-yellow-400 shadow-lg">
-            </a>
+            <!-- Inglés -->
+            <button id="lang-en" title="English version"
+                class="cursor-pointer hover:scale-110 transition">
+                <img src="assets/images/flag_uk.png" alt="English"
+                    class="lang-flag w-8 h-8 rounded-full border border-gray-400 shadow-sm">
+            </button>
           </div>
         </div>
       </header>
 
       <!-- HERO SECTION -->
       <main class="flex-1 flex flex-col justify-center items-center text-center px-6 py-20">
-        <!-- MAIN TITLE -->
+        <!-- TITULAR PRINCIPAL -->
         <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-up text-yellow-400 hover:text-yellow-300 transition">
           ADAF Tennis Simulator
         </h1>
 
-        <!-- DESCRIPTION -->
-        <p class="max-w-2xl text-gray-300 text-lg md:text-xl mb-12 leading-relaxed animate-fade-up">
-          Advanced tennis simulator powered by realistic player attributes.
-          Experience how technique, fitness, and mental strength shape every point.
+        <!-- DESCRIPCIÓN -->
+        <p data-i18n="hero_desc" class="max-w-2xl text-gray-300 text-lg md:text-xl mb-12 leading-relaxed animate-fade-up">
+          Simulador avanzado de tenis basado en atributos realistas de los jugadores.
+          Explora cómo la técnica, la condición física y la fortaleza mental influyen en cada punto.
         </p>
 
-        <!-- MAIN BUTTON -->
-        <a href="menu.html"
+        <!-- BOTÓN PRINCIPAL -->
+        <a data-i18n="hero_button" href="menu.html"
           class="animate-fade-up px-14 py-6 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold text-2xl rounded-full 
               shadow-[0_0_10px_rgba(255,255,0,0.15)] hover:shadow-[0_0_18px_rgba(255,255,0,0.25)] 
               transform hover:scale-110 transition duration-300">
-          Start Simulation
+          Comenzar Simulación
         </a>
       </main>
 
-      <!-- KEY FEATURES -->
+      <!-- CARACTERÍSTICAS DEL SIMULADOR -->
       <section class="w-full py-24 px-6 bg-slate-900/50">
         <div class="max-w-6xl mx-auto">
-          <h2 class="text-4xl font-bold text-center mb-4 text-yellow-400">Key Features</h2>
-          <p class="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
-            An advanced simulator that blends statistics, physics, and psychology to recreate professional tennis with realism.
+          <h2 data-i18n="caracteristicasTitle" class="text-4xl font-bold text-center mb-4 text-yellow-400">Características Principales</h2>
+          <p data-i18n="caracteristicasDesc" class="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
+            Un simulador avanzado que combina estadística, física y psicología del tenis para recrear el juego profesional con realismo.
           </p>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Feature 1 -->
+            <!-- Característica 1 -->
             <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-blue-800/30 hover:border-yellow-400/50 transition duration-300">
               <div class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-semibold text-center mb-4 text-yellow-400">Statistical Analysis</h3>
-              <p class="text-gray-300 text-center">
-                Probabilistic model evaluating point-by-point performance from technical, physical, and mental factors.
+              <h3 data-i18n="caracteristica1Title" class="text-xl font-semibold text-center mb-4 text-yellow-400">Análisis Estadístico</h3>
+              <p data-i18n="caracteristica1Desc" class="text-gray-300 text-center">
+                Modelo probabilístico que evalúa el rendimiento punto a punto según factores técnicos, físicos y mentales.
               </p>
             </div>
 
-            <!-- Feature 2 -->
+            <!-- Característica 2 -->
             <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-blue-800/30 hover:border-yellow-400/50 transition duration-300">
               <div class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-semibold text-center mb-4 text-yellow-400">Adjustable Parameters</h3>
-              <p class="text-gray-300 text-center">
-                Edit attributes like serve, consistency, or mindset to create custom simulations.
+              <h3 data-i18n="caracteristica2Title" class="text-xl font-semibold text-center mb-4 text-yellow-400">Parámetros Ajustables</h3>
+              <p data-i18n="caracteristica2Desc" class="text-gray-300 text-center">
+                Modifica atributos como saque, consistencia o mentalidad y crea simulaciones personalizadas.
               </p>
             </div>
 
-            <!-- Feature 3 -->
+            <!-- Característica 3 -->
             <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-blue-800/30 hover:border-yellow-400/50 transition duration-300">
               <div class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
               </div>
-              <h3 class="text-xl font-semibold text-center mb-4 text-yellow-400">Real-Time Simulation</h3>
-              <p class="text-gray-300 text-center">
-                Follow every point, game, and set with dynamic visuals and instant feedback.
+              <h3 data-i18n="caracteristica3Title" class="text-xl font-semibold text-center mb-4 text-yellow-400">Simulación en Tiempo Real</h3>
+              <p data-i18n="caracteristica3Desc" class="text-gray-300 text-center">
+                Observa cada punto, juego y set con visualizaciones dinámicas y métricas instantáneas.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- HOW IT WORKS -->
+      <!-- CÓMO FUNCIONA -->
       <section class="w-full py-24 px-6">
         <div class="max-w-6xl mx-auto">
-          <h2 class="text-4xl font-bold text-center mb-4 text-yellow-400">How It Works</h2>
-          <p class="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
-            Three simple steps to create and run your simulation.
+          <h2 data-i18n="comoFuncionaTitle" class="text-4xl font-bold text-center mb-4 text-yellow-400">¿Cómo Funciona?</h2>
+          <p data-i18n="comoFuncionaDesc" class="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
+            Tres pasos simples para crear y ejecutar tu simulación.
           </p>
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <!-- Step 1 -->
+            <!-- Paso 1 -->
             <div class="text-center">
               <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mb-6 mx-auto text-3xl font-bold text-black shadow-lg">
                 1
               </div>
-              <h3 class="text-2xl font-semibold mb-4 text-gray-100">Set the Players</h3>
-              <p class="text-gray-400">
-                Define each player’s technical, physical, and mental attributes, or use example values inspired by professional players.
+              <h3 data-i18n="paso1Title" class="text-2xl font-semibold mb-4 text-gray-100">Configura los Jugadores</h3>
+              <p data-i18n="paso1Desc" class="text-gray-400">
+                Define los atributos técnicos, físicos y mentales de cada jugador, o utiliza valores de ejemplo inspirados en tenistas profesionales.
               </p>
             </div>
 
-            <!-- Step 2 -->
+            <!-- Paso 2 -->
             <div class="text-center">
               <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mb-6 mx-auto text-3xl font-bold text-black shadow-lg">
                 2
               </div>
-              <h3 class="text-2xl font-semibold mb-4 text-gray-100">Adjust the Conditions</h3>
-              <p class="text-gray-400">
-                Choose match format, court surface, and external factors that affect performance.
+              <h3 data-i18n="paso2Title" class="text-2xl font-semibold mb-4 text-gray-100">Ajusta las Condiciones</h3>
+              <p data-i18n="paso2Desc" class="text-gray-400">
+                Elige el formato del partido, tipo de pista y factores externos que influyen en el rendimiento.
               </p>
             </div>
 
-            <!-- Step 3 -->
+            <!-- Paso 3 -->
             <div class="text-center">
               <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mb-6 mx-auto text-3xl font-bold text-black shadow-lg">
                 3
               </div>
-              <h3 class="text-2xl font-semibold mb-4 text-gray-100">Watch and Analyze</h3>
-              <p class="text-gray-400">
-                Run the point-by-point simulation and explore detailed stats after the match.
+              <h3 data-i18n="paso3Title" class="text-2xl font-semibold mb-4 text-gray-100">Observa y Analiza</h3>
+              <p data-i18n="paso3Desc" class="text-gray-400">
+                Ejecuta la simulación punto a punto y consulta estadísticas detalladas al final del partido.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- STATISTICS -->
+      <!-- ESTADÍSTICAS -->
       <section class="w-full py-24 px-6 bg-slate-900/50">
         <div class="max-w-6xl mx-auto">
-          <h2 class="text-4xl font-bold text-center mb-16 text-yellow-400">Powered by Realistic Simulation</h2>
+          <h2 data-i18n="estadisticasTitle" class="text-4xl font-bold text-center mb-16 text-yellow-400">Impulsado por Simulación Realista</h2>
           
           <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div class="text-center">
               <div class="text-5xl font-bold text-yellow-400 mb-2">12+</div>
-              <p class="text-gray-400">Attributes per player</p>
+              <p data-i18n="estadisticasAttr" class="text-gray-400">Atributos por jugador</p>
             </div>
             <div class="text-center">
               <div class="text-5xl font-bold text-yellow-400 mb-2">2000+</div>
-              <p class="text-gray-400">Matches simulated</p>
+              <p data-i18n="estadisticasMatches" class="text-gray-400">Partidos simulados</p>
             </div>
             <div class="text-center">
-              <div class="text-5xl font-bold text-yellow-400 mb-2">High</div>
-              <p class="text-gray-400">Statistical consistency</p>
+              <div data-i18n="estadisticasConsistenciaAlta" class="text-5xl font-bold text-yellow-400 mb-2">Alta</div>
+              <p data-i18n="estadisticasConsistencia" class="text-gray-400">Consistencia estadística</p>
             </div>
             <div class="text-center">
               <div class="text-5xl font-bold text-yellow-400 mb-2">24/7</div>
-              <p class="text-gray-400">Available anytime</p>
+              <p data-i18n="estadisticasDisponible" class="text-gray-400">Disponible en cualquier momento</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- FINAL CALL TO ACTION -->
+      <!-- CALL TO ACTION FINAL -->
       <section class="w-full py-24 px-6">
         <div class="max-w-4xl mx-auto text-center">
-          <h2 class="text-4xl md:text-5xl font-bold mb-6 text-yellow-400">
-            Ready to Get Started?
+          <h2 data-i18n="ctaTitle" class="text-4xl md:text-5xl font-bold mb-6 text-yellow-400">
+            ¿Listo para Comenzar?
           </h2>
-          <p class="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-            Explore how technical, physical, and mental factors influence every point.
+          <p data-i18n="ctaDesc" class="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+            Descubre cómo los factores técnicos, físicos y mentales influyen en cada punto del partido.
           </p>
           <a href="menu.html"
+            data-i18n="ctaButton"
             class="inline-block px-12 py-5 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold text-xl rounded-full 
                 shadow-[0_0_10px_rgba(255,255,0,0.15)] hover:shadow-[0_0_18px_rgba(255,255,0,0.25)] 
                 transform hover:scale-110 transition duration-300">
-            Start Simulation Now
+            Iniciar Simulación Ahora
           </a>
         </div>
       </section>
 
-      <!-- ENHANCED FOOTER -->
+      <!-- FOOTER MEJORADO -->
       <footer id="main-footer" class="bg-slate-950/80 backdrop-blur-sm border-t border-blue-800/30">
         <div class="mx-auto max-w-screen-xl space-y-8 px-4 py-16 sm:px-6 lg:space-y-16 lg:px-8">
           <div class="sm:flex sm:items-center sm:justify-between">
@@ -469,7 +481,7 @@
               </li>
 
               <li>
-                <a href="#" rel="noreferrer" target="_blank" class="text-gray-400 transition hover:text-yellow-400">
+                <a href="https://github.com/AlvaroAdrada26/ADAF_Tennis_Simulator" rel="noreferrer" target="_blank" class="text-gray-400 transition hover:text-yellow-400">
                   <span class="sr-only">GitHub</span>
                   <svg class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
@@ -481,73 +493,73 @@
 
           <div class="grid grid-cols-1 gap-8 border-t border-blue-800/30 pt-8 sm:grid-cols-2 lg:grid-cols-4 lg:pt-16">
             <div>
-              <p class="font-medium text-yellow-400">Resources</p>
+              <p data-i18n="footerRecursos" class="font-medium text-yellow-400">Recursos</p>
               <ul class="mt-6 space-y-4 text-sm">
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Model Documentation</a>
+                  <a href="#" data-i18n="footerDocModelo" class="text-gray-300 transition hover:text-yellow-400">Documentación del Modelo</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Tutorials</a>
+                  <a href="#" data-i18n="footerTutoriales" class="text-gray-300 transition hover:text-yellow-400">Tutoriales</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Results Analysis</a>
+                  <a href="#" data-i18n="footerAnalisis" class="text-gray-300 transition hover:text-yellow-400">Análisis de Resultados</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">API Documentation</a>
+                  <a href="#" data-i18n="footerApi" class="text-gray-300 transition hover:text-yellow-400">API Documentación</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Usage Examples</a>
+                  <a href="#" data-i18n="footerEjemplos" class="text-gray-300 transition hover:text-yellow-400">Ejemplos de Uso</a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <p class="font-medium text-yellow-400">Project</p>
+              <p data-i18n="footerProyecto" class="font-medium text-yellow-400">Proyecto</p>
               <ul class="mt-6 space-y-4 text-sm">
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">About the Project</a>
+                  <a href="#" data-i18n="footerSobreTFG" class="text-gray-300 transition hover:text-yellow-400">Sobre el TFG</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Credits</a>
+                  <a href="#" data-i18n="footerCreditos" class="text-gray-300 transition hover:text-yellow-400">Créditos</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Methodology</a>
+                  <a href="#" data-i18n="footerMetodologia" class="text-gray-300 transition hover:text-yellow-400">Metodología</a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <p class="font-medium text-yellow-400">Helpful Links</p>
+              <p data-i18n="footerEnlaces" class="font-medium text-yellow-400">Enlaces Útiles</p>
               <ul class="mt-6 space-y-4 text-sm">
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Contact</a>
+                  <a href="#" data-i18n="footerContacto" class="text-gray-300 transition hover:text-yellow-400">Contacto</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">FAQs</a>
+                  <a href="#" data-i18n="footerFAQs" class="text-gray-300 transition hover:text-yellow-400">FAQs</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Support</a>
+                  <a href="#" data-i18n="footerSoporte" class="text-gray-300 transition hover:text-yellow-400">Soporte</a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <p class="font-medium text-yellow-400">Legal</p>
+              <p data-i18n="footerLegal" class="font-medium text-yellow-400">Legal</p>
               <ul class="mt-6 space-y-4 text-sm">
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Privacy</a>
+                  <a href="#" data-i18n="footerPrivacidad" class="text-gray-300 transition hover:text-yellow-400">Privacidad</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">Terms of Use</a>
+                  <a href="#" data-i18n="footerTerminos" class="text-gray-300 transition hover:text-yellow-400">Términos de Uso</a>
                 </li>
                 <li>
-                  <a href="#" class="text-gray-300 transition hover:text-yellow-400">License</a>
+                  <a href="#" data-i18n="footerLicencia" class="text-gray-300 transition hover:text-yellow-400">Licencia</a>
                 </li>
               </ul>
             </div>
           </div>
 
-          <p class="text-xs text-gray-500 text-center">© 2025 ADAF Tennis Simulator · Final Degree Project · UCM</p>
+          <p data-i18n="footerCopyright" class="text-xs text-gray-500 text-center">© 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · Universidad Complutense de Madrid</p>
         </div>
       </footer>
 
@@ -601,6 +613,8 @@
     
     observer.observe(footer);
   </script>
+
+  <script src="assets/js/lang.js"></script>
 
 </body>
 </html>
