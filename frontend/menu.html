@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADAF Tennis Simulator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="assets/images/Logo_ADAF_SinLetras.png" />
+  <style>
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up {
+      animation: fade-up 1s ease-out forwards;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 text-gray-100 font-sans relative overflow-x-hidden">
+
+  <!-- Fondo con imagen de pista -->
+  <div class="absolute inset-0 bg-[url('assets/images/homepage_fondo2.jpg')] bg-cover bg-center opacity-15 blur-sm -z-20"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_rgba(0,0,0,0)_70%)] -z-10"></div>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="flex min-h-screen">
+
+    <!-- SIDEBAR (igual que en index para coherencia) -->
+    <aside class="fixed left-0 top-0 h-screen w-16 flex flex-col justify-between border-r border-blue-800/30 bg-slate-950/80 backdrop-blur-sm z-50">
+      <div>
+        <div class="inline-flex size-16 items-center justify-center">
+          <span class="grid size-10 place-content-center rounded-lg bg-yellow-400/20">
+            <img src="assets/images/Logo_ADAF_SinLetras.png" alt="Logo" class="w-8 h-8 rounded" />
+          </span>
+        </div>
+
+        <div class="border-t border-blue-800/30">
+          <div class="px-2 py-4">
+            <button id="menuToggle" class="group flex justify-center rounded-sm px-2 py-1.5 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400 w-full transition">
+              <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+              <span class="sr-only">Abrir menú</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sticky inset-x-0 bottom-0 border-t border-blue-800/30 bg-slate-950/80 p-2">
+        <a href="index.html" class="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span data-i18n="sidebarLogout" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
+            Salir
+          </span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="flex-1 ml-16 flex flex-col">
+
+      <!-- HEADER -->
+      <header class="w-full flex justify-between items-center px-10 py-4 bg-slate-950/40 backdrop-blur-sm border-b border-blue-800/30">
+        <h1 class="text-xl font-semibold text-yellow-400 tracking-wide">ADAF Tennis Simulator</h1>
+
+        <div class="flex items-center gap-3">
+          <button id="lang-es" title="Versión en Español" class="cursor-pointer hover:scale-110 transition">
+            <img src="assets/images/flag_es.png" alt="Español" class="w-8 h-8 rounded-full border-2 border-yellow-400 shadow-lg">
+          </button>
+          <button id="lang-en" title="English version" class="cursor-pointer hover:scale-110 transition">
+            <img src="assets/images/flag_uk.png" alt="English" class="w-8 h-8 rounded-full border border-gray-400 shadow-sm">
+          </button>
+        </div>
+      </header>
+
+      <!-- SECCIONES PRINCIPALES -->
+      <div class="flex-1 px-8 py-12 space-y-16 animate-fade-up">
+
+        <!-- TÍTULO PRINCIPAL -->
+        <section class="text-center">
+          <h2 class="text-4xl font-bold text-yellow-400 mb-4">Configuración Partido Rápido</h2>
+          <p class="text-gray-400 text-lg">Define jugadores, atributos y condiciones para tu simulación.</p>
+        </section>
+
+        <!-- INFORMACIÓN GENERAL -->
+        <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+        <h3 class="text-2xl font-semibold text-yellow-400 mb-10 text-center">Información General</h3>
+
+        <!-- CONTENEDOR DE JUGADORES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+            <!-- JUGADOR 1 -->
+            <div class="p-6 rounded-xl bg-slate-950/40 border border-blue-800/30 shadow-inner">
+                <h4 class="text-xl font-semibold text-yellow-400 mb-6 text-center">Jugador 1</h4>
+
+                <!-- Campo: Nombre Completo -->
+                <div class="mb-4">
+                <label for="nombre-j2" class="text-xs uppercase tracking-widest text-yellow-400">
+                    Nombre completo
+                </label>
+                <input
+                    type="text"
+                    id="nombre-j2"
+                    class="w-full mt-1 rounded-lg bg-slate-950/50 border border-yellow-400/20
+                        text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400
+                        px-4 py-2 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]"
+                    placeholder="Introduce el nombre..."
+                />
+                </div>
+
+                <!-- BRAZO DOMINANTE -->
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold uppercase text-yellow-400 mb-2">
+                        Brazo dominante
+                    </label>
+
+                    <fieldset class="flex gap-6">
+                        <legend class="sr-only">Brazo dominante</legend>
+
+                        <!-- DERECHO -->
+                        <label for="brazo-derecho-j1" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            id="brazo-derecho-j1"
+                            name="brazo-j1"
+                            onchange="toggleSingleCheckbox(this)"
+                            class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70
+                                checked:bg-yellow-400 checked:border-yellow-400
+                                hover:bg-slate-700/40 transition duration-150 ease-in-out"
+                        />
+                        <!-- Tick centrado -->
+                        <svg
+                            class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Derecho</span>
+                        </label>
+
+                        <!-- IZQUIERDO -->
+                        <label for="brazo-izquierdo-j1" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            id="brazo-izquierdo-j1"
+                            name="brazo-j1"
+                            onchange="toggleSingleCheckbox(this)"
+                            class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70
+                                checked:bg-yellow-400 checked:border-yellow-400
+                                hover:bg-slate-700/40 transition duration-150 ease-in-out"
+                        />
+                        <!-- Tick centrado -->
+                        <svg
+                            class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Izquierdo</span>
+                        </label>
+                    </fieldset>
+                    </div>
+
+
+                    <!-- ALTURA con botones + y - -->
+                    <div>
+                        <label for="altura" class="block text-xs font-semibold uppercase text-yellow-400 mb-1">
+                            Altura (cm)
+                        </label>
+
+                        <div
+                            class="flex items-center rounded-md border border-yellow-400/30 bg-slate-800/70
+                                focus-within:border-yellow-400 focus-within:ring-1 focus-within:ring-yellow-400
+                                shadow-inner transition"
+                        >
+                            <!-- Botón menos -->
+                            <button type="button"
+                            onclick="updateAltura(-1)"
+                            class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">
+                            &minus;
+                            </button>
+
+                            <!-- Input sin spinners -->
+                            <input
+                            type="number"
+                            id="altura"
+                            value="180"
+                            min="140"
+                            max="220"
+                            step="1"
+                            class="h-10 w-full text-center bg-transparent text-gray-100 border-transparent focus:outline-none sm:text-sm
+                                    [-moz-appearance:_textfield]
+                                    [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0
+                                    [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0"
+                            />
+
+                            <!-- Botón más -->
+                            <button type="button"
+                            onclick="updateAltura(1)"
+                            class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">
+                            &plus;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            <!-- JUGADOR 2 -->
+            <div class="p-6 rounded-xl bg-slate-950/40 border border-blue-800/30 shadow-inner">
+                <h4 class="text-xl font-semibold text-yellow-400 mb-6 text-center">Jugador 2</h4>
+
+                <!-- Campo: Nombre Completo -->
+                <div class="mb-4">
+                <label for="nombre-j2" class="text-xs uppercase tracking-widest text-yellow-400">
+                    Nombre completo
+                </label>
+                <input
+                    type="text"
+                    id="nombre-j2"
+                    class="w-full mt-1 rounded-lg bg-slate-950/50 border border-yellow-400/20
+                        text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400
+                        px-4 py-2 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]"
+                    placeholder="Introduce el nombre..."
+                />
+                </div>
+
+                <!-- BRAZO DOMINANTE -->
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold uppercase text-yellow-400 mb-2">
+                        Brazo dominante
+                    </label>
+
+                    <fieldset class="flex gap-6">
+                        <legend class="sr-only">Brazo dominante</legend>
+
+                        <!-- DERECHO -->
+                        <label for="brazo-derecho-j2" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            id="brazo-derecho-j2"
+                            name="brazo-j2"
+                            onchange="toggleSingleCheckbox(this)"
+                            class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70
+                                checked:bg-yellow-400 checked:border-yellow-400
+                                hover:bg-slate-700/40 transition duration-150 ease-in-out"
+                        />
+                        <!-- Tick centrado -->
+                        <svg
+                            class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Derecho</span>
+                        </label>
+
+                        <!-- IZQUIERDO -->
+                        <label for="brazo-izquierdo-j2" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            id="brazo-izquierdo-j2"
+                            name="brazo-j2"
+                            onchange="toggleSingleCheckbox(this)"
+                            class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70
+                                checked:bg-yellow-400 checked:border-yellow-400
+                                hover:bg-slate-700/40 transition duration-150 ease-in-out"
+                        />
+                        <!-- Tick centrado -->
+                        <svg
+                            class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Izquierdo</span>
+                        </label>
+                    </fieldset>
+                    </div>
+
+
+                    <!-- ALTURA con botones + y - -->
+                    <div>
+                        <label for="altura" class="block text-xs font-semibold uppercase text-yellow-400 mb-1">
+                            Altura (cm)
+                        </label>
+
+                        <div
+                            class="flex items-center rounded-md border border-yellow-400/30 bg-slate-800/70
+                                focus-within:border-yellow-400 focus-within:ring-1 focus-within:ring-yellow-400
+                                shadow-inner transition"
+                        >
+                            <!-- Botón menos -->
+                            <button type="button"
+                            onclick="updateAltura(-1)"
+                            class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">
+                            &minus;
+                            </button>
+
+                            <!-- Input sin spinners -->
+                            <input
+                            type="number"
+                            id="altura"
+                            value="180"
+                            min="140"
+                            max="220"
+                            step="1"
+                            class="h-10 w-full text-center bg-transparent text-gray-100 border-transparent focus:outline-none sm:text-sm
+                                    [-moz-appearance:_textfield]
+                                    [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0
+                                    [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0"
+                            />
+
+                            <!-- Botón más -->
+                            <button type="button"
+                            onclick="updateAltura(1)"
+                            class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">
+                            &plus;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- SELECCIÓN DE ATRIBUTOS -->
+        <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+          <h3 class="text-2xl font-semibold text-yellow-400 mb-8 text-center">Selección de Atributos</h3>
+
+          <!-- Contenedor 2 columnas -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+            <!-- COLUMNA JUGADOR 1 -->
+            <div>
+              <h4 class="text-xl font-semibold text-yellow-400 mb-4 text-center">Jugador 1</h4>
+
+              <div class="space-y-4">
+
+                <!-- ATRIBUTOS -->
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Primer Saque
+                    <span title="Potencia, precisión y fiabilidad en primeros saques. Valores altos implican más aces y menos dobles faltas." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Segundo Saque
+                    <span title="Seguridad y consistencia al sacar segundos servicios. Menos errores dobles con valores altos." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Resto
+                    <span title="Capacidad para devolver el saque rival con control y velocidad." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Derecha
+                    <span title="Calidad general del golpe de derecha: potencia, precisión y fiabilidad en intercambios." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Revés
+                    <span title="Eficacia del golpe de revés, tanto en defensa como en capacidad ofensiva." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Movilidad
+                    <span title="Rapidez de desplazamiento y colocación en pista. Mejores reflejos y defensa con valores altos." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Consistencia
+                    <span title="Capacidad para mantener el nivel de juego evitando errores no forzados." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Clutch
+                    <span title="Rendimiento bajo presión (puntos de break, finales de set o tie-breaks)." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Físico
+                    <span title="Nivel de resistencia general, estamina y potencia física mantenida en el partido." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- COLUMNA JUGADOR 2 -->
+            <div>
+              <h4 class="text-xl font-semibold text-yellow-400 mb-4 text-center">Jugador 1</h4>
+
+              <div class="space-y-4">
+
+                <!-- ATRIBUTOS -->
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Primer Saque
+                    <span title="Potencia, precisión y fiabilidad en primeros saques. Valores altos implican más aces y menos dobles faltas." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Segundo Saque
+                    <span title="Seguridad y consistencia al sacar segundos servicios. Menos errores dobles con valores altos." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Resto
+                    <span title="Capacidad para devolver el saque rival con control y velocidad." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Derecha
+                    <span title="Calidad general del golpe de derecha: potencia, precisión y fiabilidad en intercambios." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Revés
+                    <span title="Eficacia del golpe de revés, tanto en defensa como en capacidad ofensiva." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Movilidad
+                    <span title="Rapidez de desplazamiento y colocación en pista. Mejores reflejos y defensa con valores altos." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Consistencia
+                    <span title="Capacidad para mantener el nivel de juego evitando errores no forzados." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Clutch
+                    <span title="Rendimiento bajo presión (puntos de break, finales de set o tie-breaks)." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    Físico
+                    <span title="Nivel de resistencia general, estamina y potencia física mantenida en el partido." class="text-yellow-400/70 cursor-help">ⓘ</span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <style>
+          .slider {
+            width: 100%;
+            height: 0.5rem;
+            border-radius: 9999px;
+            background-color: rgba(30, 41, 59, 0.5);
+            cursor: pointer;
+            accent-color: #facc15;
+          }
+          .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            background: #facc15;
+            box-shadow: 0 0 6px rgba(255, 255, 0, 0.5);
+            transition: transform 0.2s ease;
+          }
+          .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+          }
+        </style>
+
+
+        <!-- CONFIGURACIÓN DEL PARTIDO -->
+        <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+          <h3 class="text-2xl font-semibold text-yellow-400 mb-6">Configuración del Partido</h3>
+          <div class="text-gray-400 italic">[Aquí irán las opciones de sets, superficie, tie-break, etc.]</div>
+        </section>
+
+        <!-- BOTONES -->
+        <div class="flex justify-center gap-8 pt-10">
+          <button class="px-10 py-4 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-full text-lg font-medium shadow-lg transition">Reiniciar</button>
+          <button class="px-10 py-4 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full text-lg font-semibold shadow-lg transition">Guardar Configuración</button>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="w-full py-6 text-center text-gray-400 text-sm border-t border-blue-800/30 bg-slate-950/40">
+        © 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · UCM
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- SCRIPT PARA MENU TOGGLE -->
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const menuIcon = document.getElementById('menuIcon');
+    let open = false;
+    menuToggle.addEventListener('click', () => {
+      open = !open;
+      menuIcon.innerHTML = open
+        ? '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>';
+    });
+  </script>
+
+  <!-- Traducciones -->
+  <script src="assets/js/lang.js"></script>
+
+    <script>
+    function updateAltura(delta) {
+        const input = document.getElementById('altura');
+        const step = Number(input.step) || 1;
+        const min = Number(input.min) || 0;
+        const max = Number(input.max) || 999;
+        let value = Number(input.value) + delta * step;
+        if (value < min) value = min;
+        if (value > max) value = max;
+        input.value = value;
+    }
+    </script>
+
+    <script>
+    function toggleSingleCheckbox(selected) {
+        document.querySelectorAll(`input[name='${selected.name}']`).forEach(el => {
+        if (el !== selected) el.checked = false;
+        });
+    }
+    </script>
+
+    <script src="assets/js/attributes.js"></script>
+
+
+</body>
+</html>
