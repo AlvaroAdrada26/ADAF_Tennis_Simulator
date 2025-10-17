@@ -166,7 +166,7 @@
 
                     <!-- ALTURA con botones + y - -->
                     <div>
-                        <label for="altura" class="block text-xs font-semibold uppercase text-yellow-400 mb-1">
+                        <label for="altura-j1" class="block text-xs font-semibold uppercase text-yellow-400 mb-1">
                             Altura (cm)
                         </label>
 
@@ -177,7 +177,7 @@
                         >
                             <!-- Botón menos -->
                             <button type="button"
-                            onclick="updateAltura(-1)"
+                            onclick="updateAltura('altura-j1', -1)"
                             class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">
                             &minus;
                             </button>
@@ -185,7 +185,7 @@
                             <!-- Input sin spinners -->
                             <input
                             type="number"
-                            id="altura"
+                            id="altura-j1"
                             value="180"
                             min="140"
                             max="220"
@@ -198,7 +198,7 @@
 
                             <!-- Botón más -->
                             <button type="button"
-                            onclick="updateAltura(1)"
+                            onclick="updateAltura('altura-j1', 1)"
                             class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">
                             &plus;
                             </button>
@@ -283,7 +283,7 @@
 
                     <!-- ALTURA con botones + y - -->
                     <div>
-                        <label for="altura" class="block text-xs font-semibold uppercase text-yellow-400 mb-1">
+                        <label for="altura-j2" class="block text-xs font-semibold uppercase text-yellow-400 mb-1">
                             Altura (cm)
                         </label>
 
@@ -294,7 +294,7 @@
                         >
                             <!-- Botón menos -->
                             <button type="button"
-                            onclick="updateAltura(-1)"
+                            onclick="updateAltura('altura-j2', -1)"
                             class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">
                             &minus;
                             </button>
@@ -302,7 +302,7 @@
                             <!-- Input sin spinners -->
                             <input
                             type="number"
-                            id="altura"
+                            id="altura-j2"
                             value="180"
                             min="140"
                             max="220"
@@ -315,7 +315,7 @@
 
                             <!-- Botón más -->
                             <button type="button"
-                            onclick="updateAltura(1)"
+                            onclick="updateAltura('altura-j2', 1)"
                             class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">
                             &plus;
                             </button>
@@ -454,7 +454,7 @@
 
             <!-- COLUMNA JUGADOR 2 -->
             <div>
-              <h4 class="text-xl font-semibold text-yellow-400 mb-4 text-center">Jugador 1</h4>
+              <h4 class="text-xl font-semibold text-yellow-400 mb-4 text-center">Jugador 2</h4>
 
               <div class="space-y-4">
 
@@ -634,15 +634,15 @@
   <script src="assets/js/lang.js"></script>
 
     <script>
-    function updateAltura(delta) {
-        const input = document.getElementById('altura');
-        const step = Number(input.step) || 1;
-        const min = Number(input.min) || 0;
-        const max = Number(input.max) || 999;
-        let value = Number(input.value) + delta * step;
-        if (value < min) value = min;
-        if (value > max) value = max;
-        input.value = value;
+    function updateAltura(id, delta) {
+      const input = document.getElementById(id);
+      const step = Number(input.step) || 1;
+      const min = Number(input.min) || 0;
+      const max = Number(input.max) || 999;
+      let value = Number(input.value) + delta * step;
+      if (value < min) value = min;
+      if (value > max) value = max;
+      input.value = value;
     }
     </script>
 
