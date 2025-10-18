@@ -117,7 +117,7 @@ const translations = {
     sidebarHistorial: "History",
     headerDocumentacion: "Model Documentation",
     headerCreditos: "Credits / About Project",
-    hero_desc: "Advanced tennis simulator powered by realistic player attributes.\nExperience how technique, fitness, and mental strength shape every point.",
+    hero_desc: "Advanced tennis simulator powered by realistic player attributes.\nExperience how technique, fitness, and mental strength shape\nevery point.",
     hero_button: "Start Simulation",
 
     // =============================

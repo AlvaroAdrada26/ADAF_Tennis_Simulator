@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulación en Tiempo Real - ADAF Tennis Simulator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" type="image/png" href="assets/images/Logo_ADAF_SinLetras.png" />
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.85) 80%),
+                  url('assets/images/homepage_fondo2.jpg') center/cover no-repeat;
+      opacity: 0.2;
+      filter: blur(2px);
+      z-index: -1;
+    }
+
+    /* === EFECTOS DE TEXTO === */
+    .score-glow {
+      text-shadow: 0 0 8px rgba(255, 255, 0, 0.7);
+    }
+
+    .set-winner {
+      color: #FFD700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+
+    .set-loser {
+      color: #6b7280; /* gris tenue */
+      text-shadow: none;
+    }
+
+    .set-in-game {
+        color: #4fd1c5; /* cian suave tipo Tailwind 'teal-400' */
+        text-shadow:
+            0 0 6px rgba(79, 209, 197, 0.6),
+            0 0 12px rgba(79, 209, 197, 0.4);
+        font-weight: 700;
+    }
+
+    /* === PELOTA DE SAQUE === */
+    .serve-ball {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff 10%, #ffeb3b 40%, #facc15 80%);
+      box-shadow: 0 0 8px rgba(255, 255, 0, 0.7);
+      display: inline-block;
+      margin-right: 18px;
+      margin-left: -8px; /* desplaza un poco a la izquierda */
+      vertical-align: middle;
+    }
+
+    .serve-ball.off {
+      opacity: 0;
+      filter: blur(2px);
+    }
+
+    /* === OPCIONAL: jugador que sirve === */
+    .serving-name {
+      color: #ffeb3b;
+      text-shadow: 0 0 8px rgba(255, 255, 0, 0.6);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 text-gray-100">
+
+  <!-- HEADER -->
+  <header class="flex items-center justify-between px-8 py-4 bg-slate-950/60 border-b border-blue-800/30 backdrop-blur-sm">
+    <div class="flex items-center gap-3">
+      <img src="assets/images/Logo_ADAF_SinLetras.png" class="w-8 h-8 rounded" alt="Logo ADAF" />
+      <span class="text-lg font-semibold text-yellow-400">ADAF Tennis Simulator</span>
+    </div>
+    <span class="text-sm text-gray-400 italic">Simulación en Tiempo Real</span>
+  </header>
+
+      <!-- SIDEBAR (igual que en index para coherencia) -->
+    <aside class="fixed left-0 top-0 h-screen w-16 flex flex-col justify-between border-r border-blue-800/30 bg-slate-950/80 backdrop-blur-sm z-50">
+      <div>
+        <div class="inline-flex size-16 items-center justify-center">
+          <span class="grid size-10 place-content-center rounded-lg bg-yellow-400/20">
+            <img src="assets/images/Logo_ADAF_SinLetras.png" alt="Logo" class="w-8 h-8 rounded" />
+          </span>
+        </div>
+
+        <div class="border-t border-blue-800/30">
+          <div class="px-2 py-4">
+            <button id="menuToggle" class="group flex justify-center rounded-sm px-2 py-1.5 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400 w-full transition">
+              <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+              <span class="sr-only">Abrir menú</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sticky inset-x-0 bottom-0 border-t border-blue-800/30 bg-slate-950/80 p-2">
+        <a href="index.html" class="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span data-i18n="sidebarLogout" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
+            Salir
+          </span>
+        </a>
+      </div>
+    </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="flex-1 flex flex-col justify-between items-center px-8 py-6">
+
+    <!-- 🟨 SCOREBOARD -->
+    <section id="scoreboard" class="w-full max-w-5xl bg-slate-900/50 border border-blue-800/40 rounded-xl shadow-lg backdrop-blur-sm p-6 mb-6">
+      <div class="text-center mb-4">
+        <p class="text-xs uppercase text-gray-400">Final · Mejor de 3 sets</p>
+        <h1 class="text-xl font-bold text-yellow-400">Roland Garros 2025</h1>
+      </div>
+
+      <div class="grid grid-cols-7 text-center text-yellow-400 mb-2 text-sm uppercase tracking-wide">
+        <span class="col-span-2"></span>
+        <span>Set 1</span><span>Set 2</span><span>Set 3</span><span>Puntos</span>
+      </div>
+
+      <!-- Jugador 1 -->
+      <div class="grid grid-cols-7 items-center text-center py-2 border-t border-blue-800/30">
+        <div class="col-span-2 text-right pr-4 font-semibold text-yellow-300 flex items-center justify-end">
+          <span class="serve-ball"></span>
+          <span>C. Alcaraz 🇪🇸</span>
+        </div>
+        <div class="set-winner text-2xl font-bold">6</div>
+        <div class="set-loser text-2xl font-bold">4</div>
+        <div class="set-in-game text-2xl font-bold">2</div>
+        <div class="text-4xl font-extrabold text-yellow-400 score-glow">15</div>
+      </div>
+
+      <!-- Jugador 2 -->
+      <div class="grid grid-cols-7 items-center text-center py-2 border-t border-blue-800/30">
+        <div class="col-span-2 text-right pr-4 font-semibold text-yellow-300 flex items-center justify-end">
+          <span class="serve-ball off"></span>
+          <span>N. Djokovic 🇷🇸</span>
+        </div>
+        <div class="set-loser text-2xl font-bold">4</div>
+        <div class="set-winner text-2xl font-bold">6</div>
+        <div class="set-in-game text-2xl font-bold">2</div>
+        <div class="text-4xl font-extrabold text-yellow-400 score-glow">40</div>
+      </div>
+    </section>
+
+    <!-- 🟩 VISUAL SIMULATION AREA -->
+    <section id="simulation-area" class="flex-1 w-full max-w-6xl bg-slate-900/40 border border-blue-800/30 rounded-2xl shadow-inner backdrop-blur-sm p-10 flex items-center justify-center text-center">
+      <p class="text-gray-300 text-lg italic max-w-3xl leading-relaxed">
+        “Alcaraz sube a la red tras un saque abierto. Djokovic responde con un passing milimétrico...”
+      </p>
+    </section>
+
+    <!-- 📜 EVENT LOG + 🎮 CONTROLS -->
+    <section id="bottom-panel" class="w-full max-w-6xl mt-8 grid grid-cols-3 gap-6">
+
+      <!-- EVENT LOG -->
+      <div id="event-log" class="col-span-2 bg-slate-900/40 border border-yellow-400/20 rounded-lg p-4 h-48 overflow-y-auto text-sm text-gray-300">
+        <p>🎾 [Punto 23] Alcaraz gana el intercambio tras 8 golpes.</p>
+        <p>⚡️ Saque directo de Djokovic.</p>
+        <p>💥 Doble falta de Alcaraz.</p>
+      </div>
+
+      <!-- CONTROLS -->
+      <div id="controls" class="flex flex-col justify-between items-end">
+        <div class="flex gap-4 justify-end">
+          <button class="px-6 py-3 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-500 hover:shadow-[0_0_12px_rgba(255,255,0,0.4)] transition duration-300">Siguiente punto</button>
+          <button class="px-6 py-3 bg-slate-700 text-yellow-300 rounded-lg hover:bg-slate-600 transition duration-300">Pausar</button>
+          <button class="px-6 py-3 border border-red-500 text-red-400 rounded-lg hover:bg-red-500/20 transition duration-300">Finalizar</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- FOOTER -->
+      <footer class="w-full py-6 text-center text-gray-400 text-sm border-t border-blue-800/30 bg-slate-950/40">
+        © 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · UCM
+      </footer>
+  </main>
+  <!-- JS para alternar saque (demo simple) -->
+  <script>
+    // Ejemplo de cómo alternar el saque dinámicamente
+    function toggleServe() {
+      const balls = document.querySelectorAll('.serve-ball');
+      balls.forEach(ball => ball.classList.toggle('off'));
+    }
+
+    // Ejemplo: alternar cada 4 segundos
+    // setInterval(toggleServe, 4000);
+  </script>
+
+</body>
+</html>
