@@ -5,7 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simulación en Tiempo Real - ADAF Tennis Simulator</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!--<script src="https://kit.fontawesome.com/a2e0e6b6a8.js" crossorigin="anonymous"></script>-->
   <link rel="icon" type="image/png" href="assets/images/Logo_ADAF_SinLetras.png" />
+  <!-- ICONOS FONT AWESOME -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-yz5r+4CXb3LzPZ1xrK8hE2A2cbQgWbR4RwcvqZbkRe7fQINcsqV7TVPNs3w8XbYZKnVvEdP6Vb6pX8Yd3M6Ww=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
 
   <style>
     /* TRANSICIONES DE LA SIDEBAR */
@@ -64,29 +73,18 @@
     }
 
     /* BOTONES DE CONTROL */
-    .control-btn {
-      background: linear-gradient(to bottom, #facc15, #f59e0b);
-      border-radius: 9999px;
-      padding: 1rem;
-      box-shadow: 0 0 12px rgba(255, 220, 0, 0.3);
-      transition: all 0.3s ease;
+    .control-btn:active {
+      transform: scale(0.95);
+      filter: brightness(1.1);
     }
 
-    .control-btn:hover {
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 25px rgba(255, 220, 0, 0.5);
-      transform: translateY(-2px);
-    }
-
-    .control-btn svg {
-      filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
-    }
 
   </style>
 
 
 </head>
 
-<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 text-gray-100">
+<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 relative text-gray-100 font-sans">
 
     <!-- CAPA DE IMAGEN DE PISTA -->
   <div class="absolute inset-0 bg-[url('assets/images/homepage_fondo2.jpg')] bg-cover bg-center opacity-15 blur-sm saturate-75 -z-20"></div>
@@ -293,15 +291,24 @@
 
       </header>
 
+      <!-- INFORMACIÓN DEL PARTIDO -->
+      <section id="match-info" class="w-full flex justify-center mt-6">
+        <div class="bg-slate-900/50 border border-blue-800/40 rounded-xl shadow-md backdrop-blur-sm px-8 py-4 text-center max-w-3xl">
+          <h2 class="text-4xl font-bold text-yellow-400 mb-2">Partido Rápido · Pista Dura</h2>
+          <p class="text-gray-400 text-2xl italic">
+            Al mejor de 3 sets · Tie-Break
+          </p>
+        </div>
+      </section>
+
       <!-- PANEL DE MARCADOR -->
-      <div id="scoreboard-panel" class="w-full flex flex-col items-center justify-center py-6 px-6">
+      <div id="scoreboard-panel" class="w-full flex flex-col items-center justify-center py-10 px-8">
 
         <!-- MARCADOR CENTRAL -->
-        <div class="w-full max-w-5xl bg-slate-900/50 border border-blue-800/40 rounded-xl shadow-lg backdrop-blur-sm p-8 text-center mb-8">
-          <p class="text-xs uppercase text-gray-400">Final · Mejor de 3 sets</p>
-          <h1 class="text-xl font-bold text-yellow-400 mb-4">Roland Garros 2025</h1>
+        <div class="w-full max-w-6xl bg-slate-900/50 border border-blue-800/40 rounded-2xl shadow-lg backdrop-blur-sm p-10 text-center mb-10">
+          <!--<h1 class="text-3xl font-bold text-yellow-400 mb-6">US Open</h1>-->
 
-          <div class="grid grid-cols-7 text-center text-yellow-400 mb-2 text-sm uppercase tracking-wide">
+          <div class="grid grid-cols-7 text-center text-yellow-400 mb-4 text-lg uppercase tracking-wider">
             <span class="col-span-2"></span>
             <span>Set 1</span>
             <span>Set 2</span>
@@ -310,80 +317,195 @@
           </div>
 
           <!-- Jugador 1 -->
-          <div class="grid grid-cols-7 items-center text-center py-2 border-t border-blue-800/30">
-            <div class="col-span-2 text-right pr-4 font-semibold text-yellow-300 flex items-center justify-end">
+          <div class="grid grid-cols-7 items-center text-center py-4 border-t border-blue-800/30">
+            <div class="col-span-2 text-right pr-6 font-semibold text-yellow-300 flex items-center justify-end text-3xl">
               <span class="serve-ball"></span>
-              <span>C. Alcaraz 🇪🇸</span>
+              <span>C. Alcaraz</span>
             </div>
-            <div class="set-winner text-2xl font-bold">6</div>
-            <div class="set-loser text-2xl font-bold">4</div>
-            <div class="set-in-game text-2xl font-bold">2</div>
+            <div class="set-winner text-4xl font-bold">6</div>
+            <div class="set-loser text-4xl font-bold">4</div>
+            <div class="set-in-game text-4xl font-bold">2</div>
             <div class="text-4xl font-extrabold text-yellow-400 score-glow">15</div>
           </div>
 
           <!-- Jugador 2 -->
-          <div class="grid grid-cols-7 items-center text-center py-2 border-t border-blue-800/30">
-            <div class="col-span-2 text-right pr-4 font-semibold text-yellow-300 flex items-center justify-end">
+          <div class="grid grid-cols-7 items-center text-center py-4 border-t border-blue-800/30">
+            <div class="col-span-2 text-right pr-6 font-semibold text-yellow-300 flex items-center justify-end text-3xl">
               <span class="serve-ball off"></span>
-              <span>N. Djokovic 🇷🇸</span>
+              <span>N. Djokovic</span>
             </div>
-            <div class="set-loser text-2xl font-bold">4</div>
-            <div class="set-winner text-2xl font-bold">6</div>
-            <div class="set-in-game text-2xl font-bold">2</div>
+            <div class="set-loser text-4xl font-bold">4</div>
+            <div class="set-winner text-4xl font-bold">6</div>
+            <div class="set-in-game text-4xl font-bold">2</div>
             <div class="text-4xl font-extrabold text-yellow-400 score-glow">40</div>
           </div>
         </div>
 
       </div>
 
-      <div id="control-buttons" class="flex flex-col items-center mb-10">
-        <div class="flex gap-8 justify-center mb-3">
-          <!-- REPRODUCIR -->
-          <div class="flex flex-col items-center">
-            <button title="Reproducir / Pausar" class="control-btn group">
-              <svg xmlns="http://www.w3.org/2000/svg" class="size-6 text-white group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z" />
-              </svg>
-            </button>
-            <span class="text-xs mt-2 text-gray-300">Reproducir / Pausar</span>
+      <!-- PANEL DE CONTROL DE SIMULACIÓN -->
+      <section id="control-panel" class="w-full flex flex-col items-center justify-center mt-4 mb-2">
+
+        <!-- CONTENEDOR PRINCIPAL -->
+        <div class="bg-slate-900/50 border border-blue-800/40 rounded-2xl shadow-xl backdrop-blur-sm px-10 py-6 flex flex-col items-center">
+
+          <!-- BOTONES DE CONTROL -->
+          <div class="flex items-center justify-center gap-16">
+
+            <!-- REINICIAR PARTIDO -->
+            <div class="flex flex-col items-center">
+              <button class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="darkblue" stroke-width="2" class="w-7 h-7">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v16m2-8l7 8V4l-7 8zm8 0l7 8V4l-7 8z" />
+                </svg>
+              </button>
+              <span class="text-sm mt-2 text-gray-200 font-medium">Reiniciar</span>
+            </div>
+
+            <!-- ANTERIOR PUNTO -->
+            <div class="flex flex-col items-center">
+              <button class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="darkblue" stroke-width="2" class="w-7 h-7">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 20l-9-8 9-8v16zM5 4v16" />
+                </svg>
+              </button>
+              <span class="text-sm mt-2 text-gray-200 font-medium">Anterior</span>
+            </div>
+
+            <!-- REPRODUCIR / PAUSAR -->
+            <div class="flex flex-col items-center">
+              <button id="btn-play" class="control-btn w-20 h-20 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
+                <svg id="icon-play" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5"
+                    class="w-9 h-9 transition-all duration-300">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z" />
+                </svg>
+              </button>
+              <span class="text-sm mt-2 text-gray-200 font-medium">Reproducir / Pausar</span>
+            </div>
+
+            <!-- SIGUIENTE PUNTO -->
+            <div class="flex flex-col items-center">
+              <button class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="darkblue" stroke-width="2" class="w-7 h-7">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 4l9 8-9 8V4zm14 0v16" />
+                </svg>
+              </button>
+              <span class="text-sm mt-2 text-gray-200 font-medium">Siguiente</span>
+            </div>
+
+            <!-- IR AL FINAL -->
+            <div class="flex flex-col items-center">
+              <button class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="darkblue" stroke-width="2" class="w-7 h-7">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20 4v16m-2-8l-7 8V4l7 8zm-8 0l-7 8V4l7 8z" />
+                </svg>
+              </button>
+              <span class="text-sm mt-2 text-gray-200 font-medium">Ir al Final</span>
+            </div>
           </div>
 
-          <!-- SALTAR AL FINAL -->
-          <div class="flex flex-col items-center">
-            <button title="Ir al final del partido" class="control-btn group">
-              <svg xmlns="http://www.w3.org/2000/svg" class="size-6 text-white group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-              </svg>
-            </button>
-            <span class="text-xs mt-2 text-gray-300">Ir al final del partido</span>
+          <!-- SELECTOR DE VELOCIDAD -->
+          <div class="mt-8 w-full max-w-md text-center">
+            <p class="text-sm text-gray-200 mb-2 font-medium">Velocidad</p>
+            <div class="flex justify-center gap-4"
+            >
+              <button class="speed-btn px-4 py-2 rounded-md border border-yellow-400/60 font-semibold transition bg-yellow-400 text-slate-900 hover:bg-yellow-400 hover:text-slate-900" data-speed="1">x1</button>
+              <button class="speed-btn px-4 py-2 rounded-md border border-yellow-400/60 text-yellow-300 font-semibold hover:bg-yellow-400 hover:text-slate-900 transition" data-speed="2">x2</button>
+              <button class="speed-btn px-4 py-2 rounded-md border border-yellow-400/60 text-yellow-300 font-semibold hover:bg-yellow-400 hover:text-slate-900 transition" data-speed="4">x4</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- PANEL DE SIMULACIÓN -->
+      <section id="live-match" class="flex w-full justify-between items-start gap-6 px-8 py-10">
+
+        <!--  JUGADOR 1 -->
+        <div class="w-1/4 bg-slate-900/50 border border-blue-800/30 rounded-xl shadow-md backdrop-blur-sm p-5">
+          <h3 class="text-lg font-semibold text-yellow-400 mb-4 text-center">C. Alcaraz 🇪🇸</h3>
+
+          <!-- STAMINA -->
+          <p class="text-xs text-gray-400">Stamina</p>
+          <div class="w-full bg-slate-800 rounded-full h-2 mb-3">
+            <div class="bg-green-400 h-2 rounded-full" style="width: 85%"></div>
+          </div>
+
+          <!-- MOMENTUM -->
+          <p class="text-xs text-gray-400">Momentum</p>
+          <div class="w-full bg-slate-800 rounded-full h-2 mb-5">
+            <div class="bg-yellow-400 h-2 rounded-full" style="width: 60%"></div>
           </div>
 
           <!-- ESTADÍSTICAS -->
-          <div class="flex flex-col items-center">
-            <button title="Ver estadísticas parciales" class="control-btn group">
-              <svg xmlns="http://www.w3.org/2000/svg" class="size-6 text-white group-hover:scale-110 transition" viewBox="0 0 24 24" fill="none" stroke="darkblue" stroke-width="2">
-                <rect x="3" y="10" width="3" height="10" rx="1" />
-                <rect x="9" y="6" width="3" height="14" rx="1" />
-                <rect x="15" y="2" width="3" height="18" rx="1" />
-              </svg>
-            </button>
-            <span class="text-xs mt-2 text-gray-300">Estadísticas actuales</span>
+          <ul class="text-sm text-gray-300 space-y-1">
+            <li><span class="text-yellow-400 font-medium">1ºs Dentro:</span> 68%</li>
+            <li><span class="text-yellow-400 font-medium">Aces:</span> 4</li>
+            <li><span class="text-yellow-400 font-medium">Dobles faltas:</span> 2</li>
+            <li><span class="text-yellow-400 font-medium">Winners:</span> 21</li>
+            <li><span class="text-yellow-400 font-medium">Errores no forzados:</span> 15</li>
+            <li><span class="text-yellow-400 font-medium">Break points:</span> <span class="text-green-400 font-semibold">1</span>/<span class="text-gray-400">5</span></li>
+          </ul>
+        </div>
+
+        <!--  PANEL CENTRAL: PUNTO ACTUAL -->
+        <div class="flex-1 bg-slate-900/40 border border-blue-800/30 rounded-xl shadow-lg backdrop-blur-sm p-6 text-center">
+          <h2 class="text-xl font-semibold text-yellow-400 mb-3">Punto Actual</h2>
+          
+          <div class="bg-slate-800/40 rounded-lg border border-blue-800/30 p-4 mb-6">
+            <p class="text-gray-300 italic mb-2">[Golpe 1] Saque abierto de Alcaraz.</p>
+            <p class="text-gray-300 italic mb-2">[Golpe 2] Resto cruzado de Djokovic.</p>
+            <p class="text-gray-300 italic mb-2">[Golpe 3] Winner de derecha.</p>
+            <p class="text-yellow-400 font-semibold mt-2"> Punto para Alcaraz</p>
           </div>
 
-          <!-- CAMBIAR VISTA -->
-          <div class="flex flex-col items-center">
-            <button title="Cambiar modo de visualización" class="control-btn group">
-              <svg xmlns="http://www.w3.org/2000/svg" class="size-6 text-white group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" fill="white" />
-              </svg>
-            </button>
-            <span class="text-xs mt-2 text-gray-300">Modo de vista</span>
+          <!-- MINI FEED DE JUGADAS -->
+          <div class="text-left max-h-40 overflow-y-auto px-2">
+            <h3 class="text-sm uppercase text-gray-400 mb-1">Registro de Jugadas</h3>
+            <ul class="space-y-1 text-gray-300 text-xs">
+              <li> Alcaraz gana con ace por el centro</li>
+              <li> Djokovic falla revés en la red</li>
+              <li> Rally de 14 golpes, punto Alcaraz</li>
+              <li> Doble falta Djokovic</li>
+              <li> Break para Alcaraz</li>
+            </ul>
           </div>
         </div>
-      </div>
 
+        <!-- JUGADOR 2 -->
+        <div class="w-1/4 bg-slate-900/50 border border-blue-800/30 rounded-xl shadow-md backdrop-blur-sm p-5">
+          <h3 class="text-lg font-semibold text-yellow-400 mb-4 text-center">N. Djokovic 🇷🇸</h3>
 
+          <!-- STAMINA -->
+          <p class="text-xs text-gray-400">Stamina</p>
+          <div class="w-full bg-slate-800 rounded-full h-2 mb-3">
+            <div class="bg-green-400 h-2 rounded-full" style="width: 70%"></div>
+          </div>
+
+          <!-- MOMENTUM -->
+          <p class="text-xs text-gray-400">Momentum</p>
+          <div class="w-full bg-slate-800 rounded-full h-2 mb-5">
+            <div class="bg-yellow-400 h-2 rounded-full" style="width: 40%"></div>
+          </div>
+
+          <!-- ESTADÍSTICAS -->
+          <ul class="text-sm text-gray-300 space-y-1 text-right">
+            <li><span class="text-yellow-400 font-medium">1ºs Dentro:</span> 63%</li>
+            <li><span class="text-yellow-400 font-medium">Aces:</span> 2</li>
+            <li><span class="text-yellow-400 font-medium">Dobles faltas:</span> 4</li>
+            <li><span class="text-yellow-400 font-medium">Winners:</span> 17</li>
+            <li><span class="text-yellow-400 font-medium">Errores no forzados:</span> 19</li>
+            <li><span class="text-yellow-400 font-medium">Break points:</span> <span class="text-green-400 font-semibold">2</span>/<span class="text-gray-400">6</span></li>
+          </ul>
+        </div>
+
+      </section>
+      
       <!-- FOOTER -->
       <footer class="bg-slate-950/60 border-t border-blue-800/30 py-6 text-center text-gray-400 text-sm">
         &copy; 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · UCM
@@ -392,9 +514,6 @@
     </div>
 
   </div>
-
-
-
 
   <script>
     // Toggle del menú lateral
@@ -439,6 +558,34 @@
     }, observerOptions);
     
     observer.observe(footer);
+  </script>
+
+  <script>
+    // PLAY / PAUSE
+    const playButton = document.getElementById("btn-play");
+    const playIcon = document.getElementById("icon-play");
+    let isPlaying = false;
+
+    playButton.addEventListener("click", () => {
+      isPlaying = !isPlaying;
+      playIcon.innerHTML = isPlaying
+        ? `<path stroke-linecap="round" stroke-linejoin="round" d="M6 4h4v16H6zM14 4h4v16h-4z" />`
+        : `<path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z" />`;
+    });
+
+    // VELOCIDAD
+    const speedButtons = document.querySelectorAll(".speed-btn");
+    speedButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        speedButtons.forEach(b => {
+          b.classList.remove("bg-yellow-400", "text-slate-900");
+          b.classList.add("text-yellow-300");
+        });
+        btn.classList.add("bg-yellow-400", "text-slate-900");
+        btn.classList.remove("text-yellow-300");
+        console.log("Velocidad seleccionada:", btn.dataset.speed + "x");
+      });
+    });
   </script>
   
 </body>
