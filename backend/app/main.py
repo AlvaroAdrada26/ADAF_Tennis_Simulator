@@ -58,31 +58,44 @@ app = FastAPI(
 # Permitir conexiones desde el frontend (localhost:5500)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # o ["http://127.0.0.1:5500"] para más seguridad
+    allow_origins=["*"],  # Puedes limitar a ["http://127.0.0.1:5500"] para más seguridad
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)   
+)
+
 
 # ============================================================
 # Endpoints
 # ============================================================
 
 @app.get("/")
-def root():
-    """Endpoint de prueba."""
+def root() -> Dict[str, str]:
+    """Endpoint de prueba para verificar que el backend funciona."""
     return {"mensaje": "🎾 FastAPI + ADAF Simulator funcionando correctamente!"}
 
 
 @app.post("/simulate_match")
 def simulate_match(request: MatchRequest) -> Dict[str, Any]:
-    """Ejecuta un partido completo y devuelve el resultado."""
+    """
+    Ejecuta una simulación de partido completa y devuelve el resultado detallado
+    en formato JSON, incluyendo timeline punto a punto.
+    """
     try:
+        # Ejecutar la simulación principal (devuelve JSON completo del partido)
         result = run_match(
-            player1_data=request.player1.dict(),
-            player2_data=request.player2.dict(),
-            config=request.config.dict() if request.config else {},
+            player1_data=request.player1.model_dump(),
+            player2_data=request.player2.model_dump(),
+            config=request.config.model_dump() if request.config else {},
         )
+        timeline = result.get("timeline", [])
+        for i, point in enumerate(timeline):
+            point["point_index"] = i  # índice secuencial absoluto
+
+        # Guardar el timeline actualizado
+        result["timeline"] = timeline
+
         return result
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en la simulación: {e}")

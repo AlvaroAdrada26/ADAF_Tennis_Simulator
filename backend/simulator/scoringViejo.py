@@ -52,7 +52,7 @@ class MatchSimulator:
 class TennisGame:
     """Simula un juego (game) con la secuencia de puntos 0–15–30–40–Ad."""
 
-    point_names = ["0", "15", "30", "40", "Ad"]
+    point_names = ["0", "15", "30", "40", "Ad", "Win"]
 
     def __init__(self, server: Player, returner: Player,
                  p1: Player, p2: Player, game_no: int = 1):
@@ -64,7 +64,6 @@ class TennisGame:
         self.points = {SACADOR: 0, RESTADOR: 0}
         self.feed: List[PointResult] = []
         self.point_counter = 0  # numerador de puntos dentro del juego
-        self.isFinished = False
 
 
     def is_clutch_point(self) -> bool:
@@ -86,14 +85,10 @@ class TennisGame:
     def get_point_label(self, player: Player) -> str:
         """Devuelve '0','15','30','40','Ad' según la situación real del juego."""
         s, r = self.points[SACADOR], self.points[RESTADOR]
-        if self.isFinished:
-            return "0"
         if s < 3 and r < 3:
             return self.point_names[self.points[SACADOR if player == self.server else RESTADOR]]
         if s >= 3 and r >= 3:
-            if self.isFinished:
-                return "0"
-            elif s == r:
+            if s == r:
                 return "40"
             elif s == r + 1:
                 return "Ad" if player == self.server else "40"
@@ -107,14 +102,8 @@ class TennisGame:
         """Devuelve 'SACADOR' o 'RESTADOR' si el juego ha terminado."""
         s, r = self.points[SACADOR], self.points[RESTADOR]
         if s >= 4 and s >= r + 2:
-            self.isFinished = True
-            self.points[SACADOR] = 0
-            self.points[RESTADOR] = 0
             return SACADOR
         if r >= 4 and r >= s + 2:
-            self.isFinished = True
-            self.points[RESTADOR] = 0
-            self.points[SACADOR] = 0
             return RESTADOR
         return None
 
@@ -129,6 +118,16 @@ class TennisGame:
             self.point_counter += 1
             res.point_no = self.point_counter
             res.game_no = self.game_no
+            
+            score_label_server = self.get_point_label(self.server)
+            score_label_returner = self.get_point_label(self.returner)
+            res.score_after = {
+                "server_points": score_label_server,
+                "returner_points": score_label_returner,
+                "game_progress": self.points.copy(),
+            }
+
+            self.feed.append(res)
 
             # Actualizar estamina de ambos jugadores
             for jugador in [self.server, self.returner]:
@@ -151,17 +150,6 @@ class TennisGame:
             perdedor.Momentum *= 0.97
 
             winner = self.is_finished()
-
-            score_label_server = self.get_point_label(self.server)
-            score_label_returner = self.get_point_label(self.returner)
-            res.score_after = {
-                "server_points": score_label_server,
-                "returner_points": score_label_returner,
-                "game_progress": self.points.copy(),
-            }
-
-            self.feed.append(res)
-
             if winner:
                 # Actualizar estamina de ambos jugadores
                 for jugador in [self.p1, self.p2]:
@@ -308,7 +296,7 @@ class TennisSet:
             winner = game.play(verbose=verbose)
 
             # Añadir puntos de este juego al timeline
-            for i, p in enumerate(game.feed[:-1]):
+            for i, p in enumerate(game.feed):
                 p.set_no = self.set_no
                 p.game_no = game_no
 
@@ -325,7 +313,7 @@ class TennisSet:
                 p.is_tiebreak = False
 
                 # Nuevo: marcar si es el último punto del juego
-                p.game_end = False
+                p.game_end = (i == len(game.feed) - 1)
 
                 # (set_end se marca más adelante, al final del set)
                 p.set_end = False
@@ -338,49 +326,11 @@ class TennisSet:
                 # Añadir al timeline del set
                 self.points_timeline.append(p)
 
-            # Último punto del juego
-            last_point = game.feed[-1]
-            last_point.set_no = self.set_no
-            last_point.game_no = game_no
-
-            # Determinar ganador por ID (P1 / P2)
-            last_point.winner_id = "P1" if (
-                (last_point.winner == SACADOR and server == self.p1)
-                or (last_point.winner == RESTADOR and returner == self.p1)
-            ) else "P2"
-
-            # Nuevo: quién saca este punto
-            last_point.server_id = "P1" if server == self.p1 else "P2"
-
-            # Nuevo: este punto no es de tie-break
-            last_point.is_tiebreak = False
-
-            # Nuevo: marcar si es el último punto del juego
-            last_point.game_end = True
-
-            # (set_end se marca más adelante, al final del set)
-            last_point.set_end = False
-
-            # Marcador de juegos tras el punto
-            if not hasattr(last_point, "score_after") or last_point.score_after is None:
-                last_point.score_after = {}
-            
-            score_after_aux = last_point.score_after.copy()
-            if "set_games" not in score_after_aux:
-                score_after_aux["set_games"] = self.games.copy()
-
             # Actualizar juegos ganados
             if winner == SACADOR:
-                score_after_aux["set_games"][tag_server] += 1
                 self.games[tag_server] += 1
-
             else:
-                score_after_aux["set_games"][tag_returner] += 1
                 self.games[tag_returner] += 1
-            # Añadir al timeline del set
-
-            last_point.score_after = score_after_aux.copy()
-            self.points_timeline.append(last_point)
 
             # --- Comprobación: Tie-break a 6–6 ---
             if self.tiebreak and self.games["P1"] == 6 and self.games["P2"] == 6:

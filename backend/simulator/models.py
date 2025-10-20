@@ -1,7 +1,7 @@
 # backend/simulator/models.py
 """Entidades principales (jugadores, bola, resultados, configuración) del simulador ADAF."""
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 
 
 import numpy as np
@@ -86,7 +86,45 @@ class PointResult:
     winner: str
     reason: str
     feed: List[str] = field(default_factory=list)
-    stats: Dict = field(default_factory=dict)
+    stats: Dict[str, Any] = field(default_factory=dict)
+
+    # NUEVOS campos opcionales (no afectan a la simulación)
+    set_no: Optional[int] = None
+    game_no: Optional[int] = None
+    point_no: Optional[int] = None
+    winner_id: Optional[str] = None
+    score_after: Optional[Dict[str, Any]] = None
+
+    # --- NUEVOS CAMPOS PARA EXPORTACIÓN AL FRONTEND ---
+    server_id: Optional[str] = None      # "P1" | "P2"
+    game_end: bool = False               # True si este punto termina el game
+    set_end: bool = False                # True si este punto termina el set
+    is_tiebreak: bool = False            # True si el punto es parte de un tie-break
+
+    # ============================================================
+    # Métodos útiles
+    # ============================================================
+
+    def to_dict(self, names: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+        base = {
+            "set": self.set_no,
+            "game": self.game_no,
+            "point": self.point_no,
+            "winner": self.winner_id or self.winner,
+            "reason": self.reason,
+            "feed": self.feed,
+            "stats": self.stats,
+            "server_id": self.server_id,
+            "game_end": self.game_end,
+            "set_end": self.set_end,
+            "is_tiebreak": self.is_tiebreak,
+        }
+
+        if names and self.winner_id in names:
+            base["winner_name"] = names.get(self.winner_id)
+        if self.score_after:
+            base["score_after"] = self.score_after
+        return base
 
 
 @dataclass(slots=True)
@@ -116,13 +154,13 @@ class MatchStats:
         elif res.winner == RESTADOR:
             self.returner_points_won += 1
 
-        self.first_in += res.stats["first_in"]
-        self.first_total += res.stats["first_total"]
-        self.second_in += res.stats["second_in"]
-        self.second_total += res.stats["second_total"]
-        self.aces += res.stats["aces"]
-        self.double_faults += res.stats["double_faults"]
-        self.rally_shots.append(res.stats["rally_shots"])
+        self.first_in += res.stats.get("first_in", 0)
+        self.first_total += res.stats.get("first_total", 0)
+        self.second_in += res.stats.get("second_in", 0)
+        self.second_total += res.stats.get("second_total", 0)
+        self.aces += res.stats.get("aces", 0)
+        self.double_faults += res.stats.get("double_faults", 0)
+        self.rally_shots.append(res.stats.get("rally_shots", 0))
         self.reasons[res.reason] = self.reasons.get(res.reason, 0) + 1
         self.points_feed.append(res)
 
