@@ -20,7 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!timeline.length) return;
 
     if (currentPoint < timeline.length) {
-      updateScoreboard(timeline[currentPoint]);
+
+      const pointData = timeline[currentPoint];
+      updateScoreboard(pointData);
+      updatePointsFeed(pointData);
+      playPointFeed(pointData);
       currentPoint++;
     } else {
       if (!matchEnded) {
@@ -214,121 +218,6 @@ function updateScoreboard(pointData) {
     }
   }
 }
-/*
-function updateScoreboard(pointData) {
-  // =========================
-  // 🎾 1. Extraer datos base
-  // =========================
-  const setNum = pointData.set || 1;
-  const score = pointData.score_after || {};
-  const serverId = pointData.server_id || score.server || "P1";
-  const winnerId = pointData.winner_id || null;
-  const isTiebreak = pointData.is_tiebreak || false;
-  const gameEnded = pointData.game_end || false;
-
-  // =========================
-  // 🧮 2. Juegos del set actual
-  // =========================
-  let games_p1 = score.set_games?.P1 ?? 0;
-  let games_p2 = score.set_games?.P2 ?? 0;
-
-  // Si el juego ha terminado, añadir +1 al ganador
-  if (gameEnded) {
-    if (winnerId === "P1") games_p1 += 1;
-    else if (winnerId === "P2") games_p2 += 1;
-  }
-
-  // =========================
-  // 💾 3. Sets anteriores (finalizados)
-  // =========================
-  const set1_final = matchData.set_scores?.[0] || [null, null];
-  const set2_final = matchData.set_scores?.[1] || [null, null];
-  const set3_final = matchData.set_scores?.[2] || [null, null];
-
-  // =========================
-  // 🎯 4. Puntos actuales del juego o tie-break
-  // =========================
-  let points_p1 = "0";
-  let points_p2 = "0";
-
-  if (isTiebreak && score.tiebreak_score) {
-    // Si es un tie-break, usar el marcador interno
-    points_p1 = score.tiebreak_score.P1 ?? 0;
-    points_p2 = score.tiebreak_score.P2 ?? 0;
-  } else {
-    // Normal: mostrar 0–15–30–40–Ad
-    const serverPts = score.server_points || "0";
-    const returnerPts = score.returner_points || "0";
-
-    if (serverId === "P1") {
-      points_p1 = serverPts;
-      points_p2 = returnerPts;
-    } else {
-      points_p1 = returnerPts;
-      points_p2 = serverPts;
-    }
-  }
-
-  // Si terminó el juego → resetear puntos a 0–0
-  if (gameEnded) {
-    points_p1 = "0";
-    points_p2 = "0";
-  }
-
-  // =========================
-  // 🧩 5. Aplicar al DOM
-  // =========================
-
-  // --- Juegos ---
-  if (setNum === 1) {
-    document.getElementById("p1-set1").textContent = games_p1;
-    document.getElementById("p2-set1").textContent = games_p2;
-  } else if (setNum === 2) {
-    document.getElementById("p1-set1").textContent = set1_final[0] ?? "";
-    document.getElementById("p2-set1").textContent = set1_final[1] ?? "";
-    document.getElementById("p1-set2").textContent = games_p1;
-    document.getElementById("p2-set2").textContent = games_p2;
-  } else if (setNum === 3) {
-    document.getElementById("p1-set1").textContent = set1_final[0] ?? "";
-    document.getElementById("p2-set1").textContent = set1_final[1] ?? "";
-    document.getElementById("p1-set2").textContent = set2_final[0] ?? "";
-    document.getElementById("p2-set2").textContent = set2_final[1] ?? "";
-    document.getElementById("p1-set3").textContent = games_p1;
-    document.getElementById("p2-set3").textContent = games_p2;
-  }
-
-  // --- Puntos ---
-  document.getElementById("p1-points").textContent = points_p1;
-  document.getElementById("p2-points").textContent = points_p2;
-
-  // --- Saque ---
-  const serveP1 = document.getElementById("serve-p1");
-  const serveP2 = document.getElementById("serve-p2");
-
-  if (serverId === "P1") {
-    serveP1.classList.remove("off");
-    serveP2.classList.add("off");
-  } else {
-    serveP2.classList.remove("off");
-    serveP1.classList.add("off");
-  }
-
-  // =========================
-  // 🧾 6. Log opcional
-  // =========================
-  console.log("📊 Estado marcador:", {
-    setNum,
-    games_p1,
-    games_p2,
-    points_p1,
-    points_p2,
-    serverId,
-    winnerId,
-    isTiebreak,
-    gameEnded,
-  });
-}
-*/
 
 function showFinalScore() {
   // Obtener resultados finales del JSON completo
@@ -366,4 +255,188 @@ function showFinalScore() {
   msg.textContent = `🏆 Partido finalizado — Ganador: ${winnerName}`;
   panel.appendChild(msg);
   
+}
+
+function updatePointsFeed(pointData) {
+  const feedList = document.getElementById("feed-list");
+  const feedContainer = document.getElementById("points-feed");
+  if (!feedList || !pointData) return;
+
+  const setNum = pointData.set || 1;
+  const gameNum = pointData.game || 1;
+  const rally = pointData.stats?.rally_shots ?? 0;
+  const winner = pointData.winner_name || "Jugador desconocido";
+  const reason = pointData.reason || "";
+  const serverId = pointData.server_id || "";
+  const server = serverId === "P1" ? matchData.players.P1 : matchData.players.P2;
+  const returner = serverId === "P1" ? matchData.players.P2 : matchData.players.P1;
+
+  const score = pointData.score_after || {};
+  const games = score.set_games || { P1: 0, P2: 0 };
+  const marcadorSet = `${games.P1}–${games.P2}`;
+  const marcadorJuego = `${score.server_points || "0"}–${score.returner_points || "0"}`;
+
+  // === 🎯 Generar descripción de la jugada ===
+  let desc = "";
+
+  // Analizar tipo de punto
+  if (reason.includes("ace")) {
+    desc = `🎯 <span class="text-yellow-300 font-semibold">${server}</span> mete un ace por el ${Math.random() > 0.5 ? "centro" : "abierto"}.`;
+  } else if (reason.includes("doble_falta")) {
+    desc = `⚠️ <span class="text-yellow-300 font-semibold">${server}</span> comete una doble falta en un momento delicado.`;
+  } else if (reason.includes("error_resto")) {
+    desc = `❌ <span class="text-yellow-300 font-semibold">${returner}</span> falla el resto. Punto directo para ${server}.`;
+  } else if (reason.includes("error_golpe")) {
+    desc = `😬 Error no forzado de <span class="text-yellow-300 font-semibold">${returner}</span> tras un peloteo corto.`;
+  } else if (reason.includes("no_llega")) {
+    desc = `🏃‍♂️ <span class="text-yellow-300 font-semibold">${returner}</span> no logra alcanzar la bola tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
+  } else if (reason.includes("winner")) {
+    desc = `🔥 <span class="text-yellow-300 font-semibold">${winner}</span> gana el punto con un golpe ganador tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
+  } else {
+    desc = `🎾 Punto para <span class="text-yellow-300 font-semibold">${winner}</span> tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
+  }
+
+  // === 🧩 Añadir mini resumen del punto ===
+  const extraFeed = pointData.feed?.slice(-2)?.join("<br>") || "";
+  const resumen = `<div class="text-xs text-gray-400 mt-1">${extraFeed}</div>`;
+
+  // === 🏷️ Montar elemento del feed ===
+  const li = document.createElement("li");
+  li.innerHTML = `
+    <div class="border border-blue-800/30 bg-slate-900/60 rounded-lg px-3 py-2 shadow-sm">
+      <div class="flex justify-between items-center mb-1">
+        <span class="text-gray-400 text-xs font-mono">Set ${setNum}, Juego ${gameNum}</span>
+        <span class="text-gray-500 text-xs font-mono">[${marcadorSet} | ${marcadorJuego}]</span>
+      </div>
+      <div class="text-sm text-gray-200">${desc}</div>
+      ${resumen}
+    </div>
+  `;
+  li.className = "transition-all duration-300 opacity-0 translate-y-1";
+
+  // Insertar arriba
+  feedList.prepend(li);
+
+  // Animación
+  setTimeout(() => li.classList.remove("opacity-0", "translate-y-1"), 10);
+
+  // Limitar a 8-10 jugadas
+  while (feedList.children.length > 25) {
+    feedList.removeChild(feedList.lastChild);
+  }
+
+  // Scroll arriba
+  feedContainer.scrollTop = 0;
+}
+
+async function playPointFeed(pointData) {
+  const liveList = document.getElementById("live-feed-list");
+  liveList.innerHTML = "";
+
+  const rawFeed = pointData.feed || [];
+  const readableFeed = generateReadableFeed(rawFeed, pointData);
+
+  for (const sentence of readableFeed) {
+    const li = document.createElement("li");
+    li.textContent = sentence;
+    li.className = "opacity-0 translate-y-1 transition-all duration-300";
+    liveList.appendChild(li);
+
+    setTimeout(() => li.classList.remove("opacity-0", "translate-y-1"), 10);
+    await new Promise(r => setTimeout(r, 800)); // ritmo natural
+  }
+
+  const summary = `Punto para ${pointData.winner_name}.`;
+  const li = document.createElement("li");
+  li.className = "text-yellow-400 font-semibold mt-3";
+  li.textContent = summary;
+  liveList.appendChild(li);
+}
+
+
+function generateReadableFeed(rawFeed, pointData) {
+  const readable = [];
+  const server = pointData.server_id === "P1" ? matchData.players.P1 : matchData.players.P2;
+  const returner = pointData.server_id === "P1" ? matchData.players.P2 : matchData.players.P1;
+
+  const extractValue = (text, key) => {
+    const regex = new RegExp(`${key}=([0-9.]+)`);
+    const match = text.match(regex);
+    return match ? parseFloat(match[1]) : null;
+  };
+
+  for (const line of rawFeed) {
+    const l = line.toLowerCase();
+
+    // === SAQUES ===
+    if (l.includes("primer saque")) {
+      const pot = extractValue(line, "Pot");
+      const prec = extractValue(line, "Prec");
+      const inServe = l.includes("→ in");
+
+      let phrase = `${server} inicia con un primer saque `;
+      if (pot > 0.45) phrase += "muy potente";
+      else if (pot > 0.3) phrase += "con buena velocidad";
+      else phrase += "más conservador";
+
+      if (prec > 0.4) phrase += " y bastante preciso";
+      else if (prec > 0.2) phrase += " pero algo irregular";
+      else phrase += " con poca colocación";
+
+      phrase += inServe ? "." : ", que termina en falta.";
+      readable.push(phrase);
+
+    } else if (l.includes("segundo saque")) {
+      const pot = extractValue(line, "Pot");
+      const prec = extractValue(line, "Prec");
+      const inServe = l.includes("→ in");
+
+      let phrase = `${server} ejecuta un segundo servicio `;
+      if (pot > 0.45) phrase += "agresivo";
+      else if (pot > 0.3) phrase += "sólido";
+      else phrase += "seguro";
+
+      phrase += prec > 0.3 ? " y bien colocado" : " con poca precisión";
+      phrase += inServe ? "." : ", que se marcha fuera.";
+      readable.push(phrase);
+    }
+
+    // === RESTOS / GOLPES ===
+    else if (l.includes("golpea")) {
+      const pot = extractValue(line, "Pot");
+      const prec = extractValue(line, "Prec");
+      const result = l.includes("dentro")
+        ? "la bola entra con margen."
+        : l.includes("fuera")
+        ? "la bola se va fuera."
+        : "mantiene el intercambio.";
+
+      const player = l.includes("diego") ? returner : server;
+      let phrase = `${player} golpea `;
+      if (pot > 0.45) phrase += "con mucha potencia";
+      else if (pot > 0.3) phrase += "con buena intensidad";
+      else phrase += "de forma más defensiva";
+
+      phrase += prec > 0.35 ? " y control." : " pero sin demasiada precisión.";
+      phrase += " " + result;
+      readable.push(phrase);
+    }
+
+    // === INTENTOS DE ALCANZAR ===
+    else if (l.includes("intenta alcanzar")) {
+      const player = l.includes("diego") ? returner : server;
+      if (l.includes("no llega")) readable.push(`${player} no logra alcanzar la bola.`);
+      else readable.push(`${player} llega justo a tiempo para devolver la pelota.`);
+    }
+
+    // === RESULTADO FINAL ===
+    else if (l.includes("resultado")) {
+      if (l.includes("doble falta")) readable.push(`${server} comete una doble falta, punto para ${returner}.`);
+      else if (l.includes("error de resto")) readable.push(`${returner} falla el resto, punto para ${server}.`);
+      else if (l.includes("punto para sacador")) readable.push(`Punto para ${server}.`);
+      else if (l.includes("punto para restador")) readable.push(`Gran resto, punto para ${returner}.`);
+    }
+  }
+
+  return readable.length ? readable : ["(Sin detalles disponibles para este punto)"];
 }

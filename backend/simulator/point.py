@@ -24,7 +24,9 @@ class PointSimulator:
         self.S = server
         self.R = returner
         self.clutch = clutch
-        self.tags = tags or {"SACADOR": "P1", "RESTADOR": "P2"}  # 👈 nuevo
+        self.tags = tags or {"SACADOR": "P1", "RESTADOR": "P2"}
+        self.actions: List[Dict] = []
+
 
     def simulate(self, verbose: bool = True) -> PointResult:
         feed: List[str] = []
@@ -122,7 +124,7 @@ class PointSimulator:
                 feed.append(f">>> Resultado: PUNTO para {tag_prev} (falla golpe)")
                 return PointResult(
                     winner=tag_prev,
-                    winner_id=translate_winner(tag_prev),  # 👈 nuevo
+                    winner_id=translate_winner(tag_prev), 
                     reason="error_golpe",
                     feed=feed,
                     stats=stats
