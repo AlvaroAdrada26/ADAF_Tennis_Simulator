@@ -1,0 +1,75 @@
+{
+    "FH": {
+      "IN": [
+        "{name} golpea de derecha con enorme potencia y precisión.",
+        "{name} domina el intercambio con una derecha profunda y pesada.",
+        "{name} acelera con la derecha, buscando abrir la pista.",
+        "{name} juega una derecha firme y bien colocada, controlando el ritmo.",
+        "{name} lanza un golpe de derecha cruzado que obliga al rival a correr.",
+        "Gran derecha de {name}, que marca el ritmo del intercambio.",
+        "{name} entra en la bola con decisión y saca una derecha muy agresiva.",
+        "{name} busca dominar con potencia, aunque algo arriesgado.",
+        "Buena derecha liftada de {name}, que mantiene la presión.",
+        "{name} mantiene el peloteo con una derecha bien colocada.",
+        "{name} mueve al rival con una derecha cruzada precisa.",
+        "{name} cambia el ritmo con una derecha profunda y controlada.",
+        "Derecha sólida de {name}, que mantiene el intercambio con seguridad.",
+        "{name} golpea largo y profundo con su derecha, empujando al rival hacia atrás.",
+        "{name} busca el espacio con una derecha paralela muy ajustada."
+      ],
+      "OUT": [
+        "{name} falla su derecha, la pelota se marcha larga.",
+        "Derecha demasiado fuerte de {name}, que se va fuera.",
+        "{name} intenta una derecha agresiva, pero se le escapa por centímetros.",
+        "Error de derecha de {name}, la bola impacta en la red.",
+        "{name} se precipita con la derecha y la pelota se va al pasillo.",
+        "La derecha de {name} no encuentra pista, error no forzado.",
+        "{name} busca la línea con su derecha, pero falla el golpe.",
+        "Derecha mal controlada de {name}, la bola se queda en la red.",
+        "{name} fuerza demasiado su derecha y la envía fuera de los límites.",
+        "Pelota al pasillo tras un golpe de derecha fallido de {name}.",
+        "{name} manda su derecha directamente fuera.",
+        "Derecha imprecisa de {name}, que no logra mantener la pelota en juego.",
+        "{name} golpea tarde la derecha y pierde el control del tiro.",
+        "Error no forzado de {name} con la derecha desde el fondo.",
+        "{name} busca profundidad pero su derecha se queda corta en la red."
+      ]
+    },
+    "BH": {
+      "IN": [
+        "{name} lanza un revés cruzado perfecto.",
+        "{name} conecta un revés paralelo demoledor.",
+        "{name} mantiene la consistencia con un revés sólido.",
+        "{name} juega un revés estable para seguir el intercambio.",
+        "Revés profundo y bien medido de {name}, que obliga al rival a defender.",
+        "{name} se apoya en su revés para controlar el peloteo desde el fondo.",
+        "{name} responde con un revés plano y preciso, buscando el centro.",
+        "{name} cambia el ritmo con un revés cruzado agresivo.",
+        "Buen revés liftado de {name}, que mantiene la pelota con efecto y control.",
+        "{name} ejecuta un revés paralelo que toma por sorpresa al rival.",
+        "Sólido revés de {name}, que mantiene la pelota baja y profunda.",
+        "{name} domina el intercambio con un revés largo y bien dirigido.",
+        "{name} defiende con un revés a contrapié, muy bien ejecutado.",
+        "Golpe consistente de revés por parte de {name}, que no cede terreno.",
+        "{name} aguanta la presión con un revés firme desde el fondo."
+      ],
+      "OUT": [
+        "{name} falla el revés, la bola se marcha fuera.",
+        "Revés defectuoso de {name}, la pelota golpea la red.",
+        "{name} intenta un revés agresivo pero no encuentra pista.",
+        "Error de revés de {name}, se le escapa por centímetros.",
+        "Revés largo de {name}, la pelota sobrepasa la línea de fondo.",
+        "El revés de {name} se queda corto y no pasa la red.",
+        "{name} busca el paralelo con su revés, pero la bola se va fuera.",
+        "Revés al pasillo de dobles de {name}, que pierde el punto.",
+        "{name} se precipita y falla su revés plano.",
+        "Pelota en la red tras un revés mal calculado de {name}.",
+        "{name} fuerza demasiado su revés y la bola se marcha larga.",
+        "Revés defectuoso de {name}, sin apenas control.",
+        "{name} falla su revés defensivo, la pelota queda en su campo.",
+        "El revés de {name} se va muy ancho, punto para el rival.",
+        "{name} golpea tarde el revés y lo envía directamente fuera."
+      ]
+    }
+  
+}

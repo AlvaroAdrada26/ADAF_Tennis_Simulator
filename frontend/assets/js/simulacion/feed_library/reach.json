@@ -1,0 +1,38 @@
+{
+  
+    "REACHED": [
+      "{name} logra alcanzar la bola justo a tiempo, estirándose al máximo.",
+      "{name} se estira y consigue devolver una pelota muy exigente.",
+      "{name} reacciona rápido y logra mantener la pelota en juego.",
+      "{name} llega forzado pero consigue tocar la bola.",
+      "Espectacular esfuerzo de {name}, que alcanza una bola casi imposible.",
+      "{name} corre con todo y logra devolver la pelota desde una posición complicada.",
+      "{name} alcanza la bola en el último momento y la envía de vuelta.",
+      "Con una gran zancada, {name} logra llegar justo a tiempo.",
+      "{name} salva el punto con una reacción impresionante.",
+      "{name} consigue llegar a una bola profunda que parecía inalcanzable.",
+      "{name} muestra reflejos notables para alcanzar una bola muy ajustada.",
+      "Buena respuesta defensiva de {name}, que logra devolver una bola difícil.",
+      "{name} saca una bola imposible, dejando al público sorprendido.",
+      "{name} alcanza la pelota con un último esfuerzo, manteniendo el punto vivo.",
+      "Gran reacción de {name}, que evita el golpe ganador del rival."
+    ],
+    "NOT_REACHED": [
+      "{name} no llega a la bola, se le escapa por muy poco.",
+      "{name} intenta alcanzarla, pero no lo consigue.",
+      "{name} se lanza, pero la bola pasa de largo.",
+      "{name} llega tarde y la pelota se le escapa sin remedio.",
+      "{name} corre, pero no logra contactar con la bola.",
+      "Nada que hacer para {name}, la bola le pasa por delante.",
+      "{name} se estira al máximo, pero no llega a tocarla.",
+      "{name} lo intenta, pero la velocidad del golpe lo supera.",
+      "{name} queda a centímetros de alcanzar la pelota.",
+      "{name} reacciona tarde y la bola se va fuera de su alcance.",
+      "La bola supera a {name}, que no logra llegar a tiempo.",
+      "Esfuerzo inútil de {name}, la bola ya había pasado.",
+      "{name} da un paso de más, pero no consigue tocar la pelota.",
+      "{name} se queda corto, sin poder llegar al golpe rival.",
+      "Nada que hacer para {name}, la bola fue demasiado rápida."
+    ]
+  
+}

@@ -1,0 +1,93 @@
+{
+  "POINT_END": {
+    "ace": [
+      "¡Ace de {name}!",
+      "Punto directo de servicio para {name}.",
+      "{name} conecta un saque imparable, punto directo.",
+      "Servicio ganador de {name}, el rival ni la toca.",
+      "Saque perfecto de {name}, imposible de devolver.",
+      "{name} cierra el punto con un ace impecable.",
+      "Primer saque demoledor de {name}, punto directo al marcador.",
+      "{name} sorprende con un servicio que roza la línea, ace claro.",
+      "Gran saque de {name}, sin respuesta del rival.",
+      "{name} consigue otro punto directo gracias a su potente servicio.",
+      "{name} mete un misil al cuerpo, el rival ni reacciona.",
+      "Ace de {name}, que rompe la velocidad del sonido con su saque.",
+      "{name} encuentra el ángulo perfecto con su servicio.",
+      "Imparable el saque de {name}, otro punto directo.",
+      "Ace de {name}, pura potencia y precisión al mismo tiempo."
+    ],
+
+    "doble_falta": [
+      "Doble falta de {name}.",
+      "{name} falla el segundo saque.",
+      "{name} comete doble falta en un momento clave.",
+      "Error con el segundo servicio de {name}, punto para el rival.",
+      "Segundo saque de {name} que se va fuera, doble falta.",
+      "Doble falta, {name} entrega el punto sin jugarlo.",
+      "{name} no logra colocar el segundo servicio, error costoso.",
+      "Nuevo error al saque de {name}, doble falta clara.",
+      "Doble falta de {name}, un pequeño tropiezo con el servicio.",
+      "{name} falla ambos servicios, regalando el punto.",
+      "{name} busca asegurar el segundo, pero no entra.",
+      "Segundo error consecutivo al saque de {name}, punto perdido.",
+      "Doble falta en el peor momento para {name}.",
+      "{name} deja escapar el punto con un segundo saque fallido.",
+      "Otro error con el servicio de {name}, que entrega el punto sin intercambio."
+    ],
+
+    "error_resto": [
+      "Error en el resto de {name}.",
+      "{name} envía el resto fuera.",
+      "El resto de {name} se queda en la red.",
+      "{name} falla la devolución, punto para el servidor.",
+      "Resto largo de {name}, la pelota se va por el fondo.",
+      "{name} no logra controlar el resto ante un saque potente.",
+      "Devolución fallida de {name}, que no logra conectar limpio.",
+      "{name} responde tarde al saque y la bola se va fuera.",
+      "Resto defectuoso de {name}, que se queda corto.",
+      "Mal resto de {name}, el rival se lleva el punto fácilmente.",
+      "{name} bloquea el saque, pero la pelota no pasa.",
+      "Resto precipitado de {name}, error de ejecución.",
+      "{name} se adelanta demasiado y falla la devolución.",
+      "Error de lectura en el resto de {name}, la pelota se le escapa.",
+      "{name} intenta un resto agresivo, pero lo envía al pasillo."
+    ],
+
+    "error_golpe": [
+      "Error no forzado de {name}.",
+      "{name} manda la bola fuera.",
+      "{name} falla un golpe que parecía sencillo.",
+      "Bola larga de {name}, que pierde el control del punto.",
+      "La derecha de {name} se marcha por poco, error no forzado.",
+      "Revés de {name} que se queda en la red.",
+      "{name} intenta apretar pero la bola se va fuera.",
+      "Golpe fallido de {name}, la pelota no pasa la red.",
+      "{name} busca la línea, pero el tiro se va apenas ancho.",
+      "Error de {name}, que entrega el punto al rival.",
+      "{name} golpea tarde y la bola se marcha larga.",
+      "Revés desviado de {name}, error técnico en la ejecución.",
+      "{name} se precipita con el golpe y lo manda fuera.",
+      "Pelota en la red tras un intento fallido de {name}.",
+      "{name} domina el punto, pero falla el remate final."
+    ],
+
+    "no_llega": [
+      "{name} no alcanza la bola.",
+      "Punto para el rival, {name} no llega.",
+      "{name} se lanza, pero la bola pasa de largo.",
+      "{name} llega tarde y no logra tocar la pelota.",
+      "Nada que hacer para {name}, la bola fue inalcanzable.",
+      "El rival lo supera, {name} no consigue llegar a tiempo.",
+      "{name} intenta alcanzarla, pero se queda corto.",
+      "Punto ganado por el rival, {name} no llega a la bola.",
+      "{name} reacciona tarde y la bola se le escapa.",
+      "Esfuerzo inútil de {name}, no logra llegar al golpe final.",
+      "{name} lo intenta todo, pero la bola pasa rozando su raqueta.",
+      "El golpe del rival supera a {name}, que no puede responder.",
+      "Bola inalcanzable para {name}, que se queda quieto mirando.",
+      "{name} corre con todo, pero no llega a tocar la pelota.",
+      "Nada que hacer, {name} se ve completamente superado por el tiro."
+    ]
+  }
+}

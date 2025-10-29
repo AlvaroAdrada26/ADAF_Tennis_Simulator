@@ -79,22 +79,22 @@
     }
 
     /* ==== SCROLL PERSONALIZADO ==== */
-    #points-feed::-webkit-scrollbar {
+    #live-events::-webkit-scrollbar {
       width: 8px;
     }
 
-    #points-feed::-webkit-scrollbar-track {
+    #live-events::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.4); /* slate-900/40 */
       border-radius: 8px;
     }
 
-    #points-feed::-webkit-scrollbar-thumb {
+    #live-events::-webkit-scrollbar-thumb {
       background: linear-gradient(180deg, #1e3a8a, #2563eb); /* azul elegante */
       border-radius: 8px;
       transition: background 0.3s ease;
     }
 
-    #points-feed::-webkit-scrollbar-thumb:hover {
+    #live-events::-webkit-scrollbar-thumb:hover {
       background: linear-gradient(180deg, #2563eb, #38bdf8); /* tono más claro al hover */
     }
 
@@ -523,142 +523,8 @@
     });
   </script>
   
-<!--
-    <script>
-  /* ======================================================
-  🎾 ADAF Tennis Simulator — Conexión y actualización marcador
-  ====================================================== */
+<script type="module" src="assets/js/simulacion/app.js"></script>
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    console.log("📡 Iniciando script de simulación...");
-
-    // --- ELEMENTOS DEL MARCADOR ---
-    const p1Sets = [
-      document.getElementById("p1-set1"),
-      document.getElementById("p1-set2"),
-      document.getElementById("p1-set3")
-    ];
-    const p2Sets = [
-      document.getElementById("p2-set1"),
-      document.getElementById("p2-set2"),
-      document.getElementById("p2-set3")
-    ];
-    const p1Points = document.getElementById("p1-points");
-    const p2Points = document.getElementById("p2-points");
-    const serveP1 = document.getElementById("serve-p1");
-    const serveP2 = document.getElementById("serve-p2");
-
-    // Verificamos que los elementos existen
-    if (!p1Points || !p2Points) {
-      console.error("❌ No se encontraron los elementos del marcador. ¿IDs correctos?");
-      return;
-    }
-
-    const nextButton = document.getElementById("btn-next");
-    if (!nextButton) {
-      console.error("⚠️ No se encontró el botón 'Siguiente punto'");
-      return;
-    }
-
-    // --- VARIABLES DE ESTADO ---
-    let matchData = null;
-    let currentPointIndex = 0;
-
-    // --- FUNCIÓN: CARGAR PARTIDO ---
-    async function loadMatch() {
-      console.log("🚀 Solicitando partido al backend...");
-
-      try {
-        const res = await fetch("http://127.0.0.1:8000/simulate_match", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            player1: {
-              name: "Carlos Alcaraz",
-              Primer_Saque: 82, Segundo_Saque: 80, Fisico: 88, Estamina: 90,
-              Consistencia: 85, Clutch: 87, Momentum: 0, Derecha: 90, Reves: 86,
-              Resto: 83, Movilidad: 89
-            },
-            player2: {
-              name: "Novak Djokovic",
-              Primer_Saque: 83, Segundo_Saque: 81, Fisico: 86, Estamina: 88,
-              Consistencia: 84, Clutch: 85, Momentum: 0, Derecha: 88, Reves: 90,
-              Resto: 82, Movilidad: 86
-            },
-            config: { best_of: 3, tiebreak: true, seed: 42 }
-          }),
-        });
-
-        console.log("📨 Respuesta recibida, status:", res.status);
-        if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
-
-        matchData = await res.json();
-        console.log("✅ Partido cargado correctamente:", matchData);
-
-        if (!matchData.timeline) {
-          console.warn("⚠️ El JSON no contiene timeline. Estructura devuelta:", matchData);
-        }
-
-        currentPointIndex = 0;
-        updateScore();
-      } catch (err) {
-        console.error("❌ Error en la conexión o parseo del JSON:", err);
-      }
-    }
-
-    // --- FUNCIÓN: ACTUALIZAR MARCADOR ---
-    function updateScore() {
-      if (!matchData?.timeline?.length) {
-        console.warn("⚠️ No hay timeline en matchData");
-        return;
-      }
-
-      const point = matchData.timeline[currentPointIndex];
-      console.log(`🎾 Punto ${currentPointIndex + 1}/${matchData.timeline.length}`, point);
-
-      const score = point.score_after || {};
-      const sets = score.sets || [];
-      const points = score.points || ["0", "0"];
-      const server = score.server || "P1";
-
-      // Actualizar sets
-      for (let i = 0; i < 3; i++) {
-        p1Sets[i].textContent = sets[i] ? sets[i][0] : "0";
-        p2Sets[i].textContent = sets[i] ? sets[i][1] : "0";
-      }
-
-      // Actualizar puntos del juego actual
-      p1Points.textContent = points[0];
-      p2Points.textContent = points[1];
-
-      // Actualizar indicador de saque
-      if (server === "P1") {
-        serveP1.classList.remove("off");
-        serveP2.classList.add("off");
-      } else {
-        serveP1.classList.add("off");
-        serveP2.classList.remove("off");
-      }
-    }
-
-    // --- EVENTO BOTÓN SIGUIENTE ---
-    nextButton.addEventListener("click", () => {
-      if (!matchData?.timeline) return console.warn("⚠️ No hay datos cargados");
-      if (currentPointIndex < matchData.timeline.length - 1) {
-        currentPointIndex++;
-        updateScore();
-      } else {
-        //alert("🏁 Partido finalizado");
-      }
-    });
-
-    // --- INICIO ---
-    loadMatch();
-  });
-  </script>
--->
-  
-<script src="assets/js/updateScoreboard.js"></script>
 
 
 </body>

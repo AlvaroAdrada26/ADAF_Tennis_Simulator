@@ -1,8 +1,30 @@
+import { PointFeedGenerator } from "./PointFeedGenerator.js";
+
 let matchData = null;
 let timeline = [];
 let currentPoint = 0;
 let matchLoaded = false;
 let matchEnded = false;
+
+let feedGenerator = null;
+
+async function initFeedGenerator() {
+  const files = ["serves", "returns", "rally", "reach", "misc"];
+  const library = {};
+
+  for (const f of files) {
+    const res = await fetch(`./assets/js/feed_library/${f}.json`);
+    const data = await res.json();
+    Object.assign(library, data);
+  }
+
+  feedGenerator = new PointFeedGenerator(library);
+  console.log("Biblioteca de frases cargada");
+}
+
+// Cargar automáticamente al iniciar el archivo
+initFeedGenerator();
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("btn-next");

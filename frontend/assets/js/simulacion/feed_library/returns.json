@@ -1,0 +1,75 @@
+{
+    "FH": {
+      "IN": [
+        "{name} ataca el resto de derecha, profundo y con gran precisión.",
+        "{name} devuelve agresivo de derecha, buscando el control del punto.",
+        "{name} conecta una devolución firme de derecha, metiendo presión desde el inicio.",
+        "Gran resto de derecha de {name}, que responde con autoridad.",
+        "{name} golpea sólido con su derecha, forzando al rival a retroceder.",
+        "Buena lectura de saque por parte de {name}, que resta con potencia de derecha.",
+        "{name} se anticipa bien y devuelve con un golpe plano y profundo.",
+        "{name} resta con buena lectura de derecha, colocando la pelota con intención.",
+        "{name} responde sólido al primer saque con su derecha.",
+        "Resto ofensivo de derecha por parte de {name}, que busca dominar el punto.",
+        "{name} bloquea con su derecha y logra un resto controlado.",
+        "Devolución consistente de derecha de {name}, asegurando el inicio del punto.",
+        "{name} utiliza su derecha para mantener la pelota baja y profunda.",
+        "Buen resto liftado de {name}, que le permite tomar la iniciativa.",
+        "{name} se apoya en su derecha para devolver con precisión y efecto."
+      ],
+      "OUT": [
+        "{name} falla el resto de derecha, la pelota se marcha larga.",
+        "El resto de {name} con la derecha se queda en la red.",
+        "{name} intenta un resto agresivo de derecha, pero no entra.",
+        "Error de derecha de {name}, el resto se le va por poco.",
+        "La devolución de derecha de {name} se va fuera de pista.",
+        "{name} arriesga con el resto de derecha y lo paga caro.",
+        "Pelota al pasillo tras un resto de derecha fallido de {name}.",
+        "Resto defectuoso de {name}, la derecha no pasa la red.",
+        "{name} se precipita con el resto de derecha y falla el impacto.",
+        "Resto forzado de {name} que termina fuera.",
+        "La derecha de {name} no encuentra la pista.",
+        "{name} busca un resto ganador pero se le escapa el golpe.",
+        "Error no forzado de {name} con su derecha al resto.",
+        "Resto corto y mal dirigido de {name}, punto perdido.",
+        "{name} golpea la red con su derecha, punto para el rival."
+      ]
+    },
+    "BH": {
+      "IN": [
+        "{name} bloquea el saque con un revés firme y preciso.",
+        "{name} devuelve de revés con elegancia y control.",
+        "{name} logra un buen resto con el revés, manteniendo la pelota en juego.",
+        "{name} se apoya en su revés para neutralizar el saque.",
+        "Gran devolución de revés por parte de {name}, que toma el control del punto.",
+        "{name} responde con un revés plano y profundo, buscando abrir la pista.",
+        "{name} resta bien de revés, dejando al rival sin tiempo para reaccionar.",
+        "Buen resto cruzado de revés de {name}, que cambia el ritmo del intercambio.",
+        "{name} devuelve con firmeza desde su revés, controlando la dirección.",
+        "Resto sólido de revés por parte de {name}, que asegura la devolución.",
+        "{name} bloquea con el revés y logra un resto profundo y preciso.",
+        "Excelente lectura de {name}, que responde con un revés controlado.",
+        "{name} contraataca de revés tras un saque potente, manteniendo la calma.",
+        "{name} utiliza el revés para devolver con altura y efecto, neutralizando el saque.",
+        "Devolución segura de revés de {name}, que mantiene la pelota viva en el punto."
+      ],
+      "OUT": [
+        "{name} falla el resto de revés, la pelota se va al pasillo.",
+        "El resto de revés de {name} golpea la red.",
+        "Error de {name} con el revés, el resto se marcha largo.",
+        "Revés demasiado forzado de {name}, no entra.",
+        "El revés de {name} se queda corto y no pasa la red.",
+        "{name} no logra controlar el resto de revés, pelota fuera.",
+        "Devolución fallida de revés por parte de {name}.",
+        "{name} busca el ángulo con su revés, pero la bola se escapa.",
+        "Resto defectuoso de revés, error no forzado de {name}.",
+        "{name} manda el resto de revés directamente fuera.",
+        "Golpe impreciso de {name} con el revés, la pelota no entra.",
+        "{name} se adelanta al resto y falla el contacto con su revés.",
+        "Resto de revés de {name} que no encuentra pista.",
+        "{name} intenta un resto cruzado de revés, pero se va fuera.",
+        "El revés de {name} toca la red y no pasa al otro lado."
+      ]
+    }
+  
+}

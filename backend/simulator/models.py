@@ -1,7 +1,7 @@
 # backend/simulator/models.py
 """Entidades principales (jugadores, bola, resultados, configuración) del simulador ADAF."""
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Literal, Optional, Any
 
 
 import numpy as np
@@ -100,6 +100,7 @@ class PointResult:
     game_end: bool = False               # True si este punto termina el game
     set_end: bool = False                # True si este punto termina el set
     is_tiebreak: bool = False            # True si el punto es parte de un tie-break
+    actions: List[Action] = field(default_factory=list)
 
     # ============================================================
     # Métodos útiles
@@ -118,6 +119,7 @@ class PointResult:
             "game_end": self.game_end,
             "set_end": self.set_end,
             "is_tiebreak": self.is_tiebreak,
+            "actions": [a.to_dict() for a in self.actions],
         }
 
         if names and self.winner_id in names:
@@ -194,3 +196,31 @@ class Config:
     tiebreak: bool = True
     collect_feed: bool = False
     seed: Optional[int] = None
+
+
+@dataclass(slots=True)
+class Action:
+    action_index: int
+    actor_id: str                          # "P1" | "P2"
+    action_type: Literal[
+        "FIRST_SERVE", "SECOND_SERVE", "RETURN", "RALLY_SHOT", "REACH"
+    ]
+    outcome: Literal[
+        "IN", "OUT", "FAULT", "DOUBLE_FAULT", "REACHED", "NOT_REACHED"
+    ]
+    shot_type: Optional[Literal["FH", "BH"]] = None
+    power: Optional[float] = None          # 0.0–1.0
+    precision: Optional[float] = None      # 0.0–1.0
+    clutch: bool = False
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "action_index": self.action_index,
+            "actor_id": self.actor_id,
+            "action_type": self.action_type,
+            "outcome": self.outcome,
+            "shot_type": self.shot_type,
+            "power": self.power,
+            "precision": self.precision,
+            "clutch": self.clutch,
+        }

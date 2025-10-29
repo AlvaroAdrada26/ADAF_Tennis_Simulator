@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional
 
-from .models import Player, Ball, PointResult
+from .models import Player, Ball, PointResult, Action
 from .shots import Serve, ReturnShot, RallyShot
 from .utils import SACADOR, RESTADOR
 
@@ -30,6 +30,7 @@ class PointSimulator:
 
     def simulate(self, verbose: bool = True) -> PointResult:
         feed: List[str] = []
+        actions: List[Action] = []
         stats = {
             "aces": 0,
             "double_faults": 0,
@@ -40,14 +41,37 @@ class PointSimulator:
             "rally_shots": 0,
         }
 
-        def translate_winner(winner_tag: str) -> str:  # 👈 nuevo
+        def translate_winner(winner_tag: str) -> str:
             return self.tags.get(winner_tag, "NINGUNO")
 
         # ============================================================
-        # 1️⃣ SAQUE
+        # SAQUE
         # ============================================================
         srv = Serve(self.S, self.R, feed, clutch=self.clutch)
         ball, slog = srv.serve_sequence()
+
+        # Registrar primer saque
+        actions.append(Action(
+            action_index=len(actions),
+            actor_id=self.tags["SACADOR"],
+            action_type="FIRST_SERVE",
+            outcome="IN" if slog["first"]["in"] else "FAULT",
+            power=slog["first"]["pot"],
+            precision=slog["first"]["prec"],
+            clutch=self.clutch
+        ))
+
+        # --- Segundo saque (si hubo) ---
+        if slog["second"] is not None:
+            actions.append(Action(
+                action_index=len(actions),
+                actor_id=self.tags["SACADOR"],
+                action_type="SECOND_SERVE",
+                outcome="IN" if slog["second"]["in"] else "DOBLE_FAULT",
+                power=slog["second"]["pot"],
+                precision=slog["second"]["prec"],
+                clutch=self.clutch
+            ))
 
         isFirst = True
         stats["first_total"] += 1
@@ -63,29 +87,53 @@ class PointSimulator:
             feed.append(">>> Resultado: DOBLE FALTA")
             return PointResult(
                 winner=RESTADOR,
-                winner_id=translate_winner(RESTADOR),  # 👈 nuevo
+                winner_id=translate_winner(RESTADOR),
                 reason="doble_falta",
                 feed=feed,
-                stats=stats
+                stats=stats,
+                actions=actions
             )
 
         # ============================================================
-        # 2️⃣ RESTO
+        # RESTO
         # ============================================================
         ret = ReturnShot(self.S, self.R, feed, clutch=self.clutch)
         ok, pr_reach = ret.attempt_reach(ball, isFirst)
+
+        # --- Intento de alcanzar saque ---
+        actions.append(Action(
+            action_index=len(actions),
+            actor_id=self.tags["RESTADOR"],
+            action_type="REACH",
+            outcome="REACHED" if ok else "NOT_REACHED",
+            clutch=self.clutch
+        ))
+
         if not ok:
             stats["aces"] += 1
             feed.append(">>> Resultado: ACE")
             return PointResult(
                 winner=SACADOR,
-                winner_id=translate_winner(SACADOR),  # 👈 nuevo
+                winner_id=translate_winner(SACADOR),
                 reason="ace",
                 feed=feed,
-                stats=stats
+                stats=stats,
+                actions=actions
             )
 
         ball, rlog = ret.produce_ball(ball)
+        # --- Golpe de resto ---
+        actions.append(Action(
+            action_index=len(actions),
+            actor_id=self.tags["RESTADOR"],
+            action_type="RETURN",
+            outcome="IN" if rlog["in"] else "OUT",
+            shot_type=rlog["side"],
+            power=rlog["pot"],
+            precision=rlog["prec"],
+            clutch=self.clutch
+        ))
+
         if ball is None:
             feed.append(">>> Resultado: ERROR DE RESTO")
             return PointResult(
@@ -93,11 +141,12 @@ class PointSimulator:
                 winner_id=translate_winner(SACADOR),
                 reason="error_resto",
                 feed=feed,
-                stats=stats
+                stats=stats,
+                actions=actions
             )
 
         # ============================================================
-        # 3️⃣ RALLY
+        # RALLY
         # ============================================================
         while True:
             stats["rally_shots"] += 1
@@ -109,17 +158,41 @@ class PointSimulator:
 
             rally = RallyShot(hitter_obj, other_obj, feed, clutch=self.clutch)
             ok, pr = rally.attempt_reach(ball)
+
+            # --- Intento de alcanzar durante rally ---
+            actions.append(Action(
+                action_index=len(actions),
+                actor_id=self.tags[RESTADOR if tag_prev == SACADOR else SACADOR],
+                action_type="REACH",
+                outcome="REACHED" if ok else "NOT_REACHED",
+                clutch=self.clutch
+            ))
+
             if not ok:
                 feed.append(f">>> Resultado: PUNTO para {tag_prev} (no llega)")
                 return PointResult(
                     winner=tag_prev,
-                    winner_id=translate_winner(tag_prev),  # 👈 nuevo
+                    winner_id=translate_winner(tag_prev),
                     reason="no_llega",
                     feed=feed,
-                    stats=stats
+                    stats=stats,
+                    actions=actions
                 )
 
             ball2, log = rally.produce_ball(ball)
+
+            # --- Golpe durante rally ---
+            actions.append(Action(
+                action_index=len(actions),
+                actor_id=self.tags[RESTADOR if tag_prev == SACADOR else SACADOR],
+                action_type="RALLY_SHOT",
+                outcome="IN" if log["in"] else "OUT",
+                shot_type=log["side"],
+                power=log["pot"],
+                precision=log["prec"],
+                clutch=self.clutch
+            ))
+
             if ball2 is None:
                 feed.append(f">>> Resultado: PUNTO para {tag_prev} (falla golpe)")
                 return PointResult(
@@ -127,7 +200,8 @@ class PointSimulator:
                     winner_id=translate_winner(tag_prev), 
                     reason="error_golpe",
                     feed=feed,
-                    stats=stats
+                    stats=stats,
+                    actions=actions
                 )
 
             ball = ball2

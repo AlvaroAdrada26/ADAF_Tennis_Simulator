@@ -1,0 +1,74 @@
+{
+  "FIRST_SERVE": {
+    "IN": [
+      "Gran primero de {name}, que toma la iniciativa desde el servicio.",
+      "{name} encuentra el ángulo perfecto con su primer saque, empezando el punto con autoridad.",
+      "Potente primero de {name}, que marca el ritmo del intercambio desde el inicio.",
+      "Saque directo de {name}, impecable en potencia y colocación.",
+      "{name} conecta un misil con su primer servicio, sin dar opciones al rival.",
+      "El primer saque de {name} viaja a toda velocidad, forzando un resto defensivo.",
+      "{name} impone su fuerza desde el servicio, dominando el punto de inicio a fin.",
+      "{name} abre el punto con un excelente primer saque, profundo y bien colocado.",
+      "Saque firme y controlado de {name}, que busca dominar el punto desde el inicio.",
+      "Muy buen primero de {name}, que combina potencia y precisión.",
+      "{name} ejecuta un saque consistente, que pone en aprietos al restador.",
+      "{name} juega un primero pesado al cuerpo, dificultando la respuesta del rival.",
+      "Primer saque bien dirigido de {name}, que le da ventaja desde el inicio.",
+      "Buen primero de {name}, con profundidad y buena dirección.",
+      "{name} asegura un gran primer servicio, sólido y bien medido."
+    ],
+    "FAULT": [
+      "Primer saque fallado por {name}.",
+      "{name} intenta un primero potente, pero se le va por poco.",
+      "El primer servicio de {name} se marcha largo.",
+      "{name} fuerza demasiado el primero y lo manda fuera.",
+      "Saque errado por {name}, que buscará mejor suerte con el segundo.",
+      "El primer servicio de {name} impacta en la red.",
+      "{name} comete un fallo con su primer saque, sin margen de error.",
+      "Primer intento de {name} fuera de los límites.",
+      "{name} arriesga con el primero y no entra.",
+      "El primer saque de {name} se queda en la red.",
+      "Servicio fallado por {name}, sin amenaza real.",
+      "{name} lanza un primero que no encuentra pista.",
+      "Saque que se marcha por centímetros de {name}.",
+      "{name} no logra meter el primero, toca recurrir al segundo.",
+      "Error en el primer servicio de {name}, un intento agresivo sin éxito."
+    ]
+  },
+  "SECOND_SERVE": {
+    "IN": [
+      "Segundo saque arriesgado de {name}, que entra con gran precisión.",
+      "{name} juega un segundo servicio agresivo y bien dirigido.",
+      "{name} sorprende con un segundo potente que le da ventaja en el punto.",
+      "Gran segundo de {name}, que entra con valentía y buena colocación.",
+      "{name} asume riesgos con el segundo, pero la ejecución es impecable.",
+      "{name} arriesga en el segundo saque y le sale bien.",
+      "Buen segundo servicio de {name}, con buena colocación.",
+      "{name} busca profundidad con el segundo, logrando un inicio sólido.",
+      "Segundo saque ofensivo de {name}, bien jugado.",
+      "{name} asegura el segundo saque con precisión y calma.",
+      "Servicio consistente de {name}, evita el doble fallo.",
+      "{name} coloca el segundo con buena dirección, sin arriesgar de más.",
+      "Segundo servicio fiable de {name}, que mantiene el control.",
+      "{name} mete un segundo seguro, buscando mantener el punto vivo.",
+      "{name} juega un segundo servicio táctico, medido y efectivo."
+    ],
+    "DOUBLE_FAULT": [
+      "Doble falta de {name}.",
+      "{name} falla el segundo servicio y entrega el punto.",
+      "{name} comete doble falta en un momento delicado.",
+      "Segundo saque de {name} también fuera, punto para el rival.",
+      "{name} no logra colocar ninguno de sus dos saques.",
+      "Error consecutivo de {name}, doble falta clara.",
+      "{name} pierde el punto con una doble falta inoportuna.",
+      "Doble error al servicio de {name}, cede el punto sin intercambio.",
+      "{name} desaprovecha la oportunidad con una doble falta.",
+      "Segundo servicio que se marcha, doble falta de {name}.",
+      "Doble falta cometida por {name}, que muestra frustración.",
+      "{name} arriesga con el segundo y vuelve a fallar.",
+      "El segundo también se va fuera, doble falta para {name}.",
+      "{name} entrega el punto tras errar ambos servicios.",
+      "Doble falta de {name}, error que podría costarle caro."
+    ]
+  }
+}
