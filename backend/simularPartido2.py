@@ -653,6 +653,7 @@ if __name__ == "__main__":
     # Jugador 1
     player1 = Player(
         name="Alcaraz",
+        id="P1",
         Primer_Saque = 80,   # muy sólido pero no un cañonero tipo Isner
         Segundo_Saque = 80,  # consistente y con efecto, raro que falle
         Fisico = 80,         # uno de los mejores físicamente del circuito
@@ -670,6 +671,7 @@ if __name__ == "__main__":
     # Jugador 2
     player2 = Player(
         name="Sinner",
+        id="P2",
         Primer_Saque = 80,   # muy buen primer servicio
         Segundo_Saque = 80,  # correcto, pero algo menos seguro que Alcaraz
         Fisico = 80,         # fuerte y estable físicamente

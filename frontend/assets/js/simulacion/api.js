@@ -8,12 +8,14 @@ export async function fetchMatchData() {
   const inputData = {
     player1: {
       name: "Alvaro",
+      id: "P1",
       Primer_Saque: 82, Segundo_Saque: 80, Fisico: 88, Estamina: 90,
       Consistencia: 85, Clutch: 87, Momentum: 0, Derecha: 90, Reves: 86,
       Resto: 83, Movilidad: 89
     },
     player2: {
       name: "Diego",
+      id: "P2",
       Primer_Saque: 83, Segundo_Saque: 81, Fisico: 86, Estamina: 88,
       Consistencia: 84, Clutch: 85, Momentum: 0, Derecha: 88, Reves: 90,
       Resto: 82, Movilidad: 86

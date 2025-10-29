@@ -33,8 +33,8 @@ export async function initLiveFeed() {
    ========================================================= */
 export function updatePointsFeed(pointData) {
   const { matchData } = getState();
-  const feedList = document.getElementById("feed-list");
-  const feedContainer = document.getElementById("points-feed");
+  const feedList = document.getElementById("points-feed-list");
+  const feedContainer = document.getElementById("points-feed-container");
   if (!feedList || !pointData) return;
 
   const setNum = pointData.set || 1;

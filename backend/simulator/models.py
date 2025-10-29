@@ -10,6 +10,7 @@ from .utils import SACADOR, RESTADOR
 @dataclass(slots=True)
 class Player:
     name: str
+    id: str
     Primer_Saque: float
     Segundo_Saque: float
     Fisico: float
@@ -24,6 +25,11 @@ class Player:
 
     # --- Estado interno dinámico (no recibido por API) ---
     streak: int = field(default=0, repr=False)
+
+    def __post_init__(self):
+        if not hasattr(self, "id") or self.id is None:
+            import traceback; traceback.print_stack()
+            breakpoint()
 
     # --- Propiedades normalizadas (0..1) ---
     @property

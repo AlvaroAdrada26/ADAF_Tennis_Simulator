@@ -53,7 +53,7 @@ class PointSimulator:
         # Registrar primer saque
         actions.append(Action(
             action_index=len(actions),
-            actor_id=self.tags["SACADOR"],
+            actor_id=self.S.id,
             action_type="FIRST_SERVE",
             outcome="IN" if slog["first"]["in"] else "FAULT",
             power=slog["first"]["pot"],
@@ -65,7 +65,7 @@ class PointSimulator:
         if slog["second"] is not None:
             actions.append(Action(
                 action_index=len(actions),
-                actor_id=self.tags["SACADOR"],
+                actor_id=self.S.id,
                 action_type="SECOND_SERVE",
                 outcome="IN" if slog["second"]["in"] else "DOBLE_FAULT",
                 power=slog["second"]["pot"],
@@ -103,7 +103,7 @@ class PointSimulator:
         # --- Intento de alcanzar saque ---
         actions.append(Action(
             action_index=len(actions),
-            actor_id=self.tags["RESTADOR"],
+            actor_id=self.R.id,
             action_type="REACH",
             outcome="REACHED" if ok else "NOT_REACHED",
             clutch=self.clutch
@@ -125,7 +125,7 @@ class PointSimulator:
         # --- Golpe de resto ---
         actions.append(Action(
             action_index=len(actions),
-            actor_id=self.tags["RESTADOR"],
+            actor_id=self.R.id,
             action_type="RETURN",
             outcome="IN" if rlog["in"] else "OUT",
             shot_type=rlog["side"],
@@ -162,7 +162,7 @@ class PointSimulator:
             # --- Intento de alcanzar durante rally ---
             actions.append(Action(
                 action_index=len(actions),
-                actor_id=self.tags[RESTADOR if tag_prev == SACADOR else SACADOR],
+                actor_id=hitter_obj.id,
                 action_type="REACH",
                 outcome="REACHED" if ok else "NOT_REACHED",
                 clutch=self.clutch
@@ -184,7 +184,7 @@ class PointSimulator:
             # --- Golpe durante rally ---
             actions.append(Action(
                 action_index=len(actions),
-                actor_id=self.tags[RESTADOR if tag_prev == SACADOR else SACADOR],
+                actor_id=hitter_obj.id,
                 action_type="RALLY_SHOT",
                 outcome="IN" if log["in"] else "OUT",
                 shot_type=log["side"],

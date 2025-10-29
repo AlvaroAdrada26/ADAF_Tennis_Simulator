@@ -8,6 +8,9 @@ listo para ser enviado como respuesta JSON desde FastAPI.
 """
 
 from __future__ import annotations
+import json
+import sys
+import traceback
 from typing import Dict, Any
 from .models import Player, Config
 from .scoring import TennisMatch

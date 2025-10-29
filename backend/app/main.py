@@ -20,6 +20,7 @@ from backend.simulator.api import run_match
 
 class PlayerData(BaseModel):
     name: str
+    id: str
     Primer_Saque: float
     Segundo_Saque: float
     Fisico: float
