@@ -48,7 +48,7 @@ def run_match(player1_data: Dict[str, Any],
         - "timeline": lista de puntos con estructura detallada
     """
     # --------------------------------------------------------
-    # 1️⃣ Inicialización
+    # Inicialización
     # --------------------------------------------------------
     cfg = Config(**(config or {}))
     seed_all(cfg.seed)
@@ -57,7 +57,7 @@ def run_match(player1_data: Dict[str, Any],
     p2 = Player(**player2_data)
 
     # --------------------------------------------------------
-    # 2️⃣ Ejecución del partido completo
+    # Ejecución del partido completo
     # --------------------------------------------------------
     match = TennisMatch(
         p1, p2,
@@ -65,10 +65,10 @@ def run_match(player1_data: Dict[str, Any],
         tiebreak=cfg.tiebreak
     )
 
-    # ✅ TennisMatch.play() devuelve ya un dict estructurado
+    # TennisMatch.play() devuelve ya un dict estructurado
     result = match.play(verbose=False)
 
     # --------------------------------------------------------
-    # 3️⃣ Devolver resultado directamente
+    # Devolver resultado directamente
     # --------------------------------------------------------
     return result
