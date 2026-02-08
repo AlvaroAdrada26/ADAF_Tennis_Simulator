@@ -1,8 +1,8 @@
 # backend/simulator/models.py
 """Entidades principales (jugadores, bola, resultados, configuración) del simulador ADAF."""
+from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Dict, Literal, Optional, Any
-
 
 import numpy as np
 from .utils import SACADOR, RESTADOR
