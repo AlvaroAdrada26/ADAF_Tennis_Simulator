@@ -1,331 +1,40 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulación en Tiempo Real - ADAF Tennis Simulator</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!--<script src="https://kit.fontawesome.com/a2e0e6b6a8.js" crossorigin="anonymous"></script>-->
-  <link rel="icon" type="image/png" href="assets/images/Logo_ADAF_SinLetras.png" />
-  <!-- ICONOS FONT AWESOME -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    integrity="sha512-yz5r+4CXb3LzPZ1xrK8hE2A2cbQgWbR4RwcvqZbkRe7fQINcsqV7TVPNs3w8XbYZKnVvEdP6Vb6pX8Yd3M6Ww=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
+﻿{% extends "layouts/base.html" %}
 
+{% block title %}Simulación en Tiempo Real - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-yz5r+4CXb3LzPZ1xrK8hE2A2cbQgWbR4RwcvqZbkRe7fQINcsqV7TVPNs3w8XbYZKnVvEdP6Vb6pX8Yd3M6Ww==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    /* TRANSICIONES DE LA SIDEBAR */
-    .sidebar-expanded {
-      transition: transform 0.3s ease-in-out;
-    }
-    .sidebar-hidden {
-      transform: 
-      translateX(-100%);
-    }
-
-    /* TRANSICIONES DEL CONTENIDO PRINCIPAL */
-    .content-expanded {
-      transition: margin-left 0.3s ease-in-out;
-    }
-    
-    .content-collapsed {
-      margin-left: 4rem; /* 64px - solo el ancho del sidebar de iconos */
-    }
-
-    /* MARCADOR */
-    .score-glow {
-      text-shadow: 0 0 8px rgba(255, 255, 0, 0.7);
-    }
-
-    .set-winner {
-      color: #FFD700;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6);
-    }
-
-    .set-loser {
-      color: #6b7280;
-    }
-
-    .set-in-game {
-      color: #4fd1c5;
-      text-shadow: 0 0 6px rgba(79, 209, 197, 0.6), 0 0 12px rgba(79, 209, 197, 0.4);
-      font-weight: 700;
-    }
-
-    .serve-ball {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fff 10%, #ffeb3b 40%, #facc15 80%);
-      box-shadow: 0 0 8px rgba(255, 255, 0, 0.7);
-      display: inline-block;
-      margin-right: 18px;
-      margin-left: -8px;
-      vertical-align: middle;
-    }
-
-    .serve-ball.off {
-      opacity: 0;
-      filter: blur(2px);
-    }
-
-    /* BOTONES DE CONTROL */
-    .control-btn:active {
-      transform: scale(0.95);
-      filter: brightness(1.1);
-    }
-
-    /* ==== SCROLL PERSONALIZADO ==== */
-    #points-feed::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    #points-feed::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.4); /* slate-900/40 */
-      border-radius: 8px;
-    }
-
-    #points-feed::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #1e3a8a, #2563eb); /* azul elegante */
-      border-radius: 8px;
-      transition: background 0.3s ease;
-    }
-
-    #points-feed::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(180deg, #2563eb, #38bdf8); /* tono más claro al hover */
-    }
-
-
+    .score-glow { text-shadow: 0 0 8px rgba(255, 255, 0, 0.7); }
+    .set-winner { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6); }
+    .set-loser { color: #6b7280; }
+    .set-in-game { color: #4fd1c5; text-shadow: 0 0 6px rgba(79, 209, 197, 0.6), 0 0 12px rgba(79, 209, 197, 0.4); font-weight: 700; }
+    .serve-ball { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff 10%, #ffeb3b 40%, #facc15 80%); box-shadow: 0 0 8px rgba(255, 255, 0, 0.7); display: inline-block; margin-right: 18px; margin-left: -8px; vertical-align: middle; }
+    .serve-ball.off { opacity: 0; filter: blur(2px); }
+    .control-btn:active { transform: scale(0.95); filter: brightness(1.1); }
+    #points-feed::-webkit-scrollbar { width: 8px; }
+    #points-feed::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); border-radius: 8px; }
+    #points-feed::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #1e3a8a, #2563eb); border-radius: 8px; transition: background 0.3s ease; }
+    #points-feed::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #2563eb, #38bdf8); }
   </style>
+{% endblock %}
 
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
 
-</head>
-
-<body class="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-slate-800 relative text-gray-100 font-sans">
-
-    <!-- CAPA DE IMAGEN DE PISTA -->
-  <div class="absolute inset-0 bg-[url('assets/images/homepage_fondo2.jpg')] bg-cover bg-center opacity-15 blur-sm saturate-75 -z-20"></div>
-
-  <!-- CAPA DE FONDO RADIAL SUAVE -->
-  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_rgba(0,0,0,0)_70%)] -z-10"></div>
-
-  <div class="flex min-h-screen">
-
-    <!-- SIDEBAR DE ICONOS -->
-    <div class="fixed left-0 top-0 h-screen w-16 flex flex-col justify-between border-r border-blue-800/30 bg-slate-950/80 backdrop-blur-sm z-50">
-      <div>
-        <div class="inline-flex size-16 items-center justify-center">
-          <span class="grid size-10 place-content-center rounded-lg bg-yellow-400/20">
-            <img src="assets/images/Logo_ADAF_SinLetras.png" alt="Logo" class="w-8 h-8 rounded">
-          </span>
-        </div>
-
-        <div class="border-t border-blue-800/30">
-          <div class="px-2">
-            <!-- BOTÓN HAMBURGUESA PARA TOGGLE MENU -->
-            <div class="py-4">
-              <button id="menuToggle" class="group relative flex justify-center rounded-sm px-2 py-1.5 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400 w-full">
-                <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-                <span data-i18n="sidebarMenu" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-                  Menú
-                </span>
-              </button>
-            </div>
-
-            <div class="border-t border-blue-800/30 pt-4">
-              <a href="index.html" class="group relative flex justify-center rounded-sm px-2 py-1.5 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                <span data-i18n="sidebarHome" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-yellow-400 group-hover:visible border border-yellow-400/30">
-                  Inicio
-                </span>
-              </a>
-            </div>
-
-            <ul class="space-y-1 border-t border-blue-800/30 pt-4">
-              <li>
-                <a href="nuevaSimulacion.html" class="group relative flex justify-center rounded-sm bg-yellow-400/20 px-2 py-1.5 text-yellow-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span data-i18n="sidebarSimulacion" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-yellow-400 group-hover:visible border border-yellow-400/30">
-                    Simulación
-                  </span>
-                </a>
-              </li>
-
-              <li>
-                <a href="menu.html" class="group relative flex justify-center rounded-sm px-2 py-1.5 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  <span data-i18n="sidebarJugadores" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-                    Jugadores
-                  </span>
-                </a>
-              </li>
-
-              <li>
-                <a href="#" class="group relative flex justify-center rounded-sm px-2 py-1.5 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  <span data-i18n="sidebarEstadisticas" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-                    Estadísticas
-                  </span>
-                </a>
-              </li>
-
-              <li>
-                <a href="#" class="group relative flex justify-center rounded-sm px-2 py-1.5 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span data-i18n="sidebarConfiguracion" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-                    Configuración
-                  </span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="sticky inset-x-0 bottom-0 border-t border-blue-800/30 bg-slate-950/80 p-2">
-        <a href="index.html" class="group relative flex w-full justify-center rounded-lg px-2 py-1.5 text-sm text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h4a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h4a1 1 0 001-1V10" />
-          </svg>
-          <span data-i18n="sidebarLogout" class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
-            Ir al inicio
-          </span>
-        </a>
-      </div>
-    </div>
-
-    <!-- SIDEBAR EXPANDIDO -->
-    <div id="expandedSidebar" class="sidebar-expanded sidebar-hidden fixed left-16 top-0 h-screen w-64 flex flex-col justify-between border-r border-blue-800/30 bg-slate-950/70 backdrop-blur-sm z-40">
-      <div class="px-4 py-6">
-        <ul class="mt-14 space-y-1">
-          <li>
-            <a data-i18n="sidebarHome" href="#" class="block rounded-lg bg-yellow-400/20 px-4 py-2 text-sm font-medium text-yellow-400">
-              Inicio
-            </a>
-          </li>
-
-          <li>
-            <details class="group [&_summary::-webkit-details-marker]:hidden">
-              <summary class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-                <span class="text-sm font-medium" data-i18n="sidebarSimulacion">Simulación</span>
-                <span class="shrink-0 transition duration-300 group-open:-rotate-180">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                </span>
-              </summary>
-              <ul class="mt-2 space-y-1 px-4">
-                <li>
-                  <a data-i18n="sidebarNuevaSimulacion" href="nuevaSimulacion.html" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
-                    Nueva Simulación
-                  </a>
-                </li>
-                <li>
-                  <a data-i18n="sidebarHistorial" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
-                    Historial
-                  </a>
-                </li>
-              </ul>
-            </details>
-          </li>
-
-          <li>
-            <a data-i18n="sidebarJugadores" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-              Jugadores
-            </a>
-          </li>
-
-          <li>
-            <a data-i18n="sidebarEstadisticas" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-              Estadísticas
-            </a>
-          </li>
-
-          <li>
-            <details class="group [&_summary::-webkit-details-marker]:hidden">
-              <summary class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
-                <span class="text-sm font-medium" data-i18n="sidebarConfiguracion">Configuración</span>
-                <span class="shrink-0 transition duration-300 group-open:-rotate-180">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                </span>
-              </summary>
-              <ul class="mt-2 space-y-1 px-4">
-                <li>
-                  <a data-i18n="sidebarConfiguracionGeneral" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
-                    General
-                  </a>
-                </li>
-                <li>
-                  <a data-i18n="sidebarConfiguracionAvanzado" href="#" class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
-                    Avanzado
-                  </a>
-                </li>
-                <li>
-                  <a data-i18n="sidebarConfiguracionLogout" href="#" class="w-full rounded-lg px-4 py-2 text-sm font-medium text-gray-400 hover:bg-slate-800/50 hover:text-gray-200">
-                    Salir
-                  </a>
-                </li>
-              </ul>
-            </details>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <div id="mainContent" class="content-expanded content-collapsed flex-1 flex flex-col justify-between">
-
-      <!-- HEADER -->
-      <header class="w-full flex justify-between items-center px-10 py-4 bg-slate-950/40 backdrop-blur-sm border-b border-blue-800/30">
-        
-        <h1 class="text-xl font-semibold text-yellow-400 tracking-wide">ADAF Tennis Simulator</h1>
-        
-        <!-- BOTONES DE IDIOMA -->
-        <div class="flex items-center gap-3">
-          <button id="lang-es" title="Versión en Español" class="cursor-pointer hover:scale-110 transition">
-            <img src="assets/images/flag_es.png" alt="Español" class="w-8 h-8 rounded-full border-2 border-yellow-400 shadow-lg">
-          </button>
-          <button id="lang-en" title="English version" class="cursor-pointer hover:scale-110 transition">
-            <img src="assets/images/flag_uk.png" alt="English" class="w-8 h-8 rounded-full border border-gray-400 shadow-sm">
-          </button>
-        </div>
-
-      </header>
-
-      <!-- SECCIONES PRINCIPALES -->
-      <div class="flex-1 px-8 py-12 space-y-16 animate-fade-up">  
+{% block content %}
+      <div class="flex-1 px-8 py-12 space-y-16 animate-fade-up">
 
         <!-- INFORMACIÓN DEL PARTIDO -->
         <section id="match-info" class="text-center">
-            <h2 class="text-4xl font-bold text-yellow-400 mb-4">Partido Rápido · Pista Dura</h2>
-            <p class="text-gray-400 text-lg">Al mejor de 3 sets · Tie-Break</p>
+          <h2 class="text-4xl font-bold text-yellow-400 mb-4">Partido Rápido · Pista Dura</h2>
+          <p class="text-gray-400 text-lg">Al mejor de 3 sets · Tie-Break</p>
         </section>
 
         <!-- PANEL DE MARCADOR -->
         <div id="scoreboard-panel" class="w-full flex flex-col items-center justify-center py-10 px-8">
-
-          <!-- MARCADOR CENTRAL -->
           <div class="w-full max-w-6xl bg-slate-900/50 border border-blue-800/40 rounded-2xl shadow-lg backdrop-blur-sm p-10 text-center mb-10">
-
             <div class="grid grid-cols-7 text-center text-yellow-400 mb-4 text-lg uppercase tracking-wider">
               <span class="col-span-2"></span>
               <span>Set 1</span>
@@ -333,8 +42,6 @@
               <span>Set 3</span>
               <span>Puntos</span>
             </div>
-
-            <!-- Jugador 1 -->
             <div class="grid grid-cols-7 items-center text-center py-4 border-t border-blue-800/30" id="player1-row">
               <div class="col-span-2 text-right pr-6 font-semibold text-yellow-300 flex items-center justify-end text-3xl">
                 <span id="serve-p1" class="serve-ball"></span>
@@ -345,8 +52,6 @@
               <div id="p1-set3" class="text-4xl font-bold"> </div>
               <div id="p1-points" class="text-4xl font-extrabold text-yellow-400 score-glow">0</div>
             </div>
-
-            <!-- Jugador 2 -->
             <div class="grid grid-cols-7 items-center text-center py-4 border-t border-blue-800/30" id="player2-row">
               <div class="col-span-2 text-right pr-6 font-semibold text-yellow-300 flex items-center justify-end text-3xl">
                 <span id="serve-p2" class="serve-ball off"></span>
@@ -358,109 +63,76 @@
               <div id="p2-points" class="text-4xl font-extrabold text-yellow-400 score-glow">0</div>
             </div>
           </div>
-
         </div>
 
-        <!-- PANEL DE CONTROL DE SIMULACIÓN -->
+        <!-- PANEL DE CONTROL -->
         <section id="control-panel" class="w-full flex flex-col items-center justify-center mt-4 mb-2">
-
-          <!-- CONTENEDOR PRINCIPAL -->
           <div class="bg-slate-900/50 border border-blue-800/40 rounded-2xl shadow-xl backdrop-blur-sm px-10 py-6 flex flex-col items-center">
-
-            <!-- BOTONES DE CONTROL -->
             <div class="flex items-center justify-center gap-16">
-
-              <!-- REINICIAR PARTIDO -->
               <div class="flex flex-col items-center">
                 <button class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                      stroke="darkblue" stroke-width="2" class="w-7 h-7">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2" class="w-7 h-7">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v16m2-8l7 8V4l-7 8zm8 0l7 8V4l-7 8z" />
                   </svg>
                 </button>
                 <span class="text-sm mt-2 text-gray-200 font-medium">Reiniciar</span>
               </div>
-
-              <!-- ANTERIOR PUNTO -->
               <div class="flex flex-col items-center">
                 <button id="btn-previous" class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                      stroke="darkblue" stroke-width="2" class="w-7 h-7">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2" class="w-7 h-7">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 20l-9-8 9-8v16zM5 4v16" />
                   </svg>
                 </button>
                 <span class="text-sm mt-2 text-gray-200 font-medium">Anterior</span>
               </div>
-
-              <!-- REPRODUCIR / PAUSAR -->
               <div class="flex flex-col items-center">
                 <button id="btn-play" class="control-btn w-20 h-20 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                  <svg id="icon-play" xmlns="http://www.w3.org/2000/svg" fill="none"
-                      viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5"
-                      class="w-9 h-9 transition-all duration-300">
+                  <svg id="icon-play" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5" class="w-9 h-9 transition-all duration-300">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z" />
                   </svg>
                 </button>
                 <span class="text-sm mt-2 text-gray-200 font-medium">Reproducir / Pausar</span>
               </div>
-
-              <!-- SIGUIENTE PUNTO -->
               <div class="flex flex-col items-center">
                 <button id="btn-next" class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                      stroke="darkblue" stroke-width="2" class="w-7 h-7">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2" class="w-7 h-7">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 4l9 8-9 8V4zm14 0v16" />
                   </svg>
                 </button>
                 <span class="text-sm mt-2 text-gray-200 font-medium">Siguiente</span>
               </div>
-
-              <!-- IR AL FINAL -->
               <div class="flex flex-col items-center">
                 <button id="btn-end" class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                      stroke="darkblue" stroke-width="2" class="w-7 h-7">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2" class="w-7 h-7">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20 4v16m-2-8l-7 8V4l7 8zm-8 0l-7 8V4l7 8z" />
                   </svg>
                 </button>
                 <span class="text-sm mt-2 text-gray-200 font-medium">Ir al Final</span>
               </div>
             </div>
-
-            <!-- SELECTOR DE VELOCIDAD -->
             <div class="mt-8 w-full max-w-md text-center">
               <p class="text-sm text-gray-200 mb-2 font-medium">Velocidad</p>
-              <div class="flex justify-center gap-4"
-              >
+              <div class="flex justify-center gap-4">
                 <button class="speed-btn px-4 py-2 rounded-md border border-yellow-400/60 font-semibold transition bg-yellow-400 text-slate-900 hover:bg-yellow-400 hover:text-slate-900" data-speed="1">x1</button>
                 <button class="speed-btn px-4 py-2 rounded-md border border-yellow-400/60 text-yellow-300 font-semibold hover:bg-yellow-400 hover:text-slate-900 transition" data-speed="2">x2</button>
                 <button class="speed-btn px-4 py-2 rounded-md border border-yellow-400/60 text-yellow-300 font-semibold hover:bg-yellow-400 hover:text-slate-900 transition" data-speed="4">x4</button>
               </div>
             </div>
-
           </div>
         </section>
 
         <!-- PANEL DE SIMULACIÓN -->
         <section id="live-match" class="flex w-full justify-between items-start gap-6 px-8 py-10">
-
-          <!--  JUGADOR 1 -->
           <div class="w-1/4 bg-slate-900/50 border border-blue-800/30 rounded-xl shadow-md backdrop-blur-sm p-5">
-            <h3 class="text-lg font-semibold text-yellow-400 mb-4 text-center">C. Alcaraz 🇪🇸</h3>
-
-            <!-- STAMINA -->
+            <h3 class="text-lg font-semibold text-yellow-400 mb-4 text-center">C. Alcaraz </h3>
             <p class="text-xs text-gray-400">Stamina</p>
             <div class="w-full bg-slate-800 rounded-full h-2 mb-3">
               <div class="bg-green-400 h-2 rounded-full" style="width: 85%"></div>
             </div>
-
-            <!-- MOMENTUM -->
             <p class="text-xs text-gray-400">Momentum</p>
             <div class="w-full bg-slate-800 rounded-full h-2 mb-5">
               <div class="bg-yellow-400 h-2 rounded-full" style="width: 60%"></div>
             </div>
-
-            <!-- ESTADÍSTICAS -->
             <ul class="text-sm text-gray-300 space-y-1">
               <li><span class="text-yellow-400 font-medium">1ºs Dentro:</span> 68%</li>
               <li><span class="text-yellow-400 font-medium">Aces:</span> 4</li>
@@ -470,19 +142,14 @@
               <li><span class="text-yellow-400 font-medium">Break points:</span> <span class="text-green-400 font-semibold">1</span>/<span class="text-gray-400">5</span></li>
             </ul>
           </div>
-
-          <!--  PANEL CENTRAL: PUNTO ACTUAL -->
           <div class="flex-1 bg-slate-900/40 border border-blue-800/30 rounded-xl shadow-lg backdrop-blur-sm p-6 text-center">
             <h2 class="text-xl font-semibold text-yellow-400 mb-3">Punto Actual</h2>
-            
             <div class="bg-slate-800/40 rounded-lg border border-blue-800/30 p-4 mb-6">
               <p class="text-gray-300 italic mb-2">[Golpe 1] Saque abierto de Alcaraz.</p>
               <p class="text-gray-300 italic mb-2">[Golpe 2] Resto cruzado de Djokovic.</p>
               <p class="text-gray-300 italic mb-2">[Golpe 3] Winner de derecha.</p>
               <p class="text-yellow-400 font-semibold mt-2"> Punto para Alcaraz</p>
             </div>
-
-            <!-- MINI FEED DE JUGADAS -->
             <div class="text-left max-h-40 overflow-y-auto px-2">
               <h3 class="text-sm uppercase text-gray-400 mb-1">Registro de Jugadas</h3>
               <ul class="space-y-1 text-gray-300 text-xs">
@@ -494,24 +161,16 @@
               </ul>
             </div>
           </div>
-
-          <!-- JUGADOR 2 -->
           <div class="w-1/4 bg-slate-900/50 border border-blue-800/30 rounded-xl shadow-md backdrop-blur-sm p-5">
-            <h3 class="text-lg font-semibold text-yellow-400 mb-4 text-center">N. Djokovic 🇷🇸</h3>
-
-            <!-- STAMINA -->
+            <h3 class="text-lg font-semibold text-yellow-400 mb-4 text-center">N. Djokovic </h3>
             <p class="text-xs text-gray-400">Stamina</p>
             <div class="w-full bg-slate-800 rounded-full h-2 mb-3">
               <div class="bg-green-400 h-2 rounded-full" style="width: 70%"></div>
             </div>
-
-            <!-- MOMENTUM -->
             <p class="text-xs text-gray-400">Momentum</p>
             <div class="w-full bg-slate-800 rounded-full h-2 mb-5">
               <div class="bg-yellow-400 h-2 rounded-full" style="width: 40%"></div>
             </div>
-
-            <!-- ESTADÍSTICAS -->
             <ul class="text-sm text-gray-300 space-y-1 text-right">
               <li><span class="text-yellow-400 font-medium">1ºs Dentro:</span> 63%</li>
               <li><span class="text-yellow-400 font-medium">Aces:</span> 2</li>
@@ -521,18 +180,13 @@
               <li><span class="text-yellow-400 font-medium">Break points:</span> <span class="text-green-400 font-semibold">2</span>/<span class="text-gray-400">6</span></li>
             </ul>
           </div>
-
         </section>
 
         <!-- FEED DE PUNTOS -->
         <section id="match-feed" class="w-full px-8 pb-12">
           <div class="bg-slate-900/40 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-6">
-            <h2 class="text-lg font-semibold text-yellow-400 mb-4 text-center uppercase tracking-wide">
-              Registro del Partido
-            </h2>
-
-            <div id="points-feed"
-                class="h-96 overflow-y-auto px-4 py-3 bg-slate-950/30 rounded-xl border border-blue-800/20 scroll-smooth shadow-inner">
+            <h2 class="text-lg font-semibold text-yellow-400 mb-4 text-center uppercase tracking-wide">Registro del Partido</h2>
+            <div id="points-feed" class="h-96 overflow-y-auto px-4 py-3 bg-slate-950/30 rounded-xl border border-blue-800/20 scroll-smooth shadow-inner">
               <ul id="feed-list" class="space-y-3 text-gray-300 text-sm leading-relaxed"></ul>
             </div>
           </div>
@@ -541,77 +195,22 @@
         <!-- SIMULACIÓN EN TIEMPO REAL -->
         <section id="live-feed" class="w-full px-8 pb-6">
           <div class="bg-slate-900/40 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-5">
-            <h2 class="text-lg font-semibold text-yellow-400 mb-3 text-center uppercase tracking-wide">
-              Simulación en tiempo real
-            </h2>
-
-            <div id="live-events"
-                class="h-48 overflow-y-auto px-3 py-2 bg-slate-950/30 rounded-lg border border-blue-800/20 scroll-smooth shadow-inner">
+            <h2 class="text-lg font-semibold text-yellow-400 mb-3 text-center uppercase tracking-wide">Simulación en tiempo real</h2>
+            <div id="live-events" class="h-48 overflow-y-auto px-3 py-2 bg-slate-950/30 rounded-lg border border-blue-800/20 scroll-smooth shadow-inner">
               <ul id="live-feed-list" class="space-y-2 text-gray-300 text-sm leading-relaxed font-mono"></ul>
             </div>
           </div>
         </section>
 
-
-
       </div>
-      
-      <!-- FOOTER -->
-      <footer class="bg-slate-950/60 border-t border-blue-800/30 py-6 text-center text-gray-400 text-sm">
-        &copy; 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · UCM
-      </footer>
+{% endblock %}
 
-    </div>
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}
 
-  </div>
-
+{% block scripts %}
   <script>
-    // Toggle del menú lateral
-    const menuToggle = document.getElementById('menuToggle');
-    const menuIcon = document.getElementById('menuIcon');
-    const expandedSidebar = document.getElementById('expandedSidebar');
-    const mainContent = document.getElementById('mainContent');
-    let isMenuOpen = false; // Inicialmente cerrado
-
-    menuToggle.addEventListener('click', () => {
-      isMenuOpen = !isMenuOpen;
-      
-      if (isMenuOpen) {
-        expandedSidebar.classList.remove('sidebar-hidden');
-        mainContent.classList.remove('content-collapsed');
-        mainContent.classList.add('ml-80');
-        // Icono de hamburguesa (menú abierto)
-        menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />';
-      } else {
-        expandedSidebar.classList.add('sidebar-hidden');
-        mainContent.classList.add('content-collapsed');
-        mainContent.classList.remove('ml-80');
-        // Icono de flecha derecha (menú cerrado)
-        menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />';
-      }
-    });
-
-    // Animación del footer al hacer scroll
-    const footer = document.getElementById('main-footer');
-    
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -100px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          footer.classList.add('footer-visible');
-        }
-      });
-    }, observerOptions);
-    
-    observer.observe(footer);
-  </script>
-
-  <script>
-    // PLAY / PAUSE
     const playButton = document.getElementById("btn-play");
     const playIcon = document.getElementById("icon-play");
     let isPlaying = false;
@@ -619,11 +218,10 @@
     playButton.addEventListener("click", () => {
       isPlaying = !isPlaying;
       playIcon.innerHTML = isPlaying
-        ? `<path stroke-linecap="round" stroke-linejoin="round" d="M6 4h4v16H6zM14 4h4v16h-4z" />`
-        : `<path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z" />`;
+        ? '<path stroke-linecap="round" stroke-linejoin="round" d="M6 4h4v16H6zM14 4h4v16h-4z" />'
+        : '<path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z" />';
     });
 
-    // VELOCIDAD
     const speedButtons = document.querySelectorAll(".speed-btn");
     speedButtons.forEach(btn => {
       btn.addEventListener("click", () => {
@@ -637,10 +235,5 @@
       });
     });
   </script>
-  
-
-<script src="static/js/updateScoreboard.js"></script>
-
-
-</body>
-</html>
+  <script src="/static/js/updateScoreboard.js"></script>
+{% endblock %}
