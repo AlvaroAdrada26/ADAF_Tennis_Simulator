@@ -38,7 +38,46 @@
               transform hover:scale-110 transition duration-300">
           Comenzar Simulación
         </a>
+
+        <!-- AUTH CTAs (solo si NO está logueado) -->
+        <div id="hero-auth-buttons" class="hidden mt-8 animate-fade-up">
+          <p class="text-gray-400 text-sm mb-4">¿Nuevo en ADAF Tennis?</p>
+          <div class="flex gap-4 justify-center">
+            <a href="/registro" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full shadow-lg transition transform hover:scale-105">
+              Crear cuenta gratis
+            </a>
+            <a href="/login" class="px-8 py-3 border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black font-semibold rounded-full transition transform hover:scale-105">
+              Iniciar sesión
+            </a>
+          </div>
+        </div>
+
+        <!-- Welcome message (solo si SÍ está logueado) -->
+        <div id="hero-welcome" class="hidden mt-8 animate-fade-up">
+          <p class="text-gray-300 text-lg">
+            Bienvenido, <span id="hero-username" class="text-yellow-400 font-semibold"></span>
+          </p>
+        </div>
       </main>
+
+      <script>
+        // Mostrar botones de auth o mensaje de bienvenida dependiendo del estado
+        (function() {
+          const token = localStorage.getItem('access_token');
+          const user = JSON.parse(localStorage.getItem('user') || 'null');
+          
+          const authButtons = document.getElementById('hero-auth-buttons');
+          const welcome = document.getElementById('hero-welcome');
+          const username = document.getElementById('hero-username');
+          
+          if (token && user) {
+            welcome?.classList.remove('hidden');
+            if (username) username.textContent = user.username || user.nombre;
+          } else {
+            authButtons?.classList.remove('hidden');
+          }
+        })();
+      </script>
 
       <!-- CARACTERÍSTICAS DEL SIMULADOR -->
       <section class="w-full py-24 px-6 bg-slate-900/50">

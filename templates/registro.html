@@ -1,0 +1,595 @@
+{% extends "layouts/auth.html" %}
+
+{% block title %}Registro - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<style>
+  .input-auth {
+    width: 100%;
+    border-radius: 0.5rem;
+    background-color: rgba(2, 6, 23, 0.5);
+    border: 1px solid rgba(250, 204, 21, 0.2);
+    color: #f3f4f6;
+    padding: 0.625rem 1rem 0.625rem 2.75rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    box-shadow: 0 0 8px rgba(255, 255, 0, 0.05);
+  }
+  .input-auth:focus {
+    outline: none;
+    border-color: #facc15;
+    box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2), 0 0 12px rgba(255, 255, 0, 0.1);
+  }
+  .input-auth::placeholder { color: #6b7280; }
+  .input-auth-noicon {
+    padding-left: 1rem;
+  }
+
+  .input-select {
+    width: 100%;
+    border-radius: 0.5rem;
+    background-color: rgba(2, 6, 23, 0.5);
+    border: 1px solid rgba(250, 204, 21, 0.2);
+    color: #f3f4f6;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    box-shadow: 0 0 8px rgba(255, 255, 0, 0.05);
+  }
+  .input-select:focus {
+    outline: none;
+    border-color: #facc15;
+    box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2), 0 0 12px rgba(255, 255, 0, 0.1);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.75rem;
+    background: #facc15;
+    color: #000;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 9999px;
+    transition: all 0.3s;
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.15);
+  }
+  .btn-primary:hover {
+    background: #fbbf24;
+    transform: scale(1.02);
+    box-shadow: 0 0 18px rgba(255, 255, 0, 0.25);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6b7280;
+    transition: color 0.2s;
+  }
+  .toggle-password:hover { color: #facc15; }
+
+  /* Nacionalidad dropdown */
+  #reg-nacionalidad-list {
+    max-height: 180px;
+    overflow-y: auto;
+    z-index: 100;
+    position: absolute;
+  }
+  #reg-nacionalidad-list::-webkit-scrollbar { width: 6px; }
+  #reg-nacionalidad-list::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); border-radius: 8px; }
+  #reg-nacionalidad-list::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #1e3a8a, #2563eb); border-radius: 8px; }
+
+  /* Password strength */
+  .strength-bar { transition: all 0.3s ease; height: 4px; border-radius: 9999px; }
+  .strength-weak   { background: #ef4444; width: 33%; }
+  .strength-medium { background: #fbbf24; width: 66%; }
+  .strength-strong { background: #22c55e; width: 100%; }
+
+  /* Steps */
+  .step-dot {
+    width: 2.5rem; height: 2.5rem;
+    border-radius: 9999px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.875rem;
+    transition: all 0.3s;
+  }
+  .step-dot-active { background: #facc15; color: #000; box-shadow: 0 0 12px rgba(250,204,21,0.4); }
+  .step-dot-inactive { background: rgba(30,41,59,0.6); color: #6b7280; border: 1px solid rgba(250,204,21,0.2); }
+  .step-dot-done { background: #22c55e; color: #fff; }
+  .step-line { height: 2px; flex: 1; transition: background 0.3s; }
+
+  /* Toast */
+  @keyframes toast-in  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes toast-out { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(20px); } }
+  .toast-show { animation: toast-in .4s ease forwards; }
+  .toast-hide { animation: toast-out .4s ease forwards; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-lg animate-fade-up">
+
+  <!-- Logo + Título -->
+  <div class="text-center mb-6">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-4 animate-float">
+      <img src="/static/images/Logo_ADAF_SinLetras.png" alt="Logo" class="w-12 h-12 rounded">
+    </div>
+    <h1 class="text-3xl font-bold text-yellow-400">Crear una cuenta</h1>
+    <p class="text-gray-400 mt-2">Únete a ADAF Tennis Simulator</p>
+  </div>
+
+  <!-- Indicador de pasos -->
+  <div class="flex items-center justify-center gap-0 mb-8 px-8">
+    <div id="step-dot-1" class="step-dot step-dot-active">1</div>
+    <div id="step-line-1" class="step-line bg-blue-800/30"></div>
+    <div id="step-dot-2" class="step-dot step-dot-inactive">2</div>
+    <div id="step-line-2" class="step-line bg-blue-800/30"></div>
+    <div id="step-dot-3" class="step-dot step-dot-inactive">3</div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="bg-slate-900/60 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-2xl">
+    <form id="register-form" onsubmit="handleRegister(event)" novalidate>
+
+      <!-- =================== PASO 1: Cuenta =================== -->
+      <div id="step-1">
+        <h3 class="text-lg font-semibold text-yellow-400 mb-6 text-center">Datos de la cuenta</h3>
+
+        <!-- Username -->
+        <div class="mb-4">
+          <label for="reg-username" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Nombre de usuario</label>
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <input type="text" id="reg-username" name="username" required maxlength="50" autocomplete="username"
+              class="input-auth" placeholder="ej: rafael_nadal" />
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Sin espacios, máx. 50 caracteres.</p>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-4">
+          <label for="reg-email" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Email</label>
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            <input type="email" id="reg-email" name="email" required maxlength="100" autocomplete="email"
+              class="input-auth" placeholder="usuario@email.com" />
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="mb-4">
+          <label for="reg-password" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Contraseña</label>
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <input type="password" id="reg-password" name="password" required minlength="8" autocomplete="new-password"
+              class="input-auth" placeholder="Mínimo 8 caracteres"
+              oninput="checkPasswordStrength(this.value)" />
+            <button type="button" class="toggle-password" onclick="togglePassword('reg-password', this)">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
+          <!-- Barra de fuerza -->
+          <div class="w-full bg-slate-800/60 rounded-full mt-2 h-1">
+            <div id="password-strength-bar" class="strength-bar" style="width:0"></div>
+          </div>
+          <p id="password-strength-text" class="text-xs text-gray-500 mt-1"></p>
+        </div>
+
+        <!-- Confirmar contraseña -->
+        <div class="mb-6">
+          <label for="reg-password2" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Confirmar contraseña</label>
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <input type="password" id="reg-password2" name="password_confirm" required autocomplete="new-password"
+              class="input-auth" placeholder="Repite la contraseña" />
+          </div>
+        </div>
+
+        <button type="button" onclick="nextStep(2)" class="btn-primary">Siguiente</button>
+      </div>
+
+      <!-- =================== PASO 2: Datos personales =================== -->
+      <div id="step-2" class="hidden">
+        <h3 class="text-lg font-semibold text-yellow-400 mb-6 text-center">Datos personales</h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <!-- Nombre -->
+          <div>
+            <label for="reg-nombre" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Nombre</label>
+            <input type="text" id="reg-nombre" name="nombre" required maxlength="100"
+              class="input-auth input-auth-noicon" placeholder="Ej: Rafael" />
+          </div>
+
+          <!-- Apellido -->
+          <div>
+            <label for="reg-apellido" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Apellido</label>
+            <input type="text" id="reg-apellido" name="apellido" maxlength="100"
+              class="input-auth input-auth-noicon" placeholder="Ej: Nadal" />
+          </div>
+        </div>
+
+        <!-- Nacionalidad con bandera -->
+        <div class="mb-4 relative" style="z-index: 50;">
+          <label for="reg-nacionalidad" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Nacionalidad</label>
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <input type="text" id="reg-nacionalidad" autocomplete="off"
+              class="input-auth" placeholder="Buscar país..." />
+            <ul id="reg-nacionalidad-list" class="hidden absolute w-full mt-1 rounded-lg bg-slate-950 border border-yellow-400/30 shadow-lg"></ul>
+          </div>
+        </div>
+
+        <!-- Género -->
+        <div class="mb-6">
+          <label for="reg-genero" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Género</label>
+          <select id="reg-genero" name="genero" class="input-select">
+            <option value="" disabled selected>Seleccionar...</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="Prefiero no decirlo">Prefiero no decirlo</option>
+          </select>
+        </div>
+
+        <div class="flex gap-3">
+          <button type="button" onclick="prevStep(1)" class="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-full font-medium transition">Atrás</button>
+          <button type="button" onclick="nextStep(3)" class="flex-1 btn-primary">Siguiente</button>
+        </div>
+      </div>
+
+      <!-- =================== PASO 3: Confirmación =================== -->
+      <div id="step-3" class="hidden">
+        <h3 class="text-lg font-semibold text-yellow-400 mb-6 text-center">Confirmar registro</h3>
+
+        <!-- Resumen -->
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between items-center py-2 border-b border-blue-800/20">
+            <span class="text-xs uppercase text-gray-500">Usuario</span>
+            <span id="summary-username" class="text-sm text-gray-200 font-medium"></span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-blue-800/20">
+            <span class="text-xs uppercase text-gray-500">Email</span>
+            <span id="summary-email" class="text-sm text-gray-200 font-medium"></span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-blue-800/20">
+            <span class="text-xs uppercase text-gray-500">Nombre</span>
+            <span id="summary-nombre" class="text-sm text-gray-200 font-medium"></span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-blue-800/20">
+            <span class="text-xs uppercase text-gray-500">Nacionalidad</span>
+            <span id="summary-nacionalidad" class="text-sm text-gray-200 font-medium flex items-center gap-2"></span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-blue-800/20">
+            <span class="text-xs uppercase text-gray-500">Género</span>
+            <span id="summary-genero" class="text-sm text-gray-200 font-medium"></span>
+          </div>
+        </div>
+
+        <!-- Términos -->
+        <div class="flex items-start gap-2 mb-6">
+          <label class="relative inline-flex items-start gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="reg-terms" name="terms" required
+              class="peer appearance-none size-4 mt-0.5 rounded border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 transition shrink-0" />
+            <svg class="absolute left-[2px] top-[4px] w-3 h-3 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-xs text-gray-400 leading-relaxed">
+              Acepto los <a href="/terminos" class="text-yellow-400 hover:text-yellow-300">Términos de Uso</a>
+              y la <a href="/privacidad" class="text-yellow-400 hover:text-yellow-300">Política de Privacidad</a>.
+            </span>
+          </label>
+        </div>
+
+        <!-- Error message -->
+        <div id="register-error" class="hidden mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center"></div>
+
+        <div class="flex gap-3">
+          <button type="button" onclick="prevStep(2)" class="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-full font-medium transition">Atrás</button>
+          <button type="submit" id="register-btn" class="flex-1 btn-primary">
+            <span id="register-btn-text">Crear cuenta</span>
+            <svg id="register-spinner" class="hidden animate-spin inline-block w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- Separador -->
+    <div class="flex items-center gap-4 my-8">
+      <div class="flex-1 h-px bg-blue-800/30"></div>
+      <span class="text-xs text-gray-500 uppercase tracking-widest">o</span>
+      <div class="flex-1 h-px bg-blue-800/30"></div>
+    </div>
+
+    <!-- Login -->
+    <p class="text-center text-gray-400 text-sm">
+      ¿Ya tienes una cuenta?
+      <a href="/login" class="text-yellow-400 hover:text-yellow-300 font-semibold transition ml-1">Inicia sesión</a>
+    </p>
+  </div>
+
+  <!-- Volver al inicio -->
+  <div class="text-center mt-6">
+    <a href="/" class="text-sm text-gray-500 hover:text-yellow-400 transition inline-flex items-center gap-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Volver al inicio
+    </a>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ─────── Países con códigos ISO ───────
+const COUNTRIES = {
+  "Afganistán": "af", "Albania": "al", "Alemania": "de", "Andorra": "ad", "Angola": "ao",
+  "Antigua y Barbuda": "ag", "Arabia Saudita": "sa", "Argelia": "dz", "Argentina": "ar",
+  "Armenia": "am", "Australia": "au", "Austria": "at", "Azerbaiyán": "az", "Bahamas": "bs",
+  "Bangladés": "bd", "Barbados": "bb", "Baréin": "bh", "Bélgica": "be", "Belice": "bz",
+  "Benín": "bj", "Bielorrusia": "by", "Birmania": "mm", "Bolivia": "bo",
+  "Bosnia y Herzegovina": "ba", "Botsuana": "bw", "Brasil": "br", "Brunéi": "bn",
+  "Bulgaria": "bg", "Burkina Faso": "bf", "Burundi": "bi", "Bután": "bt",
+  "Cabo Verde": "cv", "Camboya": "kh", "Camerún": "cm", "Canadá": "ca", "Catar": "qa",
+  "Chad": "td", "Chile": "cl", "China": "cn", "Chipre": "cy", "Colombia": "co",
+  "Comoras": "km", "Corea del Norte": "kp", "Corea del Sur": "kr", "Costa de Marfil": "ci",
+  "Costa Rica": "cr", "Croacia": "hr", "Cuba": "cu", "Dinamarca": "dk", "Dominica": "dm",
+  "Ecuador": "ec", "Egipto": "eg", "El Salvador": "sv", "Emiratos Árabes Unidos": "ae",
+  "Eritrea": "er", "Eslovaquia": "sk", "Eslovenia": "si", "España": "es",
+  "Estados Unidos": "us", "Estonia": "ee", "Etiopía": "et", "Filipinas": "ph",
+  "Finlandia": "fi", "Fiyi": "fj", "Francia": "fr", "Gabón": "ga", "Gambia": "gm",
+  "Georgia": "ge", "Ghana": "gh", "Granada": "gd", "Grecia": "gr", "Guatemala": "gt",
+  "Guinea": "gn", "Guinea Ecuatorial": "gq", "Guinea-Bisáu": "gw", "Guyana": "gy",
+  "Haití": "ht", "Honduras": "hn", "Hungría": "hu", "India": "in", "Indonesia": "id",
+  "Irak": "iq", "Irán": "ir", "Irlanda": "ie", "Islandia": "is", "Israel": "il",
+  "Italia": "it", "Jamaica": "jm", "Japón": "jp", "Jordania": "jo", "Kazajistán": "kz",
+  "Kenia": "ke", "Kirguistán": "kg", "Kiribati": "ki", "Kuwait": "kw", "Laos": "la",
+  "Lesoto": "ls", "Letonia": "lv", "Líbano": "lb", "Liberia": "lr", "Libia": "ly",
+  "Liechtenstein": "li", "Lituania": "lt", "Luxemburgo": "lu", "Macedonia del Norte": "mk",
+  "Madagascar": "mg", "Malasia": "my", "Malaui": "mw", "Maldivas": "mv", "Malí": "ml",
+  "Malta": "mt", "Marruecos": "ma", "Mauricio": "mu", "Mauritania": "mr", "México": "mx",
+  "Micronesia": "fm", "Moldavia": "md", "Mónaco": "mc", "Mongolia": "mn",
+  "Montenegro": "me", "Mozambique": "mz", "Namibia": "na", "Nauru": "nr", "Nepal": "np",
+  "Nicaragua": "ni", "Níger": "ne", "Nigeria": "ng", "Noruega": "no",
+  "Nueva Zelanda": "nz", "Omán": "om", "Países Bajos": "nl", "Pakistán": "pk",
+  "Palaos": "pw", "Panamá": "pa", "Papúa Nueva Guinea": "pg", "Paraguay": "py",
+  "Perú": "pe", "Polonia": "pl", "Portugal": "pt", "Reino Unido": "gb",
+  "República Centroafricana": "cf", "República Checa": "cz", "República del Congo": "cg",
+  "República Democrática del Congo": "cd", "República Dominicana": "do", "Ruanda": "rw",
+  "Rumanía": "ro", "Rusia": "ru", "Samoa": "ws", "San Cristóbal y Nieves": "kn",
+  "San Marino": "sm", "San Vicente y las Granadinas": "vc", "Santa Lucía": "lc",
+  "Santo Tomé y Príncipe": "st", "Senegal": "sn", "Serbia": "rs", "Seychelles": "sc",
+  "Sierra Leona": "sl", "Singapur": "sg", "Siria": "sy", "Somalia": "so",
+  "Sri Lanka": "lk", "Suazilandia": "sz", "Sudáfrica": "za", "Sudán": "sd",
+  "Sudán del Sur": "ss", "Suecia": "se", "Suiza": "ch", "Surinam": "sr",
+  "Tailandia": "th", "Tanzania": "tz", "Tayikistán": "tj", "Timor Oriental": "tl",
+  "Togo": "tg", "Tonga": "to", "Trinidad y Tobago": "tt", "Túnez": "tn",
+  "Turkmenistán": "tm", "Turquía": "tr", "Tuvalu": "tv", "Ucrania": "ua",
+  "Uganda": "ug", "Uruguay": "uy", "Uzbekistán": "uz", "Vanuatu": "vu",
+  "Vaticano": "va", "Venezuela": "ve", "Vietnam": "vn", "Yemen": "ye",
+  "Yibuti": "dj", "Zambia": "zm", "Zimbabue": "zw"
+};
+
+// ─────── Nacionalidad autocomplete ───────
+const regNacInput = document.getElementById('reg-nacionalidad');
+const regNacList = document.getElementById('reg-nacionalidad-list');
+
+regNacInput.addEventListener('input', () => {
+  const q = regNacInput.value.toLowerCase().trim();
+  regNacList.innerHTML = '';
+  if (!q) { regNacList.classList.add('hidden'); return; }
+  const matches = Object.keys(COUNTRIES).filter(c => c.toLowerCase().includes(q)).slice(0, 15);
+  if (!matches.length) { regNacList.classList.add('hidden'); return; }
+  matches.forEach(country => {
+    const li = document.createElement('li');
+    const code = COUNTRIES[country];
+    li.className = 'px-4 py-2 text-sm text-gray-200 hover:bg-yellow-400/20 hover:text-yellow-300 cursor-pointer transition flex items-center gap-2';
+    li.innerHTML = `<img src="https://flagcdn.com/16x12/${code}.png" alt="${country}" class="w-4 h-3 object-cover rounded-sm" onerror="this.style.display='none'"> <span>${country}</span>`;
+    li.addEventListener('click', () => { regNacInput.value = country; regNacList.classList.add('hidden'); });
+    regNacList.appendChild(li);
+  });
+  regNacList.classList.remove('hidden');
+});
+regNacInput.addEventListener('blur', () => setTimeout(() => regNacList.classList.add('hidden'), 200));
+regNacInput.addEventListener('focus', () => { if (regNacInput.value) regNacInput.dispatchEvent(new Event('input')); });
+
+// ─────── Password toggle & strength ───────
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  btn.innerHTML = isPassword
+    ? `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+       </svg>`
+    : `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+       </svg>`;
+}
+
+function checkPasswordStrength(pw) {
+  const bar = document.getElementById('password-strength-bar');
+  const txt = document.getElementById('password-strength-text');
+  if (!pw) { bar.className = 'strength-bar'; bar.style.width = '0'; txt.textContent = ''; return; }
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if (/\d/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+  if (score <= 1) {
+    bar.className = 'strength-bar strength-weak';
+    txt.textContent = 'Débil'; txt.style.color = '#ef4444';
+  } else if (score <= 2) {
+    bar.className = 'strength-bar strength-medium';
+    txt.textContent = 'Media'; txt.style.color = '#fbbf24';
+  } else {
+    bar.className = 'strength-bar strength-strong';
+    txt.textContent = 'Fuerte'; txt.style.color = '#22c55e';
+  }
+}
+
+// ─────── Steps ───────
+let currentStep = 1;
+
+function showStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('step-' + i).classList.toggle('hidden', i !== n);
+    const dot = document.getElementById('step-dot-' + i);
+    dot.className = 'step-dot ' + (i < n ? 'step-dot-done' : i === n ? 'step-dot-active' : 'step-dot-inactive');
+    if (i < 3) {
+      document.getElementById('step-line-' + i).style.background = i < n ? '#22c55e' : 'rgba(30,58,138,0.3)';
+    }
+  }
+  currentStep = n;
+}
+
+function nextStep(n) {
+  // Validar paso actual
+  if (currentStep === 1) {
+    const username = document.getElementById('reg-username').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pw = document.getElementById('reg-password').value;
+    const pw2 = document.getElementById('reg-password2').value;
+
+    if (!username) { showStepError('Introduce un nombre de usuario.'); return; }
+    if (/\s/.test(username)) { showStepError('El nombre de usuario no puede contener espacios.'); return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showStepError('Introduce un email válido.'); return; }
+    if (pw.length < 8) { showStepError('La contraseña debe tener al menos 8 caracteres.'); return; }
+    if (pw !== pw2) { showStepError('Las contraseñas no coinciden.'); return; }
+  }
+  if (currentStep === 2) {
+    const nombre = document.getElementById('reg-nombre').value.trim();
+    if (!nombre) { showStepError('Introduce tu nombre.'); return; }
+  }
+
+  hideStepError();
+
+  // Actualizar resumen si vamos al paso 3
+  if (n === 3) {
+    document.getElementById('summary-username').textContent = document.getElementById('reg-username').value;
+    document.getElementById('summary-email').textContent = document.getElementById('reg-email').value;
+    const nombre = document.getElementById('reg-nombre').value;
+    const apellido = document.getElementById('reg-apellido').value;
+    document.getElementById('summary-nombre').textContent = `${nombre} ${apellido}`.trim();
+
+    const nac = document.getElementById('reg-nacionalidad').value;
+    const nacCode = COUNTRIES[nac];
+    const nacEl = document.getElementById('summary-nacionalidad');
+    if (nacCode) {
+      nacEl.innerHTML = `<img src="https://flagcdn.com/20x15/${nacCode}.png" class="w-5 h-4 rounded-sm"> ${nac}`;
+    } else {
+      nacEl.textContent = nac || '—';
+    }
+
+    const genSelect = document.getElementById('reg-genero');
+    document.getElementById('summary-genero').textContent = genSelect.options[genSelect.selectedIndex]?.text || '—';
+  }
+
+  showStep(n);
+}
+
+function prevStep(n) { hideStepError(); showStep(n); }
+
+function showStepError(msg) {
+  const el = document.getElementById('register-error');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  // Mover error al paso actual
+  document.getElementById('step-' + currentStep).appendChild(el);
+}
+
+function hideStepError() {
+  document.getElementById('register-error').classList.add('hidden');
+}
+
+// ─────── Toast ───────
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl toast-show ${isError ? 'bg-red-600' : 'bg-green-600'}`;
+  setTimeout(() => { toast.classList.remove('toast-show'); toast.classList.add('toast-hide'); }, 2500);
+  setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+// ─────── Submit ───────
+async function handleRegister(e) {
+  e.preventDefault();
+  const errorEl = document.getElementById('register-error');
+  errorEl.classList.add('hidden');
+
+  if (!document.getElementById('reg-terms').checked) {
+    showStepError('Debes aceptar los términos y condiciones.');
+    return;
+  }
+
+  const btn = document.getElementById('register-btn');
+  const btnText = document.getElementById('register-btn-text');
+  const spinner = document.getElementById('register-spinner');
+  btn.disabled = true;
+  btnText.textContent = 'Creando cuenta...';
+  spinner.classList.remove('hidden');
+
+  const body = {
+    username: document.getElementById('reg-username').value.trim(),
+    email: document.getElementById('reg-email').value.trim(),
+    password: document.getElementById('reg-password').value,
+    nombre: document.getElementById('reg-nombre').value.trim(),
+    apellido: document.getElementById('reg-apellido').value.trim() || null,
+    nacionalidad: document.getElementById('reg-nacionalidad').value || null,
+    genero: document.getElementById('reg-genero').value || null
+  };
+
+  try {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showStepError(data.detail || 'Error al crear la cuenta.');
+    } else {
+      showToast('¡Cuenta creada correctamente!');
+      setTimeout(() => window.location.href = '/login', 1500);
+    }
+  } catch (err) {
+    showStepError('Error de conexión. Inténtalo de nuevo.');
+  } finally {
+    btn.disabled = false;
+    btnText.textContent = 'Crear cuenta';
+    spinner.classList.add('hidden');
+  }
+}
+</script>
+{% endblock %}
