@@ -1,0 +1,574 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Crear Jugador - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<style>
+  /* ── Slider custom ── */
+  .slider {
+    width: 100%;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: rgba(30, 41, 59, 0.5);
+    cursor: pointer;
+    accent-color: #facc15;
+  }
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    background: #facc15;
+    box-shadow: 0 0 6px rgba(255, 255, 0, 0.5);
+    transition: transform 0.2s ease;
+  }
+  .slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+
+  /* ── Nacionalidad dropdown ── */
+  #nacionalidad-list {
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 100;
+    position: absolute;
+  }
+  #nacionalidad-list::-webkit-scrollbar { width: 6px; }
+  #nacionalidad-list::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); border-radius: 8px; }
+  #nacionalidad-list::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #1e3a8a, #2563eb); border-radius: 8px; }
+
+  /* Asegurar que el contenedor de nacionalidad tenga contexto de apilamiento */
+  .nacionalidad-wrapper {
+    position: relative;
+    z-index: 50;
+  }
+
+  /* Asegurar que la sección de datos personales esté sobre atributos tenísticos */
+  .datos-personales-section {
+    position: relative;
+    z-index: 40;
+  }
+
+  /* ── Card tier glow ── */
+  .card-gold   { box-shadow: 0 0 24px rgba(250, 204, 21, 0.35); }
+  .card-silver { box-shadow: 0 0 24px rgba(156, 163, 175, 0.35); }
+  .card-bronze { box-shadow: 0 0 24px rgba(217, 119, 6, 0.35); }
+
+  /* ── Tooltip info ── */
+  .attr-tooltip {
+    position: relative;
+  }
+  .attr-tooltip .tip-text {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    background: #0f172a;
+    border: 1px solid rgba(250,204,21,0.3);
+    color: #d1d5db;
+    font-size: 0.7rem;
+    padding: 6px 10px;
+    border-radius: 8px;
+    z-index: 20;
+    transition: opacity 0.2s;
+    text-transform: none;
+    font-weight: 400;
+    letter-spacing: normal;
+  }
+  .attr-tooltip:hover .tip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* ── Success toast ── */
+  @keyframes toast-in  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes toast-out { from { opacity:1; transform:translateY(0);   } to { opacity:0; transform:translateY(20px); } }
+  .toast-show { animation: toast-in .4s ease forwards; }
+  .toast-hide { animation: toast-out .4s ease forwards; }
+</style>
+{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 px-8 py-12 space-y-14 animate-fade-up max-w-[100rem] mx-auto w-full">
+
+  <!-- ═══════════════════════ TÍTULO ═══════════════════════ -->
+  <section class="text-center">
+    <h2 class="text-4xl font-bold text-yellow-400 mb-3">Crear Jugador</h2>
+    <p class="text-gray-400 text-lg">Define los datos personales y atributos tenísticos de tu jugador.</p>
+  </section>
+
+  <!-- Layout: formulario (izquierda) + carta preview (derecha) -->
+  <div class="flex flex-col lg:flex-row gap-12">
+
+    <!-- ═══════════════ FORMULARIO ═══════════════ -->
+    <div class="flex-1 space-y-12">
+
+      <!-- ── DATOS PERSONALES ── -->
+      <section class="datos-personales-section bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+        <h3 class="text-2xl font-semibold text-yellow-400 mb-8 text-center">Datos Personales</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Nombre -->
+          <div>
+            <label for="nombre" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-1">Nombre</label>
+            <input type="text" id="nombre" maxlength="30"
+              class="w-full rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-2 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]"
+              placeholder="Ej: Carlos" />
+          </div>
+
+          <!-- Apellido(s) -->
+          <div>
+            <label for="apellidos" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-1">Apellido(s)</label>
+            <input type="text" id="apellidos" maxlength="40"
+              class="w-full rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-2 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]"
+              placeholder="Ej: Alcaraz Garfia" />
+          </div>
+
+          <!-- Edad -->
+          <div>
+            <label for="edad" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-1">Edad</label>
+            <select id="edad"
+              class="w-full rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-2 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]">
+              {% for i in range(16, 46) %}
+              <option value="{{ i }}" {% if i == 25 %}selected{% endif %}>{{ i }} años</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Altura -->
+          <div>
+            <label for="altura" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-1">Altura (cm)</label>
+            <div class="flex items-center rounded-md border border-yellow-400/30 bg-slate-800/70 focus-within:border-yellow-400 focus-within:ring-1 focus-within:ring-yellow-400 shadow-inner transition">
+              <button type="button" onclick="updateAltura('altura', -1)" class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">&minus;</button>
+              <input type="number" id="altura" value="180" min="150" max="215" step="1"
+                class="h-10 w-full text-center bg-transparent text-gray-100 border-transparent focus:outline-none sm:text-sm [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0" />
+              <button type="button" onclick="updateAltura('altura', 1)" class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">&plus;</button>
+            </div>
+          </div>
+
+          <!-- Nacionalidad -->
+          <div class="nacionalidad-wrapper">
+            <label for="nacionalidad-input" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-1">Nacionalidad</label>
+            <input type="text" id="nacionalidad-input" autocomplete="off"
+              class="w-full rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-2 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]"
+              placeholder="Buscar país..." />
+            <ul id="nacionalidad-list" class="hidden w-full mt-1 rounded-lg bg-slate-950 border border-yellow-400/30 shadow-lg"></ul>
+          </div>
+
+          <!-- Brazo hábil -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Brazo hábil</label>
+            <fieldset class="flex gap-6">
+              <legend class="sr-only">Brazo hábil</legend>
+              <label for="brazo-derecho" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="brazo-derecho" name="brazo" checked onchange="toggleSingleCheckbox(this)"
+                  class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 hover:bg-slate-700/40 transition duration-150 ease-in-out" />
+                <svg class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Derecho</span>
+              </label>
+              <label for="brazo-izquierdo" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="brazo-izquierdo" name="brazo" onchange="toggleSingleCheckbox(this)"
+                  class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 hover:bg-slate-700/40 transition duration-150 ease-in-out" />
+                <svg class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Izquierdo</span>
+              </label>
+            </fieldset>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── ATRIBUTOS TENÍSTICOS ── -->
+      <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+        <h3 class="text-2xl font-semibold text-yellow-400 mb-8 text-center">Atributos Tenísticos</h3>
+
+        <div class="space-y-5">
+          {% for id, label, tooltip in [
+            ('primer_saque',  'Primer Saque',     'Potencia, precisión y fiabilidad del jugador al realizar primeros saques. Un valor alto implica más aces y menos fallos directos.'),
+            ('segundo_saque', 'Segundo Saque',    'Seguridad y consistencia al realizar segundos saques. Valores más altos indican menos dobles faltas y mayor capacidad de iniciar el punto de forma estable.'),
+            ('resto',         'Resto',            'Capacidad del jugador para devolver el saque rival, tanto en velocidad de reacción como en control del golpe. Un valor alto implica mayor probabilidad de poner la pelota en juego con calidad.'),
+            ('derecha',       'Derecha',          'Calidad general del golpe de derecha del jugador, considerando potencia, precisión y fiabilidad en intercambios y golpes ganadores.'),
+            ('reves',         'Revés',            'Eficacia del golpe de revés, tanto en consistencia defensiva como en capacidad ofensiva.'),
+            ('movilidad',     'Movilidad',        'Rapidez de desplazamiento y capacidad para colocarse de forma óptima en la pista. Un valor alto significa mejor defensa y preparación de golpes.'),
+            ('consistencia',  'Consistencia',     'Capacidad del jugador para mantener un nivel estable de juego, evitando errores no forzados y manteniendo la fiabilidad en intercambios largos.'),
+            ('clutch',        'Clutch',           'Capacidad del jugador para rendir bajo presión en momentos decisivos (puntos de break, tie-breaks, finales de set o partido).'),
+            ('fisico',        'Físico',           'Evalúa la potencia de los golpes de un jugador y también condiciona cómo se ve afectada su estamina a lo largo del partido.')
+          ] %}
+          <div class="flex items-center gap-5">
+            <span class="w-36 shrink-0 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1 attr-tooltip">
+              {{ label }}
+              <svg class="w-3.5 h-3.5 text-yellow-400/60" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+              <span class="tip-text">{{ tooltip }}</span>
+            </span>
+            <div class="flex-1 flex items-center gap-3">
+              <input type="range" id="attr-{{ id }}" min="1" max="100" value="60" class="slider"
+                data-attr="{{ id }}"
+                oninput="this.nextElementSibling.value=this.value; updateValueColor(this, this.nextElementSibling); updateCard();" />
+              <input type="number" min="1" max="100" value="60"
+                class="w-14 text-center rounded-md bg-slate-950/50 border border-yellow-400/20 text-gray-100 text-sm py-1 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                oninput="clampAndSync(this)" />
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- ── ATRIBUTOS DINÁMICOS (solo lectura informativo) ── -->
+      <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+        <h3 class="text-2xl font-semibold text-yellow-400 mb-6 text-center">Atributos Dinámicos <span class="text-sm font-normal text-gray-500">(se calculan durante el partido)</span></h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Estamina -->
+          <div class="p-5 rounded-xl bg-slate-950/40 border border-blue-800/20">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-sm font-semibold text-yellow-400 uppercase">Estamina</span>
+              <span class="text-xs text-gray-500">Inicio: 100</span>
+            </div>
+            <div class="w-full bg-slate-800/60 rounded-full h-3">
+              <div class="bg-green-500 h-3 rounded-full transition-all" style="width:100%"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Se reduce a medida que avanza el partido según la duración de los puntos y el desgaste físico. Cuanto más bajo, mayor probabilidad de cometer errores.</p>
+          </div>
+
+          <!-- Momentum -->
+          <div class="p-5 rounded-xl bg-slate-950/40 border border-blue-800/20">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-sm font-semibold text-yellow-400 uppercase">Momentum</span>
+              <span class="text-xs text-gray-500">Rango: [-50, 50] · Inicio: 0</span>
+            </div>
+            <div class="w-full bg-slate-800/60 rounded-full h-3 relative">
+              <div class="absolute left-1/2 top-0 h-3 w-0.5 bg-gray-500"></div>
+              <div class="bg-yellow-400 h-3 rounded-full transition-all" style="width:50%; margin-left:25%"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Aumenta o disminuye en función de la racha de puntos ganados o perdidos. Afecta al rendimiento general del jugador durante el partido.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── ATRIBUTOS DE LA BOLA (solo informativo) ── -->
+      <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+        <h3 class="text-2xl font-semibold text-yellow-400 mb-6 text-center">Atributos de la Bola <span class="text-sm font-normal text-gray-500">(se calculan golpe a golpe)</span></h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="p-5 rounded-xl bg-slate-950/40 border border-blue-800/20">
+            <span class="text-sm font-semibold text-yellow-400 uppercase">Potencia</span>
+            <p class="text-xs text-gray-500 mt-2">Velocidad y fuerza con la que viaja la pelota tras el golpe. Depende de la capacidad del jugador que ejecuta el golpe y de la inercia de la bola recibida. Valores altos generan mayor presión sobre el rival y reducen su tiempo de reacción.</p>
+          </div>
+          <div class="p-5 rounded-xl bg-slate-950/40 border border-blue-800/20">
+            <span class="text-sm font-semibold text-yellow-400 uppercase">Precisión</span>
+            <p class="text-xs text-gray-500 mt-2">Control en la colocación de la pelota. Un valor alto implica golpes ajustados y fiables, con menor probabilidad de error y mayor capacidad para buscar zonas difíciles de alcanzar. Valores bajos pueden derivar en errores directos.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── BOTONES ── -->
+      <div class="flex justify-center gap-6 pt-4 pb-12">
+        <button onclick="resetForm()" class="px-10 py-4 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-full text-lg font-medium shadow-lg transition">
+          Reiniciar
+        </button>
+        <button onclick="savePlayer()" class="px-10 py-4 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full text-lg font-semibold shadow-lg transition">
+          Crear Jugador
+        </button>
+      </div>
+    </div>
+    <!-- FIN FORMULARIO -->
+
+    <!-- ═══════════════ CARTA PREVIEW ═══════════════ -->
+    <div class="lg:w-80 flex flex-col items-center lg:sticky lg:top-24 self-start gap-6">
+      <h3 class="text-lg font-semibold text-yellow-400">Vista previa</h3>
+
+      <!-- Carta dinámica -->
+      <div id="player-card" class="w-64 bg-gradient-to-b from-amber-200 via-yellow-300 to-yellow-600 text-slate-900 rounded-3xl shadow-2xl p-4 border-4 border-yellow-400 card-gold hover:scale-105 transition-transform duration-300">
+        <div class="flex items-center justify-between mb-2">
+          <div id="card-overall" class="text-5xl font-extrabold text-yellow-900 drop-shadow-sm">50</div>
+          <div id="card-country" class="text-sm font-semibold text-slate-800 uppercase tracking-wide flex items-center justify-end">—</div>
+        </div>
+        <div id="card-name" class="text-xl font-extrabold uppercase tracking-wide text-slate-800">Nuevo Jugador</div>
+        <div class="text-sm text-slate-700 font-medium">
+          <span id="card-height">180</span> cm · <span id="card-hand">Diestro</span>
+        </div>
+        <div class="mt-3 border-t border-yellow-500 opacity-60"></div>
+        <div class="mt-3 grid grid-cols-3 gap-x-2 gap-y-3 text-center">
+          <div><div class="text-xs font-semibold text-slate-700">1st Serve</div><div id="card-primer_saque" class="text-lg font-bold text-yellow-900">50</div></div>
+          <div><div class="text-xs font-semibold text-slate-700">2nd Serve</div><div id="card-segundo_saque" class="text-lg font-bold text-yellow-900">50</div></div>
+          <div><div class="text-xs font-semibold text-slate-700">Return</div><div id="card-resto" class="text-lg font-bold text-yellow-900">50</div></div>
+          <div><div class="text-xs font-semibold text-slate-700">Forehand</div><div id="card-derecha" class="text-lg font-bold text-yellow-900">50</div></div>
+          <div><div class="text-xs font-semibold text-slate-700">Backhand</div><div id="card-reves" class="text-lg font-bold text-yellow-900">50</div></div>
+          <div><div class="text-xs font-semibold text-slate-700">Consistency</div><div id="card-consistencia" class="text-lg font-bold text-yellow-900">50</div></div>
+          <div><div class="text-xs font-semibold text-slate-700">Movement</div><div id="card-movilidad" class="text-lg font-bold text-yellow-900">50</div></div>
+          <div><div class="text-xs font-semibold text-slate-700">Physicality</div><div id="card-fisico" class="text-lg font-bold text-yellow-900">50</div></div>
+          <div><div class="text-xs font-semibold text-slate-700">Clutch</div><div id="card-clutch" class="text-lg font-bold text-yellow-900">50</div></div>
+        </div>
+        <div class="mt-4 flex items-center justify-center">
+          <span class="text-xs uppercase tracking-wider text-slate-600 font-semibold">ADAF Tennis Simulator</span>
+        </div>
+      </div>
+
+      <p class="text-xs text-gray-500 text-center max-w-[16rem]">La carta se actualiza automáticamente con los datos del formulario.</p>
+    </div>
+    <!-- FIN CARTA PREVIEW -->
+
+  </div>
+</div>
+
+<!-- ── Toast de confirmación ── -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl bg-green-600 text-white font-semibold text-lg shadow-2xl">
+  ¡Jugador creado correctamente!
+</div>
+{% endblock %}
+
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ─────── Países con códigos ISO ───────
+const COUNTRIES = {
+  "Afganistán": "af", "Albania": "al", "Alemania": "de", "Andorra": "ad", "Angola": "ao",
+  "Antigua y Barbuda": "ag", "Arabia Saudita": "sa", "Argelia": "dz", "Argentina": "ar",
+  "Armenia": "am", "Australia": "au", "Austria": "at", "Azerbaiyán": "az", "Bahamas": "bs",
+  "Bangladés": "bd", "Barbados": "bb", "Baréin": "bh", "Bélgica": "be", "Belice": "bz",
+  "Benín": "bj", "Bielorrusia": "by", "Birmania": "mm", "Bolivia": "bo",
+  "Bosnia y Herzegovina": "ba", "Botsuana": "bw", "Brasil": "br", "Brunéi": "bn",
+  "Bulgaria": "bg", "Burkina Faso": "bf", "Burundi": "bi", "Bután": "bt",
+  "Cabo Verde": "cv", "Camboya": "kh", "Camerún": "cm", "Canadá": "ca", "Catar": "qa",
+  "Chad": "td", "Chile": "cl", "China": "cn", "Chipre": "cy", "Colombia": "co",
+  "Comoras": "km", "Corea del Norte": "kp", "Corea del Sur": "kr", "Costa de Marfil": "ci",
+  "Costa Rica": "cr", "Croacia": "hr", "Cuba": "cu", "Dinamarca": "dk", "Dominica": "dm",
+  "Ecuador": "ec", "Egipto": "eg", "El Salvador": "sv", "Emiratos Árabes Unidos": "ae",
+  "Eritrea": "er", "Eslovaquia": "sk", "Eslovenia": "si", "España": "es",
+  "Estados Unidos": "us", "Estonia": "ee", "Etiopía": "et", "Filipinas": "ph",
+  "Finlandia": "fi", "Fiyi": "fj", "Francia": "fr", "Gabón": "ga", "Gambia": "gm",
+  "Georgia": "ge", "Ghana": "gh", "Granada": "gd", "Grecia": "gr", "Guatemala": "gt",
+  "Guinea": "gn", "Guinea Ecuatorial": "gq", "Guinea-Bisáu": "gw", "Guyana": "gy",
+  "Haití": "ht", "Honduras": "hn", "Hungría": "hu", "India": "in", "Indonesia": "id",
+  "Irak": "iq", "Irán": "ir", "Irlanda": "ie", "Islandia": "is", "Israel": "il",
+  "Italia": "it", "Jamaica": "jm", "Japón": "jp", "Jordania": "jo", "Kazajistán": "kz",
+  "Kenia": "ke", "Kirguistán": "kg", "Kiribati": "ki", "Kuwait": "kw", "Laos": "la",
+  "Lesoto": "ls", "Letonia": "lv", "Líbano": "lb", "Liberia": "lr", "Libia": "ly",
+  "Liechtenstein": "li", "Lituania": "lt", "Luxemburgo": "lu", "Macedonia del Norte": "mk",
+  "Madagascar": "mg", "Malasia": "my", "Malaui": "mw", "Maldivas": "mv", "Malí": "ml",
+  "Malta": "mt", "Marruecos": "ma", "Mauricio": "mu", "Mauritania": "mr", "México": "mx",
+  "Micronesia": "fm", "Moldavia": "md", "Mónaco": "mc", "Mongolia": "mn",
+  "Montenegro": "me", "Mozambique": "mz", "Namibia": "na", "Nauru": "nr", "Nepal": "np",
+  "Nicaragua": "ni", "Níger": "ne", "Nigeria": "ng", "Noruega": "no",
+  "Nueva Zelanda": "nz", "Omán": "om", "Países Bajos": "nl", "Pakistán": "pk",
+  "Palaos": "pw", "Panamá": "pa", "Papúa Nueva Guinea": "pg", "Paraguay": "py",
+  "Perú": "pe", "Polonia": "pl", "Portugal": "pt", "Reino Unido": "gb",
+  "República Centroafricana": "cf", "República Checa": "cz", "República del Congo": "cg",
+  "República Democrática del Congo": "cd", "República Dominicana": "do", "Ruanda": "rw",
+  "Rumanía": "ro", "Rusia": "ru", "Samoa": "ws", "San Cristóbal y Nieves": "kn",
+  "San Marino": "sm", "San Vicente y las Granadinas": "vc", "Santa Lucía": "lc",
+  "Santo Tomé y Príncipe": "st", "Senegal": "sn", "Serbia": "rs", "Seychelles": "sc",
+  "Sierra Leona": "sl", "Singapur": "sg", "Siria": "sy", "Somalia": "so",
+  "Sri Lanka": "lk", "Suazilandia": "sz", "Sudáfrica": "za", "Sudán": "sd",
+  "Sudán del Sur": "ss", "Suecia": "se", "Suiza": "ch", "Surinam": "sr",
+  "Tailandia": "th", "Tanzania": "tz", "Tayikistán": "tj", "Timor Oriental": "tl",
+  "Togo": "tg", "Tonga": "to", "Trinidad y Tobago": "tt", "Túnez": "tn",
+  "Turkmenistán": "tm", "Turquía": "tr", "Tuvalu": "tv", "Ucrania": "ua",
+  "Uganda": "ug", "Uruguay": "uy", "Uzbekistán": "uz", "Vanuatu": "vu",
+  "Vaticano": "va", "Venezuela": "ve", "Vietnam": "vn", "Yemen": "ye",
+  "Yibuti": "dj", "Zambia": "zm", "Zimbabue": "zw"
+};
+
+// ─────── Nacionalidad autocomplete ───────
+const nacInput = document.getElementById('nacionalidad-input');
+const nacList  = document.getElementById('nacionalidad-list');
+
+nacInput.addEventListener('input', () => {
+  const q = nacInput.value.toLowerCase().trim();
+  nacList.innerHTML = '';
+  if (!q) { nacList.classList.add('hidden'); return; }
+  const countryNames = Object.keys(COUNTRIES);
+  const matches = countryNames.filter(c => c.toLowerCase().includes(q)).slice(0, 20);
+  if (!matches.length) { nacList.classList.add('hidden'); return; }
+  matches.forEach(country => {
+    const li = document.createElement('li');
+    const code = COUNTRIES[country];
+    li.className = 'px-4 py-2 text-sm text-gray-200 hover:bg-yellow-400/20 hover:text-yellow-300 cursor-pointer transition flex items-center gap-2';
+    li.innerHTML = `<img src="https://flagcdn.com/16x12/${code}.png" alt="${country}" class="w-4 h-3 object-cover rounded-sm" onerror="this.style.display='none'"> <span>${country}</span>`;
+    li.addEventListener('click', () => { nacInput.value = country; nacList.classList.add('hidden'); updateCard(); });
+    nacList.appendChild(li);
+  });
+  nacList.classList.remove('hidden');
+});
+
+nacInput.addEventListener('blur', () => setTimeout(() => nacList.classList.add('hidden'), 200));
+nacInput.addEventListener('focus', () => { if (nacInput.value) nacInput.dispatchEvent(new Event('input')); });
+
+// ─────── Helpers ───────
+function updateAltura(id, delta) {
+  const input = document.getElementById(id);
+  const min = Number(input.min) || 0;
+  const max = Number(input.max) || 999;
+  let value = Number(input.value) + delta;
+  input.value = Math.max(min, Math.min(max, value));
+  updateCard();
+}
+
+function toggleSingleCheckbox(selected) {
+  document.querySelectorAll(`input[name='${selected.name}']`).forEach(el => {
+    if (el !== selected) el.checked = false;
+  });
+  if (!selected.checked) selected.checked = true;   // al menos uno activo
+  updateCard();
+}
+
+function updateValueColor(slider, valueEl) {
+  const val = parseInt(slider.value);
+  let color = val < 60 ? '#ef4444' : val < 80 ? '#fbbf24' : '#22c55e';
+  valueEl.style.transition = 'color 0.3s ease';
+  valueEl.style.color = color;
+}
+
+function clampAndSync(numInput) {
+  let v = parseInt(numInput.value);
+  if (isNaN(v)) v = 1;
+  v = Math.max(1, Math.min(100, v));
+  numInput.value = v;
+  const slider = numInput.previousElementSibling;
+  slider.value = v;
+  updateValueColor(slider, numInput);
+  updateCard();
+}
+
+// ─────── Card update ───────
+const ATTR_IDS = ['primer_saque','segundo_saque','resto','derecha','reves','movilidad','consistencia','clutch','fisico'];
+
+function updateCard() {
+  // Nombre
+  const nombre = document.getElementById('nombre').value.trim();
+  const apellidos = document.getElementById('apellidos').value.trim();
+  const displayName = apellidos || nombre || 'Nuevo Jugador';
+  document.getElementById('card-name').textContent = displayName;
+
+  // País
+  const countryName = document.getElementById('nacionalidad-input').value;
+  const countryEl = document.getElementById('card-country');
+  if (countryName && COUNTRIES[countryName]) {
+    const code = COUNTRIES[countryName];
+    countryEl.innerHTML = `<img src="https://flagcdn.com/32x24/${code}.png" alt="${countryName}" class="w-8 h-6 object-cover rounded-sm shadow-md" onerror="this.innerHTML='${countryName.substring(0,3).toUpperCase()}'"> `;
+  } else {
+    countryEl.textContent = '—';
+  }
+
+  // Altura
+  document.getElementById('card-height').textContent = document.getElementById('altura').value;
+
+  // Brazo
+  const esZurdo = document.getElementById('brazo-izquierdo').checked;
+  document.getElementById('card-hand').textContent = esZurdo ? 'Zurdo' : 'Diestro';
+
+  // Atributos individuales + media
+  let sum = 0;
+  ATTR_IDS.forEach(id => {
+    const val = parseInt(document.getElementById('attr-' + id).value);
+    document.getElementById('card-' + id).textContent = val;
+    sum += val;
+  });
+
+  const overall = Math.round(sum / ATTR_IDS.length);
+  document.getElementById('card-overall').textContent = overall;
+
+  // Tier de la carta
+  const card = document.getElementById('player-card');
+  card.classList.remove('card-gold','card-silver','card-bronze',
+    'from-amber-200','via-yellow-300','to-yellow-600','border-yellow-400',
+    'from-gray-200','via-gray-400','to-gray-500','border-gray-300',
+    'from-orange-300','via-amber-500','to-amber-700','border-amber-600');
+
+  if (overall >= 75) {
+    card.classList.add('from-amber-200','via-yellow-300','to-yellow-600','border-yellow-400','card-gold');
+    setCardTextColor('text-yellow-900');
+  } else if (overall >= 55) {
+    card.classList.add('from-gray-200','via-gray-400','to-gray-500','border-gray-300','card-silver');
+    setCardTextColor('text-gray-900');
+  } else {
+    card.classList.add('from-orange-300','via-amber-500','to-amber-700','border-amber-600','card-bronze');
+    setCardTextColor('text-amber-900');
+  }
+}
+
+function setCardTextColor(cls) {
+  const overallEl = document.getElementById('card-overall');
+  overallEl.className = overallEl.className.replace(/text-\w+-900/g, '') + ' ' + cls;
+  ATTR_IDS.forEach(id => {
+    const el = document.getElementById('card-' + id);
+    el.className = el.className.replace(/text-\w+-900/g, '') + ' ' + cls;
+  });
+}
+
+// ─────── Reset ───────
+function resetForm() {
+  document.getElementById('nombre').value = '';
+  document.getElementById('apellidos').value = '';
+  document.getElementById('edad').value = '25';
+  document.getElementById('altura').value = '180';
+  document.getElementById('nacionalidad-input').value = '';
+  document.getElementById('brazo-derecho').checked = true;
+  document.getElementById('brazo-izquierdo').checked = false;
+
+  document.querySelectorAll('.slider').forEach(s => {
+    s.value = 50;
+    const numInput = s.nextElementSibling;
+    numInput.value = 50;
+    updateValueColor(s, numInput);
+  });
+
+  updateCard();
+}
+
+// ─────── "Guardar" (sin BD todavía) ───────
+function savePlayer() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const apellidos = document.getElementById('apellidos').value.trim();
+  if (!nombre || !apellidos) {
+    alert('Por favor, rellena al menos el nombre y los apellidos.');
+    return;
+  }
+
+  const player = {
+    nombre,
+    apellidos,
+    edad: parseInt(document.getElementById('edad').value),
+    altura: parseInt(document.getElementById('altura').value),
+    nacionalidad: document.getElementById('nacionalidad-input').value,
+    brazo: document.getElementById('brazo-izquierdo').checked ? 'Izquierdo' : 'Derecho',
+    atributos: {}
+  };
+  ATTR_IDS.forEach(id => { player.atributos[id] = parseInt(document.getElementById('attr-' + id).value); });
+
+  console.log('Jugador creado (sin persistir):', player);
+
+  // Toast
+  const toast = document.getElementById('toast');
+  toast.classList.remove('hidden','toast-hide');
+  toast.classList.add('toast-show');
+  setTimeout(() => { toast.classList.remove('toast-show'); toast.classList.add('toast-hide'); }, 2500);
+  setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+// ─────── Init ───────
+document.addEventListener('DOMContentLoaded', () => {
+  // Color inicial de sliders
+  document.querySelectorAll('.slider').forEach(s => updateValueColor(s, s.nextElementSibling));
+  // Listeners para actualizar carta en tiempo real
+  document.getElementById('nombre').addEventListener('input', updateCard);
+  document.getElementById('apellidos').addEventListener('input', updateCard);
+  document.getElementById('nacionalidad-input').addEventListener('input', updateCard);
+  document.getElementById('altura').addEventListener('input', updateCard);
+  updateCard();
+});
+</script>
+{% endblock %}

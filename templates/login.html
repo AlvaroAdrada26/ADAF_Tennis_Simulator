@@ -1,0 +1,243 @@
+{% extends "layouts/auth.html" %}
+
+{% block title %}Iniciar Sesión - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<style>
+  .input-auth {
+    width: 100%;
+    border-radius: 0.5rem;
+    background-color: rgba(2, 6, 23, 0.5);
+    border: 1px solid rgba(250, 204, 21, 0.2);
+    color: #f3f4f6;
+    padding: 0.625rem 1rem 0.625rem 2.75rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    box-shadow: 0 0 8px rgba(255, 255, 0, 0.05);
+  }
+  .input-auth:focus {
+    outline: none;
+    border-color: #facc15;
+    box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2), 0 0 12px rgba(255, 255, 0, 0.1);
+  }
+  .input-auth::placeholder { color: #6b7280; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.75rem;
+    background: #facc15;
+    color: #000;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 9999px;
+    transition: all 0.3s;
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.15);
+  }
+  .btn-primary:hover {
+    background: #fbbf24;
+    transform: scale(1.02);
+    box-shadow: 0 0 18px rgba(255, 255, 0, 0.25);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6b7280;
+    transition: color 0.2s;
+  }
+  .toggle-password:hover { color: #facc15; }
+
+  /* Toast */
+  @keyframes toast-in  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes toast-out { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(20px); } }
+  .toast-show { animation: toast-in .4s ease forwards; }
+  .toast-hide { animation: toast-out .4s ease forwards; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-md animate-fade-up">
+
+  <!-- Logo + Título -->
+  <div class="text-center mb-8">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-4 animate-float">
+      <img src="/static/images/Logo_ADAF_SinLetras.png" alt="Logo" class="w-12 h-12 rounded">
+    </div>
+    <h1 class="text-3xl font-bold text-yellow-400">Bienvenido de nuevo</h1>
+    <p class="text-gray-400 mt-2">Inicia sesión en tu cuenta</p>
+  </div>
+
+  <!-- Formulario -->
+  <div class="bg-slate-900/60 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-2xl">
+    <form id="login-form" onsubmit="handleLogin(event)" novalidate>
+
+      <!-- Email o Usuario -->
+      <div class="mb-5">
+        <label for="login-email" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Email o nombre de usuario</label>
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <input type="text" id="login-email" name="identifier" required autocomplete="username"
+            class="input-auth" placeholder="usuario@email.com" />
+        </div>
+      </div>
+
+      <!-- Contraseña -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-2">
+          <label for="login-password" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400">Contraseña</label>
+          <a href="#" class="text-xs text-gray-500 hover:text-yellow-400 transition">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <input type="password" id="login-password" name="password" required autocomplete="current-password"
+            class="input-auth" placeholder="••••••••" />
+          <button type="button" class="toggle-password" onclick="togglePassword('login-password', this)">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recordarme -->
+      <div class="flex items-center mb-6">
+        <label class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" id="remember-me" name="remember"
+            class="peer appearance-none size-4 rounded border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 transition" />
+          <svg class="absolute left-[2px] top-[2px] w-3 h-3 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span class="text-sm text-gray-400">Recordarme</span>
+        </label>
+      </div>
+
+      <!-- Error message -->
+      <div id="login-error" class="hidden mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center"></div>
+
+      <!-- Botón -->
+      <button type="submit" id="login-btn" class="btn-primary">
+        <span id="login-btn-text">Iniciar Sesión</span>
+        <svg id="login-spinner" class="hidden animate-spin inline-block w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </button>
+    </form>
+
+    <!-- Separador -->
+    <div class="flex items-center gap-4 my-8">
+      <div class="flex-1 h-px bg-blue-800/30"></div>
+      <span class="text-xs text-gray-500 uppercase tracking-widest">o</span>
+      <div class="flex-1 h-px bg-blue-800/30"></div>
+    </div>
+
+    <!-- Registro -->
+    <p class="text-center text-gray-400 text-sm">
+      ¿No tienes una cuenta?
+      <a href="/registro" class="text-yellow-400 hover:text-yellow-300 font-semibold transition ml-1">Regístrate aquí</a>
+    </p>
+  </div>
+
+  <!-- Volver al inicio -->
+  <div class="text-center mt-6">
+    <a href="/" class="text-sm text-gray-500 hover:text-yellow-400 transition inline-flex items-center gap-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Volver al inicio
+    </a>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  btn.innerHTML = isPassword
+    ? `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+       </svg>`
+    : `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+       </svg>`;
+}
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl toast-show ${isError ? 'bg-red-600' : 'bg-green-600'}`;
+  setTimeout(() => { toast.classList.remove('toast-show'); toast.classList.add('toast-hide'); }, 2500);
+  setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const errorEl = document.getElementById('login-error');
+  errorEl.classList.add('hidden');
+
+  const identifier = document.getElementById('login-email').value.trim();
+  const password   = document.getElementById('login-password').value;
+
+  if (!identifier || !password) {
+    errorEl.textContent = 'Por favor, completa todos los campos.';
+    errorEl.classList.remove('hidden');
+    return;
+  }
+
+  const btn = document.getElementById('login-btn');
+  const btnText = document.getElementById('login-btn-text');
+  const spinner = document.getElementById('login-spinner');
+  btn.disabled = true;
+  btnText.textContent = 'Iniciando sesión...';
+  spinner.classList.remove('hidden');
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, password })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      errorEl.textContent = data.detail || 'Credenciales incorrectas.';
+      errorEl.classList.remove('hidden');
+    } else {
+      // Guardar token en localStorage
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      showToast('¡Sesión iniciada correctamente!');
+      setTimeout(() => window.location.href = '/', 1000);
+    }
+  } catch (err) {
+    errorEl.textContent = 'Error de conexión. Inténtalo de nuevo.';
+    errorEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btnText.textContent = 'Iniciar Sesión';
+    spinner.classList.add('hidden');
+  }
+}
+</script>
+{% endblock %}

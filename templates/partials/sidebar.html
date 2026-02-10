@@ -57,6 +57,17 @@
           </li>
 
           <li>
+            <a href="/crear-jugador" class="group relative flex justify-center rounded-sm {% if active_page == 'crear_jugador' %}bg-yellow-400/20 text-yellow-400{% else %}text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400{% endif %} px-2 py-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+              <span class="invisible absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded-sm bg-slate-900 px-2 py-1.5 text-xs font-medium text-gray-200 group-hover:visible border border-yellow-400/30">
+                Crear Jugador
+              </span>
+            </a>
+          </li>
+
+          <li>
             <a href="/estadisticas" class="group relative flex justify-center rounded-sm {% if active_page == 'estadisticas' %}bg-yellow-400/20 text-yellow-400{% else %}text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400{% endif %} px-2 py-1.5">
               <svg xmlns="http://www.w3.org/2000/svg" class="size-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -131,9 +142,28 @@
       </li>
 
       <li>
-        <a data-i18n="sidebarJugadores" href="/menu" class="block rounded-lg {% if active_page == 'menu' %}bg-yellow-400/20 text-yellow-400{% else %}text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400{% endif %} px-4 py-2 text-sm font-medium">
-          Jugadores
-        </a>
+        <details class="group [&_summary::-webkit-details-marker]:hidden" {% if active_page == 'menu' or active_page == 'crear_jugador' %}open{% endif %}>
+          <summary class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-gray-400 hover:bg-slate-800/50 hover:text-yellow-400">
+            <span class="text-sm font-medium" data-i18n="sidebarJugadores">Jugadores</span>
+            <span class="shrink-0 transition duration-300 group-open:-rotate-180">
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </span>
+          </summary>
+          <ul class="mt-2 space-y-1 px-4">
+            <li>
+              <a href="/menu" class="block rounded-lg px-4 py-2 text-sm font-medium {% if active_page == 'menu' %}text-yellow-400{% else %}text-gray-400 hover:bg-slate-800/50 hover:text-gray-200{% endif %}">
+                Configuración Partido
+              </a>
+            </li>
+            <li>
+              <a href="/crear-jugador" class="block rounded-lg px-4 py-2 text-sm font-medium {% if active_page == 'crear_jugador' %}text-yellow-400{% else %}text-gray-400 hover:bg-slate-800/50 hover:text-gray-200{% endif %}">
+                Crear Jugador
+              </a>
+            </li>
+          </ul>
+        </details>
       </li>
 
       <li>

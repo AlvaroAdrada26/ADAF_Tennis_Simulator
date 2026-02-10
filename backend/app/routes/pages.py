@@ -56,6 +56,28 @@ def resultados(request: Request):
     )
 
 
+@router.get("/crear-jugador", response_class=HTMLResponse)
+def crear_jugador(request: Request):
+    return templates.TemplateResponse(
+        "crear_jugador.html", {"request": request, "active_page": "crear_jugador"}
+    )
+
+
+# ─── Autenticación ────────────────────────────────────────────────────────
+@router.get("/login", response_class=HTMLResponse)
+def login_page(request: Request):
+    return templates.TemplateResponse(
+        "login.html", {"request": request, "active_page": "login"}
+    )
+
+
+@router.get("/registro", response_class=HTMLResponse)
+def registro_page(request: Request):
+    return templates.TemplateResponse(
+        "registro.html", {"request": request, "active_page": "registro"}
+    )
+
+
 # ─── Sidebar: Estadísticas, Configuración, Historial ──────────────────────
 @router.get("/estadisticas", response_class=HTMLResponse)
 def estadisticas(request: Request):
