@@ -530,7 +530,7 @@ function resetForm() {
 }
 
 // ─────── "Guardar" (sin BD todavía) ───────
-function savePlayer() {
+/*function savePlayer() {
   const nombre = document.getElementById('nombre').value.trim();
   const apellidos = document.getElementById('apellidos').value.trim();
   if (!nombre || !apellidos) {
@@ -557,7 +557,48 @@ function savePlayer() {
   toast.classList.add('toast-show');
   setTimeout(() => { toast.classList.remove('toast-show'); toast.classList.add('toast-hide'); }, 2500);
   setTimeout(() => toast.classList.add('hidden'), 3000);
+}*/
+
+async function savePlayer() {
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    alert("Debes iniciar sesión");
+    return;
+  }
+
+  const player = {
+    nombre: document.getElementById('nombre').value.trim(),
+    apellidos: document.getElementById('apellidos').value.trim(),
+    edad: parseInt(document.getElementById('edad').value),
+    altura: parseInt(document.getElementById('altura').value),
+    nacionalidad: document.getElementById('nacionalidad-input').value,
+    brazo: document.getElementById('brazo-izquierdo').checked ? 'Izquierdo' : 'Derecho',
+    atributos: {}
+  };
+
+  ATTR_IDS.forEach(id => {
+    player.atributos[id] = parseInt(document.getElementById('attr-' + id).value);
+  });
+
+  const res = await fetch("/api/players", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(player)
+  });
+
+  if (!res.ok) {
+    alert("Error al crear jugador");
+    return;
+  }
+
+  // Toast OK
+  const toast = document.getElementById('toast');
+  toast.classList.remove('hidden');
 }
+
 
 // ─────── Init ───────
 document.addEventListener('DOMContentLoaded', () => {

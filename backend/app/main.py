@@ -15,6 +15,10 @@ from fastapi.staticfiles import StaticFiles
 from backend.app.routes.pages import router as pages_router
 from backend.app.routes.api import router as api_router
 from backend.app.auth.routes import router as auth_router
+from backend.app.players.routes import router as jugadores_router
+
+
+
 
 
 # ------------------------------------------------------------
@@ -49,3 +53,4 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 app.include_router(pages_router)                 # páginas HTML
 app.include_router(api_router, prefix="/api")    # API JSON bajo /api
 app.include_router(auth_router, prefix="/api")   # Auth bajo /api/auth
+app.include_router(jugadores_router, prefix="/api")  # Jugadores bajo /api/jugadores
