@@ -1,0 +1,477 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Partido Rápido - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<style>
+  .player-card {
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+  .player-card:hover {
+    border-color: rgba(250, 204, 21, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(250, 204, 21, 0.15);
+  }
+  .player-card.selected {
+    border-color: #facc15;
+    background-color: rgba(250, 204, 21, 0.08);
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);
+  }
+  .player-card.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .radio-opt {
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  .radio-opt:hover { border-color: rgba(250, 204, 21, 0.5); }
+  .radio-opt.active {
+    border-color: #facc15;
+    background-color: rgba(250, 204, 21, 0.1);
+    color: #facc15;
+  }
+  @keyframes toast-in  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes toast-out { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(20px); } }
+  .toast-show { animation: toast-in .4s ease forwards; }
+  .toast-hide { animation: toast-out .4s ease forwards; }
+  .vs-text {
+    background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .custom-scroll::-webkit-scrollbar { width: 6px; }
+  .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); border-radius: 8px; }
+  .custom-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #1e3a8a, #2563eb); border-radius: 8px; }
+</style>
+{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 px-8 py-12 space-y-10 animate-fade-up max-w-7xl mx-auto w-full">
+
+  <!-- TÍTULO -->
+  <div class="text-center">
+    <h1 class="text-4xl font-bold text-yellow-400 mb-2">⚡ Partido Rápido</h1>
+    <p class="text-gray-400 text-lg">Elige dos jugadores, configura el partido y ¡a jugar!</p>
+  </div>
+
+  <!-- ═══ Estado: NO logueado ═══ -->
+  <div id="state-no-auth" class="hidden text-center py-20">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
+      <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold text-gray-200 mb-2">Inicia sesión para continuar</h2>
+    <p class="text-gray-400 mb-6">Necesitas una cuenta para crear un partido rápido.</p>
+    <a href="/login" class="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-full transition shadow-lg shadow-yellow-400/20">
+      Iniciar Sesión
+    </a>
+  </div>
+
+  <!-- ═══ Estado: sin jugadores ═══ -->
+  <div id="state-no-players" class="hidden text-center py-20">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
+      <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold text-gray-200 mb-2">No tienes jugadores creados</h2>
+    <p class="text-gray-400 mb-6">Para crear un partido rápido necesitas al menos <strong class="text-yellow-400">2 jugadores</strong>. ¡Crea tus jugadores primero!</p>
+    <a href="/crear-jugador" class="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-full transition shadow-lg shadow-yellow-400/20">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      Crear Jugador
+    </a>
+  </div>
+
+  <!-- ═══ Estado: pocos jugadores (1) ═══ -->
+  <div id="state-few-players" class="hidden text-center py-20">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
+      <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold text-gray-200 mb-2">Necesitas más jugadores</h2>
+    <p class="text-gray-400 mb-6">Solo tienes <strong id="cnt" class="text-yellow-400">1</strong> jugador. Necesitas al menos <strong class="text-yellow-400">2</strong> para un partido.</p>
+    <a href="/crear-jugador" class="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-full transition shadow-lg shadow-yellow-400/20">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      Crear otro Jugador
+    </a>
+  </div>
+
+  <!-- ═══ Estado: cargando ═══ -->
+  <div id="state-loading" class="hidden text-center py-20">
+    <svg class="animate-spin w-10 h-10 text-yellow-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+    <p class="text-gray-400">Cargando jugadores...</p>
+  </div>
+
+  <!-- ═══ MATCH SETUP (visible con ≥2 jugadores) ═══ -->
+  <div id="match-setup" class="hidden space-y-10">
+
+    <!-- Selección de jugadores -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <!-- JUGADOR 1 -->
+      <div>
+        <h2 class="text-lg font-semibold text-yellow-400 mb-4 flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black text-sm font-bold">1</span>
+          Jugador 1
+        </h2>
+        <div id="p1-list" class="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scroll"></div>
+      </div>
+
+      <!-- VS -->
+      <div class="hidden lg:flex items-center justify-center lg:mt-16">
+        <span class="vs-text text-6xl font-black select-none">VS</span>
+      </div>
+
+      <!-- JUGADOR 2 -->
+      <div>
+        <h2 class="text-lg font-semibold text-yellow-400 mb-4 flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black text-sm font-bold">2</span>
+          Jugador 2
+        </h2>
+        <div id="p2-list" class="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scroll"></div>
+      </div>
+    </div>
+
+    <!-- Configuración -->
+    <div class="bg-slate-900/60 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8">
+      <h2 class="text-lg font-semibold text-yellow-400 mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Configuración del Partido
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Formato -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Formato (Sets)</label>
+          <div class="flex gap-3" id="opt-sets">
+            <button data-val="1" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">1 Set</button>
+            <button data-val="3" class="radio-opt active flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">Mejor de 3</button>
+            <button data-val="5" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">Mejor de 5</button>
+          </div>
+        </div>
+        <!-- Superficie -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Superficie</label>
+          <div class="flex gap-3 flex-wrap" id="opt-surface">
+            <button data-val="Dura" class="radio-opt active flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">🏟️ Dura</button>
+            <button data-val="Arcilla" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">🧱 Arcilla</button>
+            <button data-val="Hierba" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">🌿 Hierba</button>
+          </div>
+        </div>
+        <!-- Tiebreak -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Tiebreak último set</label>
+          <div class="flex gap-3" id="opt-tb">
+            <button data-val="true" class="radio-opt active flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">Sí</button>
+            <button data-val="false" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen + Botón -->
+    <div id="summary-box" class="hidden bg-slate-900/60 backdrop-blur-sm border border-yellow-400/30 rounded-2xl p-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-6">
+          <div class="text-center">
+            <div class="w-14 h-14 rounded-full bg-yellow-400/20 border border-yellow-400/40 flex items-center justify-center mb-2 mx-auto">
+              <span id="s-p1-i" class="text-xl font-bold text-yellow-400"></span>
+            </div>
+            <p id="s-p1-n" class="text-sm font-medium text-gray-200"></p>
+          </div>
+          <span class="text-3xl font-black text-yellow-400/60">VS</span>
+          <div class="text-center">
+            <div class="w-14 h-14 rounded-full bg-yellow-400/20 border border-yellow-400/40 flex items-center justify-center mb-2 mx-auto">
+              <span id="s-p2-i" class="text-xl font-bold text-yellow-400"></span>
+            </div>
+            <p id="s-p2-n" class="text-sm font-medium text-gray-200"></p>
+          </div>
+        </div>
+        <div class="text-sm text-gray-400 text-center md:text-right space-y-1">
+          <p>📐 Formato: <span id="s-fmt" class="text-gray-200 font-medium"></span></p>
+          <p>🏟️ Superficie: <span id="s-surf" class="text-gray-200 font-medium"></span></p>
+          <p>🎾 Tiebreak: <span id="s-tb" class="text-gray-200 font-medium"></span></p>
+        </div>
+        <button id="btn-sim" class="px-8 py-3.5 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-full transition shadow-lg shadow-yellow-400/20 text-lg flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Simular Partido
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  'use strict';
+
+  // ── Estado ──────────────────────────────────────────────
+  let players = [];
+  let sel1 = null;   // jugador 1 seleccionado
+  let sel2 = null;   // jugador 2 seleccionado
+
+  // ── Helpers ─────────────────────────────────────────────
+  function getToken() {
+    return localStorage.getItem('access_token');
+  }
+
+  function getActiveVal(groupId) {
+    const el = document.querySelector('#' + groupId + ' .active');
+    return el ? el.dataset.val : null;
+  }
+
+  function showToast(msg, isErr) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl toast-show ' + (isErr ? 'bg-red-600' : 'bg-green-600');
+    setTimeout(function() { t.classList.remove('toast-show'); t.classList.add('toast-hide'); }, 2500);
+    setTimeout(function() { t.classList.add('hidden'); }, 3000);
+  }
+
+  function show(id) { document.getElementById(id).classList.remove('hidden'); }
+  function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+  // ── Init ────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async function() {
+    var token = getToken();
+
+    if (!token) {
+      show('state-no-auth');
+      return;
+    }
+
+    show('state-loading');
+
+    try {
+      var res = await fetch('/api/players', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      hide('state-loading');
+
+      if (res.status === 401) {
+        // Token inválido o expirado
+        show('state-no-auth');
+        return;
+      }
+
+      if (!res.ok) {
+        showToast('Error al cargar jugadores', true);
+        return;
+      }
+
+      players = await res.json();
+
+      if (players.length === 0) {
+        show('state-no-players');
+        return;
+      }
+
+      if (players.length < 2) {
+        document.getElementById('cnt').textContent = players.length;
+        show('state-few-players');
+        return;
+      }
+
+      show('match-setup');
+      renderPlayers();
+
+    } catch (err) {
+      hide('state-loading');
+      showToast('Error de conexión al cargar jugadores.', true);
+    }
+  });
+
+  // ── Render tarjetas ─────────────────────────────────────
+  function renderPlayers() {
+    var l1 = document.getElementById('p1-list');
+    var l2 = document.getElementById('p2-list');
+    l1.innerHTML = '';
+    l2.innerHTML = '';
+    players.forEach(function(p) {
+      l1.appendChild(makeCard(p, 1));
+      l2.appendChild(makeCard(p, 2));
+    });
+    refreshCards();
+  }
+
+  function makeCard(p, slot) {
+    var card = document.createElement('div');
+    card.className = 'player-card bg-slate-900/60 border border-blue-800/30 rounded-xl p-4 flex items-center gap-4';
+    card.dataset.pid = p.id;
+    card.dataset.slot = slot;
+
+    var attrs = [p.attr_primer_saque, p.attr_segundo_saque, p.attr_resto,
+                 p.attr_derecha, p.attr_reves, p.attr_movilidad,
+                 p.attr_consistencia, p.attr_clutch, p.attr_fisico];
+    var sum = 0;
+    for (var i = 0; i < attrs.length; i++) sum += (attrs[i] || 0);
+    var avg = Math.round(sum / 9);
+
+    var tc = avg >= 80 ? 'text-yellow-400' : (avg >= 60 ? 'text-gray-300' : 'text-amber-600');
+    var hand = p.brazo_bueno === 'L' ? 'Zurdo' : 'Diestro';
+
+    card.innerHTML =
+      '<div class="w-12 h-12 rounded-full bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center flex-shrink-0">' +
+        '<span class="text-lg font-bold text-yellow-400">' + p.nombre.charAt(0) + '</span>' +
+      '</div>' +
+      '<div class="flex-1 min-w-0">' +
+        '<p class="text-sm font-semibold text-gray-100 truncate">' + p.nombre + ' ' + p.apellido + '</p>' +
+        '<p class="text-xs text-gray-500">' + (p.nacionalidad || '---') + ' · ' + hand + (p.altura_cm ? ' · ' + p.altura_cm + ' cm' : '') + '</p>' +
+      '</div>' +
+      '<div class="text-right flex-shrink-0">' +
+        '<p class="text-lg font-bold ' + tc + '">' + avg + '</p>' +
+        '<p class="text-[10px] uppercase tracking-wider text-gray-500">OVR</p>' +
+      '</div>';
+
+    card.addEventListener('click', function() { selectPlayer(p, slot); });
+    return card;
+  }
+
+  // ── Selección ───────────────────────────────────────────
+  function selectPlayer(p, slot) {
+    if (slot === 1) {
+      sel1 = (sel1 && sel1.id === p.id) ? null : p;
+    } else {
+      sel2 = (sel2 && sel2.id === p.id) ? null : p;
+    }
+    refreshCards();
+    refreshSummary();
+  }
+
+  function refreshCards() {
+    document.querySelectorAll('.player-card').forEach(function(c) {
+      var id = Number(c.dataset.pid);
+      var slot = Number(c.dataset.slot);
+      c.classList.remove('selected', 'disabled');
+      if (slot === 1) {
+        if (sel1 && sel1.id === id) c.classList.add('selected');
+        if (sel2 && sel2.id === id) c.classList.add('disabled');
+      } else {
+        if (sel2 && sel2.id === id) c.classList.add('selected');
+        if (sel1 && sel1.id === id) c.classList.add('disabled');
+      }
+    });
+  }
+
+  function refreshSummary() {
+    if (sel1 && sel2) {
+      var sets = getActiveVal('opt-sets') || '3';
+      var surf = getActiveVal('opt-surface') || 'Dura';
+      var tb   = getActiveVal('opt-tb') || 'true';
+
+      document.getElementById('s-p1-i').textContent = sel1.nombre.charAt(0);
+      document.getElementById('s-p1-n').textContent = sel1.nombre + ' ' + sel1.apellido;
+      document.getElementById('s-p2-i').textContent = sel2.nombre.charAt(0);
+      document.getElementById('s-p2-n').textContent = sel2.nombre + ' ' + sel2.apellido;
+      document.getElementById('s-fmt').textContent  = sets === '1' ? '1 Set' : 'Mejor de ' + sets;
+      document.getElementById('s-surf').textContent = surf;
+      document.getElementById('s-tb').textContent   = tb === 'true' ? 'Sí' : 'No';
+      show('summary-box');
+    } else {
+      hide('summary-box');
+    }
+  }
+
+  // ── Radio buttons ───────────────────────────────────────
+  document.querySelectorAll('#opt-sets .radio-opt, #opt-surface .radio-opt, #opt-tb .radio-opt').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      btn.parentElement.querySelectorAll('.radio-opt').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      refreshSummary();
+    });
+  });
+
+  // ── Simular ─────────────────────────────────────────────
+  document.getElementById('btn-sim').addEventListener('click', async function() {
+    if (!sel1 || !sel2) { showToast('Selecciona ambos jugadores', true); return; }
+
+    var btn = document.getElementById('btn-sim');
+    var origHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Simulando...';
+
+    var sets = Number(getActiveVal('opt-sets') || 3);
+    var surf = getActiveVal('opt-surface') || 'Dura';
+    var tb   = (getActiveVal('opt-tb') || 'true') === 'true';
+
+    function buildP(p) {
+      return {
+        name: p.nombre + ' ' + p.apellido,
+        id: String(p.id),
+        Primer_Saque: p.attr_primer_saque || 50,
+        Segundo_Saque: p.attr_segundo_saque || 50,
+        Fisico: p.attr_fisico || 50,
+        Estamina: p.attr_fisico || 50,
+        Consistencia: p.attr_consistencia || 50,
+        Clutch: p.attr_clutch || 50,
+        Momentum: p.attr_clutch || 50,
+        Derecha: p.attr_derecha || 50,
+        Reves: p.attr_reves || 50,
+        Resto: p.attr_resto || 50,
+        Movilidad: p.attr_movilidad || 50
+      };
+    }
+
+    try {
+      var res = await fetch('/api/simulate_match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          player1: buildP(sel1),
+          player2: buildP(sel2),
+          config: { best_of: sets, tiebreak: tb }
+        })
+      });
+
+      if (!res.ok) {
+        var errData = await res.json().catch(function() { return {}; });
+        showToast(errData.detail || 'Error en la simulación', true);
+        return;
+      }
+
+      var result = await res.json();
+      sessionStorage.setItem('match_result', JSON.stringify(result));
+      sessionStorage.setItem('match_config', JSON.stringify({
+        surface: surf,
+        player1_name: sel1.nombre + ' ' + sel1.apellido,
+        player2_name: sel2.nombre + ' ' + sel2.apellido
+      }));
+      window.location.href = '/resultados';
+
+    } catch (err) {
+      showToast('Error de conexión. Inténtalo de nuevo.', true);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = origHTML;
+    }
+  });
+
+})();
+</script>
+{% endblock %}

@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -5,10 +7,34 @@ from backend.app.auth.database import get_db
 from backend.app.auth.models import Usuario
 from backend.app.auth.security import decode_access_token
 from backend.app.players.models import Jugador
-from backend.app.players.schemas import JugadorCreate
+from backend.app.players.schemas import JugadorCreate, JugadorOut
 from backend.app.auth.routes import bearer_scheme
 
 router = APIRouter(prefix="/players", tags=["players"])
+
+
+# ─── GET /api/players ──────────────────────────────────────────
+@router.get("", response_model=List[JugadorOut])
+def listar_jugadores(
+    credentials=Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+):
+    """Devuelve todos los jugadores del usuario autenticado."""
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Token requerido")
+
+    payload = decode_access_token(credentials.credentials)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Token inválido o expirado")
+
+    user_id = payload.get("sub")
+    jugadores = (
+        db.query(Jugador)
+        .filter(Jugador.id_creador == int(user_id), Jugador.activo == True)
+        .order_by(Jugador.nombre)
+        .all()
+    )
+    return jugadores
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
