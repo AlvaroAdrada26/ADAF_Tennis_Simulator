@@ -64,10 +64,16 @@ def crear_jugador(request: Request):
 
 
 @router.get("/crear-partido", response_class=HTMLResponse)
-@router.get("/partido-rapido", response_class=HTMLResponse)
 def crear_partido(request: Request):
     return templates.TemplateResponse(
-        "crear_partido.html", {"request": request, "active_page": "partido_rapido"}
+        "crear_partido.html", {"request": request, "active_page": "crear_partido"}
+    )
+
+
+@router.get("/partido-rapido", response_class=HTMLResponse)
+def partido_rapido(request: Request):
+    return templates.TemplateResponse(
+        "partido_rapido.html", {"request": request, "active_page": "partido_rapido"}
     )
 
 

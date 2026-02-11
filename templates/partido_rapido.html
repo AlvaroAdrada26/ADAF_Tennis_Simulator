@@ -4,25 +4,51 @@
 
 {% block head_extra %}
 <style>
+  /* ── Card tiers (mismo estilo que crear_jugador) ── */
+  .tier-gold   { background: linear-gradient(to bottom, #fde68a, #fbbf24, #b45309); }
+  .tier-silver { background: linear-gradient(to bottom, #e5e7eb, #9ca3af, #6b7280); }
+  .tier-bronze { background: linear-gradient(to bottom, #fdba74, #f59e0b, #92400e); }
+  .glow-gold   { box-shadow: 0 0 18px rgba(250, 204, 21, 0.3); }
+  .glow-silver { box-shadow: 0 0 18px rgba(156, 163, 175, 0.3); }
+  .glow-bronze { box-shadow: 0 0 18px rgba(217, 119, 6, 0.3); }
+
+  /* ── Player card wrapper ── */
   .player-card {
     transition: all 0.25s ease;
     cursor: pointer;
-    border: 2px solid transparent;
+    position: relative;
   }
   .player-card:hover {
-    border-color: rgba(250, 204, 21, 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(250, 204, 21, 0.15);
+    transform: translateY(-4px) scale(1.03);
   }
   .player-card.selected {
-    border-color: #facc15;
-    background-color: rgba(250, 204, 21, 0.08);
-    box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);
+    transform: translateY(-4px) scale(1.05);
+  }
+  .player-card.selected::after {
+    content: '\2713';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 28px;
+    height: 28px;
+    background: #facc15;
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 14px;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
   .player-card.disabled {
-    opacity: 0.4;
+    opacity: 0.3;
     pointer-events: none;
+    filter: grayscale(0.6);
   }
+
+  /* ── Radio / Surface options ── */
   .radio-opt {
     transition: all 0.2s;
     cursor: pointer;
@@ -34,6 +60,47 @@
     background-color: rgba(250, 204, 21, 0.1);
     color: #facc15;
   }
+  .surface-card {
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 0.75rem;
+    border-radius: 0.75rem;
+    flex: 1;
+  }
+  .surface-card:hover {
+    border-color: rgba(250, 204, 21, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .surface-card.active {
+    border-color: #facc15;
+    background-color: rgba(250, 204, 21, 0.08);
+    box-shadow: 0 0 15px rgba(250, 204, 21, 0.15);
+  }
+  .surface-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .surface-swatch.hard  { background-color: #1e3a6e; }
+  .surface-swatch.clay  { background-color: #b85c38; }
+  .surface-swatch.grass { background-color: #2d8a4e; }
+
+  /* ── Player grid ── */
+  .player-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+    justify-items: center;
+  }
+
+  /* ── Animations / misc ── */
   @keyframes toast-in  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
   @keyframes toast-out { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(20px); } }
   .toast-show { animation: toast-in .4s ease forwards; }
@@ -120,28 +187,28 @@
   <div id="match-setup" class="hidden space-y-10">
 
     <!-- Selección de jugadores -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+    <div class="flex items-start gap-4">
       <!-- JUGADOR 1 -->
-      <div>
+      <div class="flex-1 min-w-0 bg-slate-900/60 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-5">
         <h2 class="text-lg font-semibold text-yellow-400 mb-4 flex items-center gap-2">
           <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black text-sm font-bold">1</span>
           Jugador 1
         </h2>
-        <div id="p1-list" class="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scroll"></div>
+        <div id="p1-list" class="player-grid max-h-[520px] overflow-y-auto pr-2 custom-scroll py-3"></div>
       </div>
 
       <!-- VS -->
-      <div class="hidden lg:flex items-center justify-center lg:mt-16">
-        <span class="vs-text text-6xl font-black select-none">VS</span>
+      <div class="flex items-center justify-center self-center pt-10 shrink-0">
+        <span class="vs-text text-5xl font-black select-none">VS</span>
       </div>
 
       <!-- JUGADOR 2 -->
-      <div>
+      <div class="flex-1 min-w-0 bg-slate-900/60 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-5">
         <h2 class="text-lg font-semibold text-yellow-400 mb-4 flex items-center gap-2">
           <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black text-sm font-bold">2</span>
           Jugador 2
         </h2>
-        <div id="p2-list" class="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scroll"></div>
+        <div id="p2-list" class="player-grid max-h-[520px] overflow-y-auto pr-2 custom-scroll py-3"></div>
       </div>
     </div>
 
@@ -167,10 +234,19 @@
         <!-- Superficie -->
         <div>
           <label class="block text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Superficie</label>
-          <div class="flex gap-3 flex-wrap" id="opt-surface">
-            <button data-val="Dura" class="radio-opt active flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">🏟️ Dura</button>
-            <button data-val="Arcilla" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">🧱 Arcilla</button>
-            <button data-val="Hierba" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">🌿 Hierba</button>
+          <div class="flex gap-3" id="opt-surface">
+            <button data-val="Dura" class="surface-card active">
+              <div class="surface-swatch hard"></div>
+              <span class="text-sm font-medium text-gray-300">Dura</span>
+            </button>
+            <button data-val="Tierra" class="surface-card">
+              <div class="surface-swatch clay"></div>
+              <span class="text-sm font-medium text-gray-300">Tierra Batida</span>
+            </button>
+            <button data-val="Hierba" class="surface-card">
+              <div class="surface-swatch grass"></div>
+              <span class="text-sm font-medium text-gray-300">Hierba</span>
+            </button>
           </div>
         </div>
         <!-- Tiebreak -->
@@ -241,7 +317,7 @@
   }
 
   function getActiveVal(groupId) {
-    const el = document.querySelector('#' + groupId + ' .active');
+    const el = document.querySelector('#' + groupId + ' .active[data-val]');
     return el ? el.dataset.val : null;
   }
 
@@ -322,7 +398,6 @@
 
   function makeCard(p, slot) {
     var card = document.createElement('div');
-    card.className = 'player-card bg-slate-900/60 border border-blue-800/30 rounded-xl p-4 flex items-center gap-4';
     card.dataset.pid = p.id;
     card.dataset.slot = slot;
 
@@ -333,20 +408,46 @@
     for (var i = 0; i < attrs.length; i++) sum += (attrs[i] || 0);
     var avg = Math.round(sum / 9);
 
-    var tc = avg >= 80 ? 'text-yellow-400' : (avg >= 60 ? 'text-gray-300' : 'text-amber-600');
+    // Tier visual
+    var tierBg, tierGlow, tierBorder, tierText, tierSub;
+    if (avg >= 80) {
+      tierBg = 'tier-gold'; tierGlow = 'glow-gold';
+      tierBorder = 'border-yellow-400'; tierText = 'text-yellow-900'; tierSub = 'text-slate-700';
+    } else if (avg >= 55) {
+      tierBg = 'tier-silver'; tierGlow = 'glow-silver';
+      tierBorder = 'border-gray-400'; tierText = 'text-gray-800'; tierSub = 'text-gray-600';
+    } else {
+      tierBg = 'tier-bronze'; tierGlow = 'glow-bronze';
+      tierBorder = 'border-amber-600'; tierText = 'text-amber-900'; tierSub = 'text-slate-700';
+    }
+
     var hand = p.brazo_bueno === 'L' ? 'Zurdo' : 'Diestro';
+    var altura = p.altura_cm || '—';
+    var nac = p.nacionalidad || '—';
+
+    card.className = 'player-card w-[200px] ' + tierBg + ' ' + tierGlow + ' text-slate-900 rounded-2xl shadow-xl p-3.5 border-[3px] ' + tierBorder + ' transition-transform duration-300';
 
     card.innerHTML =
-      '<div class="w-12 h-12 rounded-full bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center flex-shrink-0">' +
-        '<span class="text-lg font-bold text-yellow-400">' + p.nombre.charAt(0) + '</span>' +
+      '<div class="flex items-center justify-between mb-1">' +
+        '<div class="text-4xl font-extrabold ' + tierText + ' drop-shadow-sm leading-none">' + avg + '</div>' +
+        '<div class="text-[11px] font-semibold ' + tierSub + ' uppercase tracking-wide text-right">' + nac + '</div>' +
       '</div>' +
-      '<div class="flex-1 min-w-0">' +
-        '<p class="text-sm font-semibold text-gray-100 truncate">' + p.nombre + ' ' + p.apellido + '</p>' +
-        '<p class="text-xs text-gray-500">' + (p.nacionalidad || '---') + ' · ' + hand + (p.altura_cm ? ' · ' + p.altura_cm + ' cm' : '') + '</p>' +
+      '<div class="text-base font-extrabold uppercase tracking-wide ' + tierText + ' truncate">' + p.nombre + ' ' + p.apellido + '</div>' +
+      '<div class="text-[11px] ' + tierSub + ' font-medium">' + altura + ' cm · ' + hand + '</div>' +
+      '<div class="mt-2 border-t border-current opacity-20"></div>' +
+      '<div class="mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 text-center">' +
+        '<div><div class="text-[9px] font-semibold ' + tierSub + '">1st Srv</div><div class="text-sm font-bold ' + tierText + '">' + (p.attr_primer_saque||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + tierSub + '">2nd Srv</div><div class="text-sm font-bold ' + tierText + '">' + (p.attr_segundo_saque||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + tierSub + '">Return</div><div class="text-sm font-bold ' + tierText + '">' + (p.attr_resto||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + tierSub + '">Forehand</div><div class="text-sm font-bold ' + tierText + '">' + (p.attr_derecha||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + tierSub + '">Backhand</div><div class="text-sm font-bold ' + tierText + '">' + (p.attr_reves||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + tierSub + '">Consist.</div><div class="text-sm font-bold ' + tierText + '">' + (p.attr_consistencia||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + tierSub + '">Movement</div><div class="text-sm font-bold ' + tierText + '">' + (p.attr_movilidad||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + tierSub + '">Physical</div><div class="text-sm font-bold ' + tierText + '">' + (p.attr_fisico||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + tierSub + '">Clutch</div><div class="text-sm font-bold ' + tierText + '">' + (p.attr_clutch||50) + '</div></div>' +
       '</div>' +
-      '<div class="text-right flex-shrink-0">' +
-        '<p class="text-lg font-bold ' + tc + '">' + avg + '</p>' +
-        '<p class="text-[10px] uppercase tracking-wider text-gray-500">OVR</p>' +
+      '<div class="mt-2 flex items-center justify-center">' +
+        '<span class="text-[8px] uppercase tracking-wider ' + tierSub + ' font-semibold opacity-60">ADAF Tennis Simulator</span>' +
       '</div>';
 
     card.addEventListener('click', function() { selectPlayer(p, slot); });
@@ -399,9 +500,17 @@
   }
 
   // ── Radio buttons ───────────────────────────────────────
-  document.querySelectorAll('#opt-sets .radio-opt, #opt-surface .radio-opt, #opt-tb .radio-opt').forEach(function(btn) {
+  document.querySelectorAll('#opt-sets .radio-opt, #opt-tb .radio-opt').forEach(function(btn) {
     btn.addEventListener('click', function() {
       btn.parentElement.querySelectorAll('.radio-opt').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      refreshSummary();
+    });
+  });
+
+  document.querySelectorAll('#opt-surface .surface-card').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      btn.parentElement.querySelectorAll('.surface-card').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');
       refreshSummary();
     });
@@ -420,17 +529,17 @@
     var surf = getActiveVal('opt-surface') || 'Dura';
     var tb   = (getActiveVal('opt-tb') || 'true') === 'true';
 
-    function buildP(p) {
+    function buildP(p, tag) {
       return {
         name: p.nombre + ' ' + p.apellido,
-        id: String(p.id),
+        id: tag,
         Primer_Saque: p.attr_primer_saque || 50,
         Segundo_Saque: p.attr_segundo_saque || 50,
         Fisico: p.attr_fisico || 50,
         Estamina: p.attr_fisico || 50,
         Consistencia: p.attr_consistencia || 50,
         Clutch: p.attr_clutch || 50,
-        Momentum: p.attr_clutch || 50,
+        Momentum: 0,
         Derecha: p.attr_derecha || 50,
         Reves: p.attr_reves || 50,
         Resto: p.attr_resto || 50,
@@ -443,8 +552,8 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          player1: buildP(sel1),
-          player2: buildP(sel2),
+          player1: buildP(sel1, 'P1'),
+          player2: buildP(sel2, 'P2'),
           config: { best_of: sets, tiebreak: tb }
         })
       });
@@ -459,10 +568,14 @@
       sessionStorage.setItem('match_result', JSON.stringify(result));
       sessionStorage.setItem('match_config', JSON.stringify({
         surface: surf,
+        best_of: sets,
+        tiebreak: tb,
         player1_name: sel1.nombre + ' ' + sel1.apellido,
-        player2_name: sel2.nombre + ' ' + sel2.apellido
+        player2_name: sel2.nombre + ' ' + sel2.apellido,
+        db_player1_id: sel1.id,
+        db_player2_id: sel2.id
       }));
-      window.location.href = '/resultados';
+      window.location.href = '/simulacion2';
 
     } catch (err) {
       showToast('Error de conexión. Inténtalo de nuevo.', true);

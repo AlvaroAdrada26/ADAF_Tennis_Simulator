@@ -23,8 +23,13 @@ async function initSimulation() {
     console.log("Simulación lista para comenzar");
   } catch (err) {
     console.error("Error inicializando simulación:", err);
-    document.getElementById("winnerMsg").textContent =
-      "Error al iniciar simulación.";
+    const panel = document.getElementById("scoreboard-panel");
+    if (panel) {
+      const msg = document.createElement("div");
+      msg.className = "text-xl text-red-400 font-bold mt-4 text-center";
+      msg.textContent = "⚠️ Error al iniciar simulación. Revisa la consola.";
+      panel.appendChild(msg);
+    }
   }
 }
 

@@ -59,14 +59,14 @@ CREATE TABLE partidos (
     id_jugador_1 INT REFERENCES jugadores(id) ON DELETE CASCADE,
     id_jugador_2 INT REFERENCES jugadores(id) ON DELETE CASCADE,
     id_ganador INT REFERENCES jugadores(id) ON DELETE CASCADE, -- Importante para saber quién ganó rápido
-    
+    id_usuario_creador INT REFERENCES usuarios(id) ON DELETE SET NULL, -- Quién creó el partido (puede ser NULL si fue el sistema)
     -- Detalles del Partido
     marcador_final VARCHAR(50) NOT NULL, -- Ej: "6-4, 6-2, 7-6"
     duracion_minutos INT,                -- Ej: 145 (minutos)
     fecha_jugado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     -- Configuración
-    superficie VARCHAR(20) CHECK (superficie IN ('Dura', 'Arcilla', 'Hierba', 'Moqueta')),
+    superficie VARCHAR(20) CHECK (superficie IN ('Dura', 'Tierra', 'Hierba')),
     formato_sets INT CHECK (formato_sets IN (1, 3, 5)), -- Solo permite partidos a 1, 3 o 5 sets
     tiebreak_ultimo_set BOOLEAN DEFAULT TRUE, -- TRUE = hay tiebreak, FALSE = hay que ganar por 2 juegos
     
@@ -107,4 +107,63 @@ CREATE TABLE estadisticas_partido (
     CHECK (dobles_faltas >= 0),
     CHECK (primeros_saques_in <= primeros_saques_total), -- No puedes meter más saques de los que tiras
     CHECK (break_points_convertidos <= break_points_oportunidades) -- No puedes convertir más BPs de los que tienes
+);
+
+-- ==========================================================
+-- INSERCIÓN DE JUGADORES LEYENDA Y ACTUALES
+-- ==========================================================
+
+INSERT INTO jugadores (
+    nombre, apellido, nacionalidad, altura_cm, brazo_bueno, id_creador,
+    attr_primer_saque, attr_segundo_saque, attr_resto,
+    attr_derecha, attr_reves,
+    attr_movilidad, attr_consistencia, attr_clutch, attr_fisico
+) VALUES 
+
+-- 1. NOVAK DJOKOVIC (La Máquina Perfecta)
+-- Destaca en: Resto (el mejor de la historia), Revés, Consistencia y Mente (Clutch).
+('Novak', 'Djokovic', 'SRB', 188, 'R', NULL,
+ 92, 94, 99,  -- Saque sólido, Resto legendario (99)
+ 93, 98,      -- Derecha muy buena, Revés muro (98)
+ 95, 99, 99, 96 -- Movilidad elástica, Consistencia y Clutch máximos
+),
+
+-- 2. RAFAEL NADAL (El Rey de la Tierra)
+-- Destaca en: Derecha (Spin), Físico, Mentalidad y Consistencia. Zurdo.
+('Rafael', 'Nadal', 'ESP', 185, 'L', NULL,
+ 88, 92, 94,  -- Saque colocado, buen segundo
+ 99, 90,      -- La mejor derecha de la historia (99), Revés sólido
+ 94, 97, 99, 99 -- Físico inagotable y Mente de acero
+),
+
+-- 3. ROGER FEDERER (El Maestro)
+-- Destaca en: Primer saque (precisión), Derecha y Talento ofensivo. Movilidad fluida.
+('Roger', 'Federer', 'CHE', 185, 'R', NULL,
+ 97, 93, 88,  -- Primer saque letal por colocación
+ 98, 89,      -- Derecha increíble, Revés a una mano (baja un poco por bolas altas)
+ 93, 90, 95, 88 -- Movilidad flotante, Físico bueno pero no de maratón
+),
+
+-- 4. CARLOS ALCARAZ (El Prodigio Físico)
+-- Destaca en: Potencia, Movilidad explosiva y Derecha. Un poco menos de consistencia por arriesgar.
+('Carlos', 'Alcaraz', 'ESP', 183, 'R', NULL,
+ 90, 91, 93,
+ 97, 92,      -- Derecha cañón
+ 99, 89, 94, 96 -- Movilidad eléctrica (99), Físico bestial
+),
+
+-- 5. JANNIK SINNER (El Golpeo Limpio)
+-- Destaca en: Velocidad de bola, Revés y Derecha (ambos lados muy fuertes). Frialdad.
+('Jannik', 'Sinner', 'ITA', 188, 'R', NULL,
+ 93, 92, 95,
+ 96, 97,      -- De los mejores golpeos de fondo actuales
+ 92, 94, 96, 93 -- Muy regular y mente fría reciente
+),
+
+-- 6. ANDY MURRAY (El Estratega)
+-- Destaca en: Resto, Revés y defensa. Su punto débil relativo es el segundo saque.
+('Andy', 'Murray', 'GBR', 191, 'R', NULL,
+ 89, 78, 97,  -- Segundo saque atacable (78), Resto élite
+ 88, 95,      -- Revés buenísimo
+ 94, 96, 92, 92 -- Defensor increíble y muy consistente
 );

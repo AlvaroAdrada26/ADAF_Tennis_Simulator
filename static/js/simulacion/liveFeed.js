@@ -134,3 +134,13 @@ export async function playPointFeed(pointData) {
   li.textContent = lastSentence;
   liveList.appendChild(li);
 }
+
+/* =========================================================
+   🧹 4. Limpiar ambos feeds (para reinicio)
+   ========================================================= */
+export function clearFeeds() {
+  const liveList = document.getElementById("live-feed-list");
+  const pointsList = document.getElementById("points-feed-list");
+  if (liveList) liveList.innerHTML = "";
+  if (pointsList) pointsList.innerHTML = "";
+}

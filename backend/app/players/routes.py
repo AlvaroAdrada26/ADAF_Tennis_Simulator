@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from backend.app.auth.database import get_db
@@ -19,7 +20,7 @@ def listar_jugadores(
     credentials=Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ):
-    """Devuelve todos los jugadores del usuario autenticado."""
+    """Devuelve los jugadores del usuario autenticado + los por defecto (sin creador)."""
     if not credentials:
         raise HTTPException(status_code=401, detail="Token requerido")
 
@@ -30,7 +31,13 @@ def listar_jugadores(
     user_id = payload.get("sub")
     jugadores = (
         db.query(Jugador)
-        .filter(Jugador.id_creador == int(user_id), Jugador.activo == True)
+        .filter(
+            or_(
+                Jugador.id_creador == int(user_id),
+                Jugador.id_creador.is_(None),
+            ),
+            Jugador.activo == True,
+        )
         .order_by(Jugador.nombre)
         .all()
     )

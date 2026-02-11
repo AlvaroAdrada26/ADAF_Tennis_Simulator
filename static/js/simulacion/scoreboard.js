@@ -147,7 +147,30 @@ export function showFinalScore() {
 
   const panel = document.getElementById("scoreboard-panel");
   const msg = document.createElement("div");
+  msg.id = "winner-msg";
   msg.className = "text-3xl text-yellow-400 font-bold mt-4 animate-pulse";
   msg.textContent = `🏆 Partido finalizado — Ganador: ${winnerName}`;
   panel.appendChild(msg);
+}
+
+/**
+ * Reinicia el marcador visual a su estado inicial (todo a 0 / vacío).
+ */
+export function resetScoreboard() {
+  // Sets
+  for (let s = 1; s <= 3; s++) {
+    const p1 = document.getElementById(`p1-set${s}`);
+    const p2 = document.getElementById(`p2-set${s}`);
+    if (p1) p1.textContent = s === 1 ? "0" : "";
+    if (p2) p2.textContent = s === 1 ? "0" : "";
+  }
+  // Puntos
+  document.getElementById("p1-points").textContent = "0";
+  document.getElementById("p2-points").textContent = "0";
+  // Saque: P1 saca por defecto
+  document.getElementById("serve-p1")?.classList.remove("off");
+  document.getElementById("serve-p2")?.classList.add("off");
+  // Quitar mensaje de ganador si existe
+  const msg = document.getElementById("winner-msg");
+  if (msg) msg.remove();
 }
