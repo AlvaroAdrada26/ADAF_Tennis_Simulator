@@ -1,0 +1,441 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Crear Partido Rápido - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<style>
+  /* ── Animaciones ── */
+  @keyframes toast-in  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes toast-out { from { opacity:1; transform:translateY(0);   } to { opacity:0; transform:translateY(20px); } }
+  .toast-show { animation: toast-in .4s ease forwards; }
+  .toast-hide { animation: toast-out .4s ease forwards; }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 8px rgba(250,204,21,0.2); }
+    50%      { box-shadow: 0 0 20px rgba(250,204,21,0.5); }
+  }
+
+  /* ── Card tiers ── */
+  .card-gold   { background: linear-gradient(to bottom, #fde68a, #fbbf24, #b45309); }
+  .card-silver { background: linear-gradient(to bottom, #e5e7eb, #9ca3af, #6b7280); }
+  .card-bronze { background: linear-gradient(to bottom, #fdba74, #f59e0b, #92400e); }
+
+  /* ── Player select dropdown ── */
+  .player-option:hover { background: rgba(250,204,21,0.15); }
+  .player-option.selected { background: rgba(250,204,21,0.25); border-left: 3px solid #facc15; }
+
+  /* ── VS badge ── */
+  .vs-badge {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* ── Custom select styling ── */
+  select option {
+    background: #0f172a;
+    color: #f1f5f9;
+  }
+</style>
+{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 px-8 py-12 space-y-10 animate-fade-up max-w-[90rem] mx-auto w-full">
+
+  <!-- ═══════ TÍTULO ═══════ -->
+  <section class="text-center">
+    <h2 class="text-4xl font-bold text-yellow-400 mb-3">Partido Rápido</h2>
+    <p class="text-gray-400 text-lg">Elige dos jugadores de tu plantilla y configura las condiciones del partido.</p>
+  </section>
+
+  <!-- ═══════ AVISO: NO LOGUEADO ═══════ -->
+  <div id="notLoggedIn" class="hidden">
+    <div class="bg-red-900/30 border border-red-500/40 rounded-2xl p-8 text-center space-y-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="text-2xl font-semibold text-red-400">Inicia sesión para continuar</h3>
+      <p class="text-gray-400">Necesitas una cuenta para crear jugadores y simular partidos.</p>
+      <a href="/login" class="inline-block mt-2 px-8 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-full transition shadow-lg">
+        Iniciar Sesión
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════ AVISO: SIN JUGADORES ═══════ -->
+  <div id="noPlayers" class="hidden">
+    <div class="bg-amber-900/20 border border-yellow-500/30 rounded-2xl p-8 text-center space-y-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="text-2xl font-semibold text-yellow-400">No tienes jugadores creados</h3>
+      <p class="text-gray-400">Para crear un partido rápido necesitas al menos <strong class="text-yellow-300">2 jugadores</strong> en tu plantilla.</p>
+      <a href="/crear-jugador" class="inline-block mt-2 px-8 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-full transition shadow-lg">
+        Crear Jugador
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════ AVISO: SOLO 1 JUGADOR ═══════ -->
+  <div id="onePlayer" class="hidden">
+    <div class="bg-amber-900/20 border border-yellow-500/30 rounded-2xl p-8 text-center space-y-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="text-2xl font-semibold text-yellow-400">Necesitas más jugadores</h3>
+      <p class="text-gray-400">Solo tienes <strong class="text-yellow-300">1 jugador</strong>. Necesitas al menos 2 para simular un partido.</p>
+      <a href="/crear-jugador" class="inline-block mt-2 px-8 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-full transition shadow-lg">
+        Crear otro Jugador
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══════ CONTENIDO PRINCIPAL (oculto hasta cargar jugadores) ═══════ -->
+  <div id="matchSetup" class="hidden space-y-10">
+
+    <!-- ── SELECCIÓN DE JUGADORES ── -->
+    <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+      <h3 class="text-2xl font-semibold text-yellow-400 mb-8 text-center">Selecciona los Jugadores</h3>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 items-start">
+
+        <!-- JUGADOR 1 -->
+        <div class="space-y-4">
+          <label for="select-j1" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 text-center">Jugador 1</label>
+          <select id="select-j1" onchange="onPlayerSelected(1)"
+            class="w-full rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-3 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]">
+            <option value="">-- Elige un jugador --</option>
+          </select>
+          <!-- Card preview J1 -->
+          <div id="card-j1" class="flex justify-center mt-4"></div>
+        </div>
+
+        <!-- VS -->
+        <div class="flex items-center justify-center pt-8">
+          <div class="vs-badge w-16 h-16 rounded-full bg-yellow-400/20 border-2 border-yellow-400 flex items-center justify-center">
+            <span class="text-xl font-extrabold text-yellow-400">VS</span>
+          </div>
+        </div>
+
+        <!-- JUGADOR 2 -->
+        <div class="space-y-4">
+          <label for="select-j2" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 text-center">Jugador 2</label>
+          <select id="select-j2" onchange="onPlayerSelected(2)"
+            class="w-full rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-3 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]">
+            <option value="">-- Elige un jugador --</option>
+          </select>
+          <!-- Card preview J2 -->
+          <div id="card-j2" class="flex justify-center mt-4"></div>
+        </div>
+      </div>
+
+      <!-- Error: mismo jugador -->
+      <p id="samePlayers" class="hidden text-center text-red-400 text-sm mt-4">
+        ⚠ No puedes enfrentar a un jugador contra sí mismo. Elige jugadores diferentes.
+      </p>
+    </section>
+
+    <!-- ── CONFIGURACIÓN DEL PARTIDO ── -->
+    <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+      <h3 class="text-2xl font-semibold text-yellow-400 mb-8 text-center">Configuración del Partido</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- Superficie -->
+        <div>
+          <label for="superficie" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Superficie</label>
+          <select id="superficie"
+            class="w-full rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-3 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]">
+            <option value="Dura">🏟️ Dura</option>
+            <option value="Arcilla">🧱 Arcilla</option>
+            <option value="Hierba">🌱 Hierba</option>
+            <option value="Moqueta">🔵 Moqueta</option>
+          </select>
+        </div>
+
+        <!-- Formato de sets -->
+        <div>
+          <label for="formato-sets" class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Formato</label>
+          <select id="formato-sets"
+            class="w-full rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-3 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]">
+            <option value="1">Al mejor de 1 set</option>
+            <option value="3" selected>Al mejor de 3 sets</option>
+            <option value="5">Al mejor de 5 sets</option>
+          </select>
+        </div>
+
+        <!-- Tiebreak último set -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-widest text-yellow-400 mb-2">Tiebreak en último set</label>
+          <fieldset class="flex gap-6 mt-1">
+            <legend class="sr-only">Tiebreak en último set</legend>
+            <label for="tb-si" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" id="tb-si" name="tiebreak" checked onchange="toggleSingleCheckbox(this)"
+                class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 hover:bg-slate-700/40 transition duration-150 ease-in-out" />
+              <svg class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Sí</span>
+            </label>
+            <label for="tb-no" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" id="tb-no" name="tiebreak" onchange="toggleSingleCheckbox(this)"
+                class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 hover:bg-slate-700/40 transition duration-150 ease-in-out" />
+              <svg class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span class="text-sm text-gray-300 peer-checked:text-yellow-300">No</span>
+            </label>
+          </fieldset>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BOTÓN SIMULAR ── -->
+    <div class="flex justify-center gap-6 pt-4 pb-8">
+      <button id="btnSimular" onclick="iniciarPartido()" disabled
+        class="px-12 py-4 bg-yellow-400 hover:bg-yellow-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-black disabled:text-gray-400 rounded-full text-lg font-semibold shadow-lg transition-all duration-300">
+        ⚡ Simular Partido
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════ LOADING ═══════ -->
+  <div id="loading" class="hidden text-center py-20">
+    <div class="inline-block w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+    <p class="text-gray-400 mt-4">Cargando jugadores...</p>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ─── Estado ───────────────────────────────────────────────
+let allPlayers = [];
+let selectedPlayer1 = null;
+let selectedPlayer2 = null;
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    document.getElementById('notLoggedIn').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('loading').classList.remove('hidden');
+  fetchPlayers(token);
+});
+
+// ─── Fetch jugadores ──────────────────────────────────────
+async function fetchPlayers(token) {
+  try {
+    const res = await fetch('/api/players', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (res.status === 401) {
+      localStorage.removeItem('access_token');
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('notLoggedIn').classList.remove('hidden');
+      return;
+    }
+
+    if (!res.ok) throw new Error('Error al cargar jugadores');
+
+    allPlayers = await res.json();
+    document.getElementById('loading').classList.add('hidden');
+
+    if (allPlayers.length === 0) {
+      document.getElementById('noPlayers').classList.remove('hidden');
+      return;
+    }
+
+    if (allPlayers.length === 1) {
+      document.getElementById('onePlayer').classList.remove('hidden');
+      return;
+    }
+
+    // Poblar selects y mostrar formulario
+    populateSelects();
+    document.getElementById('matchSetup').classList.remove('hidden');
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('noPlayers').classList.remove('hidden');
+  }
+}
+
+// ─── Poblar dropdowns ─────────────────────────────────────
+function populateSelects() {
+  const s1 = document.getElementById('select-j1');
+  const s2 = document.getElementById('select-j2');
+
+  allPlayers.forEach(p => {
+    const overall = calcOverall(p);
+    const text = `${p.nombre} ${p.apellido} (${p.nacionalidad || '???'}) — OVR ${overall}`;
+
+    const opt1 = new Option(text, p.id);
+    const opt2 = new Option(text, p.id);
+    s1.appendChild(opt1);
+    s2.appendChild(opt2);
+  });
+}
+
+// ─── Calcular Overall ─────────────────────────────────────
+function calcOverall(p) {
+  const attrs = [
+    p.attr_primer_saque, p.attr_segundo_saque, p.attr_resto,
+    p.attr_derecha, p.attr_reves, p.attr_movilidad,
+    p.attr_consistencia, p.attr_clutch, p.attr_fisico
+  ].filter(v => v != null);
+
+  if (attrs.length === 0) return 0;
+  return Math.round(attrs.reduce((a, b) => a + b, 0) / attrs.length);
+}
+
+// ─── Al seleccionar jugador ───────────────────────────────
+function onPlayerSelected(slot) {
+  const selectEl = document.getElementById(`select-j${slot}`);
+  const playerId = parseInt(selectEl.value);
+  const player = allPlayers.find(p => p.id === playerId) || null;
+
+  if (slot === 1) selectedPlayer1 = player;
+  else selectedPlayer2 = player;
+
+  renderCard(slot, player);
+  validateSelection();
+}
+
+// ─── Renderizar carta FIFA ────────────────────────────────
+function renderCard(slot, player) {
+  const container = document.getElementById(`card-j${slot}`);
+  if (!player) {
+    container.innerHTML = '';
+    return;
+  }
+
+  const ovr = calcOverall(player);
+  let tierClass, tierBorder, tierText;
+  if (ovr >= 80) {
+    tierClass = 'card-gold'; tierBorder = 'border-yellow-400'; tierText = 'text-yellow-900';
+  } else if (ovr >= 60) {
+    tierClass = 'card-silver'; tierBorder = 'border-gray-300'; tierText = 'text-gray-800';
+  } else {
+    tierClass = 'card-bronze'; tierBorder = 'border-amber-600'; tierText = 'text-amber-900';
+  }
+
+  const hand = player.brazo_bueno === 'L' ? 'Zurdo' : 'Diestro';
+
+  container.innerHTML = `
+    <div class="w-56 ${tierClass} text-slate-900 rounded-2xl shadow-2xl p-4 border-4 ${tierBorder} hover:scale-105 transition-transform duration-300">
+      <div class="flex items-center justify-between mb-1">
+        <div class="text-4xl font-extrabold ${tierText} drop-shadow-sm">${ovr}</div>
+        <div class="text-xs font-semibold text-slate-800 uppercase tracking-wide">${player.nacionalidad || '???'}</div>
+      </div>
+      <div class="text-base font-extrabold uppercase tracking-wide text-slate-800 truncate">${player.nombre} ${player.apellido}</div>
+      <div class="text-xs text-slate-700 font-medium">${player.altura_cm || '?'} cm · ${hand}</div>
+      <div class="mt-2 border-t border-current opacity-30"></div>
+      <div class="mt-2 grid grid-cols-3 gap-x-1 gap-y-2 text-center text-xs">
+        ${attrCell('1er Saque', player.attr_primer_saque, tierText)}
+        ${attrCell('2do Saque', player.attr_segundo_saque, tierText)}
+        ${attrCell('Resto', player.attr_resto, tierText)}
+        ${attrCell('Derecha', player.attr_derecha, tierText)}
+        ${attrCell('Revés', player.attr_reves, tierText)}
+        ${attrCell('Consist.', player.attr_consistencia, tierText)}
+        ${attrCell('Movilid.', player.attr_movilidad, tierText)}
+        ${attrCell('Físico', player.attr_fisico, tierText)}
+        ${attrCell('Clutch', player.attr_clutch, tierText)}
+      </div>
+      <div class="mt-3 flex items-center justify-center">
+        <span class="text-[0.6rem] uppercase tracking-wider text-slate-600 font-semibold">ADAF Tennis Simulator</span>
+      </div>
+    </div>
+  `;
+}
+
+function attrCell(label, value, tierText) {
+  return `<div><div class="font-semibold text-slate-700">${label}</div><div class="text-sm font-bold ${tierText}">${value ?? '-'}</div></div>`;
+}
+
+// ─── Validar selección ────────────────────────────────────
+function validateSelection() {
+  const btn = document.getElementById('btnSimular');
+  const warn = document.getElementById('samePlayers');
+
+  if (!selectedPlayer1 || !selectedPlayer2) {
+    btn.disabled = true;
+    warn.classList.add('hidden');
+    return;
+  }
+
+  if (selectedPlayer1.id === selectedPlayer2.id) {
+    btn.disabled = true;
+    warn.classList.remove('hidden');
+    return;
+  }
+
+  warn.classList.add('hidden');
+  btn.disabled = false;
+}
+
+// ─── Iniciar partido ──────────────────────────────────────
+function iniciarPartido() {
+  if (!selectedPlayer1 || !selectedPlayer2) return;
+  if (selectedPlayer1.id === selectedPlayer2.id) return;
+
+  const config = {
+    best_of: parseInt(document.getElementById('formato-sets').value),
+    tiebreak: document.getElementById('tb-si').checked,
+  };
+
+  // Mapear atributos al formato esperado por /api/simulate_match
+  const p1Data = mapPlayerToSimData(selectedPlayer1);
+  const p2Data = mapPlayerToSimData(selectedPlayer2);
+
+  const matchPayload = {
+    player1: p1Data,
+    player2: p2Data,
+    config: config
+  };
+
+  // Guardar en sessionStorage para la página de simulación
+  sessionStorage.setItem('matchPayload', JSON.stringify(matchPayload));
+  sessionStorage.setItem('matchSurface', document.getElementById('superficie').value);
+
+  // Redirigir a la simulación
+  window.location.href = '/simulacion2';
+}
+
+function mapPlayerToSimData(p) {
+  return {
+    name: `${p.nombre} ${p.apellido}`,
+    id: String(p.id),
+    Primer_Saque: p.attr_primer_saque || 50,
+    Segundo_Saque: p.attr_segundo_saque || 50,
+    Fisico: p.attr_fisico || 50,
+    Estamina: p.attr_fisico || 50,
+    Consistencia: p.attr_consistencia || 50,
+    Clutch: p.attr_clutch || 50,
+    Momentum: p.attr_clutch || 50,
+    Derecha: p.attr_derecha || 50,
+    Reves: p.attr_reves || 50,
+    Resto: p.attr_resto || 50,
+    Movilidad: p.attr_movilidad || 50
+  };
+}
+
+// ─── Checkbox exclusivo (reutilizado del proyecto) ────────
+function toggleSingleCheckbox(selected) {
+  document.querySelectorAll(`input[name='${selected.name}']`).forEach(el => {
+    if (el !== selected) el.checked = false;
+  });
+}
+</script>
+{% endblock %}
