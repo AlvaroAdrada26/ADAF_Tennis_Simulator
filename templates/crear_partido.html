@@ -393,6 +393,7 @@ function iniciarPartido() {
   const config = {
     best_of: parseInt(document.getElementById('formato-sets').value),
     tiebreak: document.getElementById('tb-si').checked,
+    superficie: document.getElementById('superficie').value,
   };
 
   // Mapear atributos al formato esperado por /api/simulate_match

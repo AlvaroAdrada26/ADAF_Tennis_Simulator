@@ -1,4 +1,4 @@
-import { fetchMatchData, setPlayerNames } from "./api.js";
+import { fetchMatchData, setPlayerNames } from "./api.js?v=2";
 import { setMatchData } from "./state.js";
 import { bindSimulationControls } from "./controls.js";
 import { initLiveFeed } from "./liveFeed.js";

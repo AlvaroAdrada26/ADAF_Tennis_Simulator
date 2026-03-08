@@ -17,6 +17,9 @@ from backend.app.routes.api import router as api_router
 from backend.app.auth.routes import router as auth_router
 from backend.app.players.routes import router as jugadores_router
 
+# Importar modelos para que SQLAlchemy los registre
+import backend.app.matches.models  # noqa: F401
+
 
 
 

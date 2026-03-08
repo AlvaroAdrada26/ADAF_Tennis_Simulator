@@ -83,6 +83,23 @@ class TennisGame:
 
         return False
 
+    def is_break_point(self) -> bool:
+        """
+        Determina si el punto actual es un break point.
+        Break point = el restador está a un punto de ganar el juego de servicio.
+        """
+        s, r = self.points[SACADOR], self.points[RESTADOR]
+
+        # Returner at 40, server not yet at 40 (0-40, 15-40, 30-40)
+        if s < 3 and r >= 3:
+            return True
+
+        # Advantage returner (deuce situation)
+        if s >= 3 and r >= 3 and r == s + 1:
+            return True
+
+        return False
+
     def get_point_label(self, player: Player) -> str:
         """Devuelve '0','15','30','40','Ad' según la situación real del juego."""
         s, r = self.points[SACADOR], self.points[RESTADOR]
@@ -122,9 +139,11 @@ class TennisGame:
         """Juega un juego completo y devuelve el ganador ('SACADOR' o 'RESTADOR')."""
         while True:
             clutch = self.is_clutch_point()
+            bp = self.is_break_point()
             ps = PointSimulator(self.server, self.returner, clutch=clutch)
 
             res = ps.simulate(verbose=verbose)
+            res.is_break_point = bp
             self.points[res.winner] += 1
             self.point_counter += 1
             res.point_no = self.point_counter
@@ -235,6 +254,9 @@ class TieBreakGame:
             res.game_no = self.game_no
             res.point_no = self.point_counter
             res.winner_id = winner_tag
+            res.server_id = "P1" if server == self.p1 else "P2"
+            res.is_tiebreak = True
+            res.is_break_point = False
             res.score_after = {
                 "tiebreak_score": {"P1": self.points["P1"], "P2": self.points["P2"]},
                 "server": "P1" if server == self.p1 else "P2",
@@ -394,7 +416,12 @@ class TennisSet:
                 # Añadir puntos del tie-break al timeline del set
                 for p in tb_points:
                     p.set_no = self.set_no
+                    p.is_tiebreak = True
+                    p.is_break_point = False  # No hay break points en tie-break
                     p.winner_id = p.winner_id or ("P1" if p.winner == SACADOR and tb.p1 == self.p1 else "P2")
+                    # Asegurar server_id
+                    if not p.server_id and p.score_after and "server" in p.score_after:
+                        p.server_id = p.score_after["server"]
                     # También guardar marcador de juegos
                     if not hasattr(p, "score_after") or p.score_after is None:
                         p.score_after = {}
