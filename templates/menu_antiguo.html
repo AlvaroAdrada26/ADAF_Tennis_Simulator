@@ -1,0 +1,351 @@
+﻿{% extends "layouts/base.html" %}
+
+{% block title %}Configuración - ADAF Tennis Simulator{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+      <!-- SECCIONES PRINCIPALES -->
+      <div class="flex-1 px-8 py-12 space-y-16 animate-fade-up">
+
+        <!-- TÍTULO PRINCIPAL -->
+        <section class="text-center">
+          <h2 class="text-4xl font-bold text-yellow-400 mb-4">Configuración Partido Rápido</h2>
+          <p class="text-gray-400 text-lg">Define jugadores, atributos y condiciones para tu simulación.</p>
+        </section>
+
+        <!-- INFORMACIÓN GENERAL -->
+        <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+        <h3 class="text-2xl font-semibold text-yellow-400 mb-10 text-center">Información General</h3>
+
+        <!-- CONTENEDOR DE JUGADORES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+            <!-- JUGADOR 1 -->
+            <div class="p-6 rounded-xl bg-slate-950/40 border border-blue-800/30 shadow-inner">
+                <h4 class="text-xl font-semibold text-yellow-400 mb-6 text-center">Jugador 1</h4>
+
+                <div class="mb-4">
+                <label for="nombre-j1" class="text-xs uppercase tracking-widest text-yellow-400">Nombre completo</label>
+                <input type="text" id="nombre-j1"
+                    class="w-full mt-1 rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-2 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]"
+                    placeholder="Introduce el nombre..." />
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold uppercase text-yellow-400 mb-2">Brazo dominante</label>
+                    <fieldset class="flex gap-6">
+                        <legend class="sr-only">Brazo dominante</legend>
+                        <label for="brazo-derecho-j1" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="brazo-derecho-j1" name="brazo-j1" onchange="toggleSingleCheckbox(this)"
+                            class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 hover:bg-slate-700/40 transition duration-150 ease-in-out" />
+                        <svg class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Derecho</span>
+                        </label>
+                        <label for="brazo-izquierdo-j1" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="brazo-izquierdo-j1" name="brazo-j1" onchange="toggleSingleCheckbox(this)"
+                            class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 hover:bg-slate-700/40 transition duration-150 ease-in-out" />
+                        <svg class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Izquierdo</span>
+                        </label>
+                    </fieldset>
+                </div>
+
+                <div>
+                    <label for="altura-j1" class="block text-xs font-semibold uppercase text-yellow-400 mb-1">Altura (cm)</label>
+                    <div class="flex items-center rounded-md border border-yellow-400/30 bg-slate-800/70 focus-within:border-yellow-400 focus-within:ring-1 focus-within:ring-yellow-400 shadow-inner transition">
+                        <button type="button" onclick="updateAltura('altura-j1', -1)" class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">&minus;</button>
+                        <input type="number" id="altura-j1" value="180" min="140" max="220" step="1"
+                            class="h-10 w-full text-center bg-transparent text-gray-100 border-transparent focus:outline-none sm:text-sm [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0" />
+                        <button type="button" onclick="updateAltura('altura-j1', 1)" class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">&plus;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JUGADOR 2 -->
+            <div class="p-6 rounded-xl bg-slate-950/40 border border-blue-800/30 shadow-inner">
+                <h4 class="text-xl font-semibold text-yellow-400 mb-6 text-center">Jugador 2</h4>
+
+                <div class="mb-4">
+                <label for="nombre-j2" class="text-xs uppercase tracking-widest text-yellow-400">Nombre completo</label>
+                <input type="text" id="nombre-j2"
+                    class="w-full mt-1 rounded-lg bg-slate-950/50 border border-yellow-400/20 text-gray-100 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 px-4 py-2 text-sm transition shadow-[0_0_8px_rgba(255,255,0,0.1)]"
+                    placeholder="Introduce el nombre..." />
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold uppercase text-yellow-400 mb-2">Brazo dominante</label>
+                    <fieldset class="flex gap-6">
+                        <legend class="sr-only">Brazo dominante</legend>
+                        <label for="brazo-derecho-j2" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="brazo-derecho-j2" name="brazo-j2" onchange="toggleSingleCheckbox(this)"
+                            class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 hover:bg-slate-700/40 transition duration-150 ease-in-out" />
+                        <svg class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Derecho</span>
+                        </label>
+                        <label for="brazo-izquierdo-j2" class="relative inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="brazo-izquierdo-j2" name="brazo-j2" onchange="toggleSingleCheckbox(this)"
+                            class="peer appearance-none size-5 rounded-md border border-yellow-400/40 bg-slate-800/70 checked:bg-yellow-400 checked:border-yellow-400 hover:bg-slate-700/40 transition duration-150 ease-in-out" />
+                        <svg class="absolute left-[2.5px] top-[2.5px] w-3.5 h-3.5 text-slate-900 hidden peer-checked:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-sm text-gray-300 peer-checked:text-yellow-300">Izquierdo</span>
+                        </label>
+                    </fieldset>
+                </div>
+
+                <div>
+                    <label for="altura-j2" class="block text-xs font-semibold uppercase text-yellow-400 mb-1">Altura (cm)</label>
+                    <div class="flex items-center rounded-md border border-yellow-400/30 bg-slate-800/70 focus-within:border-yellow-400 focus-within:ring-1 focus-within:ring-yellow-400 shadow-inner transition">
+                        <button type="button" onclick="updateAltura('altura-j2', -1)" class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">&minus;</button>
+                        <input type="number" id="altura-j2" value="180" min="140" max="220" step="1"
+                            class="h-10 w-full text-center bg-transparent text-gray-100 border-transparent focus:outline-none sm:text-sm [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0" />
+                        <button type="button" onclick="updateAltura('altura-j2', 1)" class="size-10 leading-10 text-yellow-400 transition hover:text-yellow-300">&plus;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </section>
+
+        <!-- SELECCIÓN DE ATRIBUTOS -->
+        <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+          <h3 class="text-2xl font-semibold text-yellow-400 mb-8 text-center">Selección de Atributos</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+            <!-- COLUMNA JUGADOR 1 -->
+            <div>
+              <h4 class="text-xl font-semibold text-yellow-400 mb-4 text-center">Jugador 1</h4>
+              <div class="space-y-4">
+                {% for label, tooltip in [
+                  ('Primer Saque', 'Potencia, precisión y fiabilidad en primeros saques. Valores altos implican más aces y menos dobles faltas.'),
+                  ('Segundo Saque', 'Seguridad y consistencia al sacar segundos servicios. Menos errores dobles con valores altos.'),
+                  ('Resto', 'Capacidad para devolver el saque rival con control y velocidad.'),
+                  ('Derecha', 'Calidad general del golpe de derecha: potencia, precisión y fiabilidad en intercambios.'),
+                  ('Revés', 'Eficacia del golpe de revés, tanto en defensa como en capacidad ofensiva.'),
+                  ('Movilidad', 'Rapidez de desplazamiento y colocación en pista. Mejores reflejos y defensa con valores altos.'),
+                  ('Consistencia', 'Capacidad para mantener el nivel de juego evitando errores no forzados.'),
+                  ('Clutch', 'Rendimiento bajo presión (puntos de break, finales de set o tie-breaks).'),
+                  ('Físico', 'Nivel de resistencia general, estamina y potencia física mantenida en el partido.')
+                ] %}
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    {{ label }}
+                    <span title="{{ tooltip }}" class="text-yellow-400/70 cursor-help"></span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- COLUMNA JUGADOR 2 -->
+            <div>
+              <h4 class="text-xl font-semibold text-yellow-400 mb-4 text-center">Jugador 2</h4>
+              <div class="space-y-4">
+                {% for label, tooltip in [
+                  ('Primer Saque', 'Potencia, precisión y fiabilidad en primeros saques. Valores altos implican más aces y menos dobles faltas.'),
+                  ('Segundo Saque', 'Seguridad y consistencia al sacar segundos servicios. Menos errores dobles con valores altos.'),
+                  ('Resto', 'Capacidad para devolver el saque rival con control y velocidad.'),
+                  ('Derecha', 'Calidad general del golpe de derecha: potencia, precisión y fiabilidad en intercambios.'),
+                  ('Revés', 'Eficacia del golpe de revés, tanto en defensa como en capacidad ofensiva.'),
+                  ('Movilidad', 'Rapidez de desplazamiento y colocación en pista. Mejores reflejos y defensa con valores altos.'),
+                  ('Consistencia', 'Capacidad para mantener el nivel de juego evitando errores no forzados.'),
+                  ('Clutch', 'Rendimiento bajo presión (puntos de break, finales de set o tie-breaks).'),
+                  ('Físico', 'Nivel de resistencia general, estamina y potencia física mantenida en el partido.')
+                ] %}
+                <div class="flex items-center gap-6">
+                  <span class="w-1/4 text-sm font-semibold text-yellow-400 uppercase flex items-center gap-1">
+                    {{ label }}
+                    <span title="{{ tooltip }}" class="text-yellow-400/70 cursor-help"></span>
+                  </span>
+                  <div class="w-3/4 flex items-center gap-3">
+                    <input type="range" min="1" max="100" value="60" class="slider"
+                      oninput="this.nextElementSibling.textContent=this.value; updateValueColor(this, this.nextElementSibling)"/>
+                    <span class="w-10 text-center text-sm text-gray-300">60</span>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <style>
+          .slider {
+            width: 100%;
+            height: 0.5rem;
+            border-radius: 9999px;
+            background-color: rgba(30, 41, 59, 0.5);
+            cursor: pointer;
+            accent-color: #facc15;
+          }
+          .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            background: #facc15;
+            box-shadow: 0 0 6px rgba(255, 255, 0, 0.5);
+            transition: transform 0.2s ease;
+          }
+          .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+          }
+        </style>
+
+        <!-- CONFIGURACIÓN DEL PARTIDO -->
+        <section class="bg-slate-900/40 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-lg">
+          <h3 class="text-2xl font-semibold text-yellow-400 mb-6">Configuración del Partido</h3>
+          <div class="text-gray-400 italic">[Aquí irán las opciones de sets, superficie, tie-break, etc.]</div>
+        </section>
+
+        <!-- BOTONES -->
+        <div class="flex justify-center gap-8 pt-10">
+          <button class="px-10 py-4 bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-full text-lg font-medium shadow-lg transition">Reiniciar</button>
+          <button class="px-10 py-4 bg-yellow-400 hover:bg-yellow-500 text-black rounded-full text-lg font-semibold shadow-lg transition">Guardar Configuración</button>
+        </div>
+
+        <!-- Carta estilo FIFA para jugador -->
+        <div class="w-64 bg-gradient-to-b from-amber-200 via-yellow-300 to-yellow-600 text-slate-900 rounded-3xl shadow-2xl p-4 border-4 border-yellow-400 hover:scale-105 transition-transform duration-300">
+          <div class="flex items-center justify-between mb-2">
+            <div class="text-5xl font-extrabold text-yellow-900 drop-shadow-sm">89</div>
+            <div class="text-sm font-semibold text-slate-800 uppercase tracking-wide">Spain</div>
+          </div>
+          <div class="text-xl font-extrabold uppercase tracking-wide text-slate-800">Carlos Alcaraz</div>
+          <div class="text-sm text-slate-700 font-medium">183 cm · Right-handed</div>
+          <div class="mt-3 border-t border-yellow-500 opacity-60"></div>
+          <div class="mt-3 grid grid-cols-3 gap-x-2 gap-y-3 text-center">
+            <div><div class="text-xs font-semibold text-slate-700">1st Serve</div><div class="text-lg font-bold text-yellow-900">90</div></div>
+            <div><div class="text-xs font-semibold text-slate-700">2nd Serve</div><div class="text-lg font-bold text-yellow-900">78</div></div>
+            <div><div class="text-xs font-semibold text-slate-700">Return</div><div class="text-lg font-bold text-yellow-900">81</div></div>
+            <div><div class="text-xs font-semibold text-slate-700">Forehand</div><div class="text-lg font-bold text-yellow-900">88</div></div>
+            <div><div class="text-xs font-semibold text-slate-700">Backhand</div><div class="text-lg font-bold text-yellow-900">84</div></div>
+            <div><div class="text-xs font-semibold text-slate-700">Consistency</div><div class="text-lg font-bold text-yellow-900">85</div></div>
+            <div><div class="text-xs font-semibold text-slate-700">Movement</div><div class="text-lg font-bold text-yellow-900">87</div></div>
+            <div><div class="text-xs font-semibold text-slate-700">Physicality</div><div class="text-lg font-bold text-yellow-900">90</div></div>
+            <div><div class="text-xs font-semibold text-slate-700">Clutch</div><div class="text-lg font-bold text-yellow-900">92</div></div>
+          </div>
+          <div class="mt-4 flex items-center justify-center">
+            <span class="text-xs uppercase tracking-wider text-slate-600 font-semibold">ADAF Tennis Simulator</span>
+          </div>
+        </div>
+
+        <!-- Contenedor de cartas -->
+        <div class="flex flex-wrap justify-center gap-10">
+          <!-- Carta Oro -->
+          <div class="w-64 bg-gradient-to-b from-amber-200 via-yellow-300 to-yellow-600 text-slate-900 rounded-3xl shadow-2xl p-4 border-4 border-yellow-400 hover:scale-105 transition-transform duration-300">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-5xl font-extrabold text-yellow-900 drop-shadow-sm">91</div>
+              <div class="text-sm font-semibold text-slate-800 uppercase tracking-wide">Spain</div>
+            </div>
+            <div class="text-xl font-extrabold uppercase tracking-wide text-slate-800">Carlos Alcaraz</div>
+            <div class="text-sm text-slate-700 font-medium">183 cm · Right-handed</div>
+            <div class="mt-3 border-t border-yellow-500 opacity-60"></div>
+            <div class="mt-3 grid grid-cols-3 gap-x-2 gap-y-3 text-center">
+              <div><div class="text-xs font-semibold text-slate-700">1st Serve</div><div class="text-lg font-bold text-yellow-900">90</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">2nd Serve</div><div class="text-lg font-bold text-yellow-900">80</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Return</div><div class="text-lg font-bold text-yellow-900">88</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Forehand</div><div class="text-lg font-bold text-yellow-900">94</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Backhand</div><div class="text-lg font-bold text-yellow-900">89</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Consistency</div><div class="text-lg font-bold text-yellow-900">86</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Movement</div><div class="text-lg font-bold text-yellow-900">91</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Physicality</div><div class="text-lg font-bold text-yellow-900">90</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Clutch</div><div class="text-lg font-bold text-yellow-900">93</div></div>
+            </div>
+            <div class="mt-4 flex items-center justify-center">
+              <span class="text-xs uppercase tracking-wider text-slate-700 font-semibold">ADAF Tennis Simulator</span>
+            </div>
+          </div>
+
+          <!-- Carta Plata -->
+          <div class="w-64 bg-gradient-to-b from-gray-200 via-gray-400 to-gray-500 text-slate-900 rounded-3xl shadow-2xl p-4 border-4 border-gray-300 hover:scale-105 transition-transform duration-300">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-5xl font-extrabold text-gray-800 drop-shadow-sm">72</div>
+              <div class="text-sm font-semibold text-slate-800 uppercase tracking-wide">Italy</div>
+            </div>
+            <div class="text-xl font-extrabold uppercase tracking-wide text-slate-800">Lorenzo Sonego</div>
+            <div class="text-sm text-slate-700 font-medium">191 cm · Right-handed</div>
+            <div class="mt-3 border-t border-gray-400 opacity-60"></div>
+            <div class="mt-3 grid grid-cols-3 gap-x-2 gap-y-3 text-center">
+              <div><div class="text-xs font-semibold text-slate-700">1st Serve</div><div class="text-lg font-bold text-gray-900">76</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">2nd Serve</div><div class="text-lg font-bold text-gray-900">70</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Return</div><div class="text-lg font-bold text-gray-900">68</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Forehand</div><div class="text-lg font-bold text-gray-900">74</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Backhand</div><div class="text-lg font-bold text-gray-900">69</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Consistency</div><div class="text-lg font-bold text-gray-900">71</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Movement</div><div class="text-lg font-bold text-gray-900">70</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Physicality</div><div class="text-lg font-bold text-gray-900">73</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Clutch</div><div class="text-lg font-bold text-gray-900">72</div></div>
+            </div>
+            <div class="mt-4 flex items-center justify-center">
+              <span class="text-xs uppercase tracking-wider text-slate-700 font-semibold">ADAF Tennis Simulator</span>
+            </div>
+          </div>
+
+          <!-- Carta Bronce -->
+          <div class="w-64 bg-gradient-to-b from-orange-300 via-amber-500 to-amber-700 text-slate-900 rounded-3xl shadow-2xl p-4 border-4 border-amber-600 hover:scale-105 transition-transform duration-300">
+            <div class="flex items-center justify-between mb-2">
+              <div class="text-5xl font-extrabold text-amber-900 drop-shadow-sm">58</div>
+              <div class="text-sm font-semibold text-slate-800 uppercase tracking-wide">Argentina</div>
+            </div>
+            <div class="text-xl font-extrabold uppercase tracking-wide text-slate-800">Facundo Díaz</div>
+            <div class="text-sm text-slate-700 font-medium">178 cm · Left-handed</div>
+            <div class="mt-3 border-t border-amber-500 opacity-60"></div>
+            <div class="mt-3 grid grid-cols-3 gap-x-2 gap-y-3 text-center">
+              <div><div class="text-xs font-semibold text-slate-700">1st Serve</div><div class="text-lg font-bold text-amber-900">55</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">2nd Serve</div><div class="text-lg font-bold text-amber-900">60</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Return</div><div class="text-lg font-bold text-amber-900">58</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Forehand</div><div class="text-lg font-bold text-amber-900">59</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Backhand</div><div class="text-lg font-bold text-amber-900">61</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Consistency</div><div class="text-lg font-bold text-amber-900">57</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Movement</div><div class="text-lg font-bold text-amber-900">63</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Physicality</div><div class="text-lg font-bold text-amber-900">60</div></div>
+              <div><div class="text-xs font-semibold text-slate-700">Clutch</div><div class="text-lg font-bold text-amber-900">59</div></div>
+            </div>
+            <div class="mt-4 flex items-center justify-center">
+              <span class="text-xs uppercase tracking-wider text-slate-700 font-semibold">ADAF Tennis Simulator</span>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    function updateAltura(id, delta) {
+      const input = document.getElementById(id);
+      const step = Number(input.step) || 1;
+      const min = Number(input.min) || 0;
+      const max = Number(input.max) || 999;
+      let value = Number(input.value) + delta * step;
+      if (value < min) value = min;
+      if (value > max) value = max;
+      input.value = value;
+    }
+  </script>
+  <script>
+    function toggleSingleCheckbox(selected) {
+      document.querySelectorAll(`input[name='${selected.name}']`).forEach(el => {
+        if (el !== selected) el.checked = false;
+      });
+    }
+  </script>
+  <script src="/static/js/attributes.js"></script>
+{% endblock %}

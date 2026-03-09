@@ -43,7 +43,7 @@
   <div class="flex min-h-screen w-full">
 
     <!-- SIDEBAR (partial reutilizable) -->
-    {% include "partials/sidebar.html" %}
+    {% block sidebar %}{% include "partials/sidebar.html" %}{% endblock %}
 
     <!-- CONTENIDO PRINCIPAL -->
     <div id="mainContent" class="content-expanded content-collapsed flex-1 flex flex-col {% block main_class %}{% endblock %}">
@@ -64,6 +64,7 @@
   <!-- FIN FLEX CONTAINER -->
 
   <!-- Menu Toggle Script -->
+  {% block sidebar_script %}
   <script>
     const menuToggle = document.getElementById('menuToggle');
     const menuIcon = document.getElementById('menuIcon');
@@ -71,22 +72,25 @@
     const mainContent = document.getElementById('mainContent');
     let isMenuOpen = false;
 
-    menuToggle.addEventListener('click', () => {
-      isMenuOpen = !isMenuOpen;
-      
-      if (isMenuOpen) {
-        expandedSidebar.classList.remove('sidebar-hidden');
-        mainContent.classList.remove('content-collapsed');
-        mainContent.classList.add('ml-80');
-        menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />';
-      } else {
-        expandedSidebar.classList.add('sidebar-hidden');
-        mainContent.classList.add('content-collapsed');
-        mainContent.classList.remove('ml-80');
-        menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />';
-      }
-    });
+    if (menuToggle) {
+      menuToggle.addEventListener('click', () => {
+        isMenuOpen = !isMenuOpen;
+        
+        if (isMenuOpen) {
+          expandedSidebar.classList.remove('sidebar-hidden');
+          mainContent.classList.remove('content-collapsed');
+          mainContent.classList.add('ml-80');
+          menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />';
+        } else {
+          expandedSidebar.classList.add('sidebar-hidden');
+          mainContent.classList.add('content-collapsed');
+          mainContent.classList.remove('ml-80');
+          menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />';
+        }
+      });
+    }
   </script>
+  {% endblock %}
 
   {% block scripts %}{% endblock %}
 

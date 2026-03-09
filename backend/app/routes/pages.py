@@ -77,6 +77,13 @@ def partido_rapido(request: Request):
     )
 
 
+@router.get("/simulacion-rapida", response_class=HTMLResponse)
+def simulacion_rapida(request: Request):
+    return templates.TemplateResponse(
+        "simulacion_rapida.html", {"request": request, "active_page": "simulacion_rapida"}
+    )
+
+
 # ─── Autenticación ────────────────────────────────────────────────────────
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):

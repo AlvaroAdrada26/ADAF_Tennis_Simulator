@@ -228,7 +228,7 @@ async function handleLogin(e) {
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('user', JSON.stringify(data.user));
       showToast('¡Sesión iniciada correctamente!');
-      setTimeout(() => window.location.href = '/', 1000);
+      setTimeout(() => window.location.href = '/menu', 1000);
     }
   } catch (err) {
     errorEl.textContent = 'Error de conexión. Inténtalo de nuevo.';
