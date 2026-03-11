@@ -66,7 +66,7 @@ CREATE TABLE partidos (
     fecha_jugado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     -- Configuración
-    superficie VARCHAR(20) CHECK (superficie IN ('Dura', 'Tierra', 'Hierba')),
+    superficie VARCHAR(20) CHECK (superficie IN ('Dura', 'Arcilla', 'Hierba')),
     formato_sets INT CHECK (formato_sets IN (1, 3, 5)), -- Solo permite partidos a 1, 3 o 5 sets
     tiebreak_ultimo_set BOOLEAN DEFAULT TRUE, -- TRUE = hay tiebreak, FALSE = hay que ganar por 2 juegos
     

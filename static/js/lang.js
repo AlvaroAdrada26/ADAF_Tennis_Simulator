@@ -94,6 +94,50 @@ const translations = {
 
     footerCopyright: "© 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · Universidad Complutense de Madrid",
 
+    // =============================
+    // RESUMEN DEL PARTIDO
+    // =============================
+    summaryChampion:         "CAMPEÓN",
+    summaryWins:             "Gana el Partido",
+    summaryMatchStats:       "Estadísticas del Partido",
+    summaryVersus:           "vs",
+    /* Secciones */
+    summarySectionServe:     "Saque",
+    summarySectionReturn:    "Resto",
+    summarySectionPoints:    "Puntos",
+    /* Saque */
+    summaryAces:             "Aces",
+    summaryDoubleFaults:     "Dobles Faltas",
+    summaryFirstServePct:    "1.er Saque %",
+    summaryPtsOn1st:         "Puntos en 1.er Saque %",
+    summaryPtsOn2nd:         "Puntos en 2.º Saque %",
+    summaryServicePtsWon:    "Pts. de Saque Ganados %",
+    /* Resto */
+    summaryReturnPtsWon:     "Pts. de Resto Ganados %",
+    summaryBreakPoints:      "Break Points",
+    summaryBPSaved:          "Break Points Salvados",
+    /* Puntos */
+    summaryTotalPtsPlayed:   "Puntos Jugados",
+    summaryTotalPoints:      "Puntos Ganados",
+    summaryTotalPtsWonPct:   "Puntos Ganados %",
+    summaryWinners:          "Winners",
+    summaryUnforcedErrors:   "Errores No Forzados",
+    summaryWinnerUERatio:    "Ratio Winners / ENF",
+    summaryAvgRally:         "Media de Rally",
+    summaryMaxRally:         "Rally Más Largo",
+    /* Gráficas */
+    summaryReturnPts:        "Puntos de Resto",
+    summaryPointsChart:      "Distribución de Puntos",
+    summaryKeyStatsChart:    "Estadísticas Clave",
+    summaryServeReturnChart: "Saque & Resto",
+    summaryRallyChart:       "Duración de los Puntos",
+    summaryShots:            "golpes",
+    summaryBtnNewMatch:      "Nueva Simulación",
+    summaryBtnViewSim:       "Ver Simulación",
+    summaryBtnGoToSummary:   "Ver Resumen del Partido",
+    summaryNoData:           "No hay datos de partido disponibles.",
+    summaryReturnToSim:      "Volver a la Simulación",
+
   },
   en: {
     // ********************************
@@ -188,6 +232,51 @@ const translations = {
     footerLicencia: "License",
 
     footerCopyright: "© 2025 ADAF Tennis Simulator · Final Degree Project · UCM",
+
+    // =============================
+    // RESUMEN DEL PARTIDO
+    // =============================
+    summaryChampion:         "CHAMPION",
+    summaryWins:             "Wins the Match",
+    summaryMatchStats:       "Match Statistics",
+    summaryVersus:           "vs",
+    /* Sections */
+    summarySectionServe:     "Serve",
+    summarySectionReturn:    "Return",
+    summarySectionPoints:    "Points",
+    /* Serve */
+    summaryAces:             "Aces",
+    summaryDoubleFaults:     "Double Faults",
+    summaryFirstServePct:    "1st Serve %",
+    summaryPtsOn1st:         "Points on 1st Serve %",
+    summaryPtsOn2nd:         "Points on 2nd Serve %",
+    summaryServicePtsWon:    "Service Pts. Won %",
+    /* Return */
+    summaryReturnPtsWon:     "Return Pts. Won %",
+    summaryBreakPoints:      "Break Points",
+    summaryBPSaved:          "Break Points Saved",
+    /* Points */
+    summaryTotalPtsPlayed:   "Points Played",
+    summaryTotalPoints:      "Points Won",
+    summaryTotalPtsWonPct:   "Points Won %",
+    summaryWinners:          "Winners",
+    summaryUnforcedErrors:   "Unforced Errors",
+    summaryWinnerUERatio:    "Winner / UE Ratio",
+    summaryAvgRally:         "Avg. Rally Length",
+    summaryMaxRally:         "Longest Rally",
+    /* Charts */
+    summaryReturnPts:        "Return Points",
+    summaryPointsChart:      "Points Distribution",
+    summaryKeyStatsChart:    "Key Statistics",
+    summaryServeReturnChart: "Serve & Return",
+    summaryRallyChart:       "Rally Length",
+    summaryShots:            "shots",
+    summaryBtnNewMatch:      "New Simulation",
+    summaryBtnViewSim:       "Watch Simulation",
+    summaryBtnGoToSummary:   "View Match Summary",
+    summaryNoData:           "No match data available.",
+    summaryReturnToSim:      "Back to Simulation",
+
   }
 };
 

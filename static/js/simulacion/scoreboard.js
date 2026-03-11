@@ -3,8 +3,17 @@
 
 import { getState } from "./state.js";  // importante para acceder a matchData del estado global
 
+/** Número máximo de sets según la configuración del partido */
+function _getNumSets() {
+  try {
+    var cfg = JSON.parse(sessionStorage.getItem('match_config') || '{}');
+    return parseInt(cfg.best_of, 10) || 3;
+  } catch (e) { return 3; }
+}
+
 export function updateScoreboard(pointData) {
   const { matchData } = getState();
+  const numSets = _getNumSets();
 
   const setNum = pointData.set;
   const games = pointData.score_after?.set_games || { P1: 0, P2: 0 };
@@ -12,7 +21,7 @@ export function updateScoreboard(pointData) {
   const isTiebreak = pointData.is_tiebreak || false;
 
   // === 1. Juegos por set: anteriores, actual, futuros ===
-  for (let s = 1; s <= 3; s++) {
+  for (let s = 1; s <= numSets; s++) {
     const el1 = document.getElementById(`p1-set${s}`);
     const el2 = document.getElementById(`p2-set${s}`);
     if (!el1 || !el2) continue;
@@ -75,9 +84,11 @@ export function showFinalScore() {
   const winnerName = matchData.winner_name;
 
   // Poner juegos finales de cada set
-  for (let i = 0; i < 3; i++) {
+  const numSets = _getNumSets();
+  for (let i = 0; i < numSets; i++) {
     const p1El = document.getElementById(`p1-set${i + 1}`);
     const p2El = document.getElementById(`p2-set${i + 1}`);
+    if (!p1El || !p2El) continue;
     if (finalSets[i]) {
       p1El.textContent = finalSets[i][0];
       p2El.textContent = finalSets[i][1];
@@ -113,7 +124,8 @@ export function showFinalScore() {
  */
 export function resetScoreboard() {
   // Sets
-  for (let s = 1; s <= 3; s++) {
+  const numSets = _getNumSets();
+  for (let s = 1; s <= numSets; s++) {
     const p1 = document.getElementById(`p1-set${s}`);
     const p2 = document.getElementById(`p2-set${s}`);
     if (p1) p1.textContent = s === 1 ? "0" : "";

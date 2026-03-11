@@ -52,6 +52,35 @@ class MatchRequest(BaseModel):
 # ------------------------------------------------------------
 # Helpers
 # ------------------------------------------------------------
+# Normalizar nombres de superficie al valor que acepta el CHECK de la BD
+# La BD fue creada con ('Dura', 'Arcilla', 'Hierba')
+_SUPERFICIE_NORM: dict[str, str] = {
+    "dura":    "Dura",
+    "hard":    "Dura",
+    "tierra":  "Arcilla",
+    "arcilla": "Arcilla",
+    "clay":    "Arcilla",
+    "hierba":  "Hierba",
+    "grass":   "Hierba",
+}
+_VALID_SUPERFICIES = {"Dura", "Arcilla", "Hierba"}
+
+
+def _normalize_superficie(raw: str | None) -> str | None:
+    """Mapea cualquier variante de nombre de superficie al valor canónico de la BD."""
+    if raw is None:
+        return None
+    canon = _SUPERFICIE_NORM.get(raw.lower())
+    if canon:
+        return canon
+    # Si ya es un valor válido (mayúscula correcta) devuélvelo tal cual
+    if raw in _VALID_SUPERFICIES:
+        return raw
+    # Valor desconocido → None para evitar violación del CHECK
+    logger.warning("Superficie desconocida '%s', se guardará como NULL", raw)
+    return None
+
+
 def _format_marcador(set_scores: list) -> str:
     return ", ".join(f"{a}-{b}" for a, b in set_scores)
 
@@ -79,7 +108,7 @@ def _try_save_match(
         winner_id_tag = result.get("winner_id")  # "P1" o "P2"
 
         id_ganador = p1_db_id if winner_id_tag == "P1" else p2_db_id
-        superficie = config.superficie if config and config.superficie else None
+        superficie = _normalize_superficie(config.superficie if config else None)
         formato_sets = config.best_of if config else 3
         tiebreak = config.tiebreak if config else True
 

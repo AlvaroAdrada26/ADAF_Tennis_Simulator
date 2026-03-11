@@ -65,35 +65,40 @@
 
           <!-- PANEL DE MARCADOR -->
           <div id="scoreboard-panel" class="w-full flex flex-col items-center justify-center py-6 px-6">
-            <div class="w-full bg-slate-900/50 border border-blue-800/40 rounded-2xl shadow-lg backdrop-blur-sm p-8 text-center mb-8">
-              <div class="grid grid-cols-7 text-center text-yellow-400 mb-4 text-lg uppercase tracking-wider">
-                <span class="col-span-2"></span>
-                <span>Set 1</span>
-                <span>Set 2</span>
-                <span>Set 3</span>
-                <span>Puntos</span>
-              </div>
-              <div class="grid grid-cols-7 items-center text-center py-4 border-t border-blue-800/30" id="player1-row">
-                <div class="col-span-2 text-right pr-6 font-semibold text-yellow-300 flex items-center justify-end text-3xl">
-                  <span id="serve-p1" class="serve-ball"></span>
-                  <span id="player1-name">Jugador 1</span>
-                </div>
-                <div id="p1-set1" class="text-4xl font-bold">0</div>
-                <div id="p1-set2" class="text-4xl font-bold"> </div>
-                <div id="p1-set3" class="text-4xl font-bold"> </div>
-                <div id="p1-points" class="text-4xl font-extrabold text-yellow-400 score-glow">0</div>
-              </div>
-              <div class="grid grid-cols-7 items-center text-center py-4 border-t border-blue-800/30" id="player2-row">
-                <div class="col-span-2 text-right pr-6 font-semibold text-yellow-300 flex items-center justify-end text-3xl">
-                  <span id="serve-p2" class="serve-ball off"></span>
-                  <span id="player2-name">Jugador 2</span>
-                </div>
-                <div id="p2-set1" class="text-4xl font-bold">0</div>
-                <div id="p2-set2" class="text-4xl font-bold"> </div>
-                <div id="p2-set3" class="text-4xl font-bold"> </div>
-                <div id="p2-points" class="text-4xl font-extrabold text-yellow-400 score-glow">0</div>
-              </div>
+            <div id="scoreboard-grid" class="w-full bg-slate-900/50 border border-blue-800/40 rounded-2xl shadow-lg backdrop-blur-sm p-8 text-center mb-8">
+              <!-- Generado dinámicamente por JS según best_of -->
             </div>
+            <script>
+              (function() {
+                var cfg = JSON.parse(sessionStorage.getItem('match_config') || '{}');
+                var numSets = parseInt(cfg.best_of, 10) || 3;
+                var cols = numSets + 3; /* col-span-2 (nombre) + sets + puntos */
+                var grid = document.getElementById('scoreboard-grid');
+
+                /* Header */
+                var hdr = '<div class="grid text-center text-yellow-400 mb-4 text-lg uppercase tracking-wider" style="grid-template-columns: 2fr ' + 'repeat(' + numSets + ', 1fr)' + ' 1fr;">';
+                hdr += '<span></span>';
+                for (var i = 1; i <= numSets; i++) hdr += '<span>Set ' + i + '</span>';
+                hdr += '<span>Puntos</span></div>';
+
+                /* Player row builder */
+                function playerRow(pid, serveCls) {
+                  var r = '<div class="grid items-center text-center py-4 border-t border-blue-800/30" id="' + pid + '-row" style="grid-template-columns: 2fr ' + 'repeat(' + numSets + ', 1fr)' + ' 1fr;">';
+                  r += '<div class="text-right pr-6 font-semibold text-yellow-300 flex items-center justify-end text-3xl">';
+                  r += '<span id="serve-' + pid.replace('player','p') + '" class="serve-ball ' + serveCls + '"></span>';
+                  r += '<span id="' + pid + '-name">Jugador</span></div>';
+                  var tag = pid === 'player1' ? 'p1' : 'p2';
+                  for (var s = 1; s <= numSets; s++) {
+                    r += '<div id="' + tag + '-set' + s + '" class="text-4xl font-bold">' + (s === 1 ? '0' : ' ') + '</div>';
+                  }
+                  r += '<div id="' + tag + '-points" class="text-4xl font-extrabold text-yellow-400 score-glow">0</div>';
+                  r += '</div>';
+                  return r;
+                }
+
+                grid.innerHTML = hdr + playerRow('player1', '') + playerRow('player2', 'off');
+              })();
+            </script>
           </div>
 
           <!-- PANEL DE CONTROL -->
@@ -187,9 +192,9 @@
 
       <!-- BARRA POST-PARTIDO (guardar + volver) — Aparece al terminar -->
       <section id="post-match-bar" class="w-full px-8 pb-10 hidden">
-        <div class="bg-slate-900/50 border border-yellow-400/40 rounded-2xl shadow-xl backdrop-blur-sm p-6 flex flex-col items-center gap-4">
+        <div class="bg-slate-900/50 border border-yellow-400/40 rounded-2xl shadow-xl backdrop-blur-sm p-6 flex flex-col items-center gap-5">
           <p id="save-status" class="text-lg text-gray-300"></p>
-          <div class="flex gap-6">
+          <div class="flex flex-wrap gap-4 justify-center">
             <button id="btn-save-match"
               class="px-8 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-bold rounded-lg shadow-lg hover:scale-105 transition text-lg">
               💾 Guardar partido en la BD
@@ -197,6 +202,28 @@
             <a href="/partido_rapido"
               class="px-8 py-3 border-2 border-yellow-400 text-yellow-400 font-bold rounded-lg hover:bg-yellow-400 hover:text-slate-900 transition text-lg text-center">
               🔄 Jugar otro partido
+            </a>
+            <!-- ══ VER RESUMEN BUTTON ══ -->
+            <a href="/resumen"
+               class="relative overflow-hidden inline-flex items-center gap-3 px-10 py-3
+                      bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500
+                      text-slate-900 font-black rounded-lg text-lg
+                      shadow-[0_0_28px_rgba(250,204,21,0.45)]
+                      hover:shadow-[0_0_50px_rgba(250,204,21,0.75)]
+                      hover:scale-110 hover:from-yellow-300 hover:to-amber-400
+                      transition-all duration-300 group">
+              <!-- Sheen sweep -->
+              <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent
+                           -translate-x-full skew-x-[-12deg]
+                           group-hover:translate-x-[250%] transition-transform duration-700 pointer-events-none">
+              </span>
+              <span class="text-xl">📊</span>
+              <span data-i18n="summaryBtnGoToSummary">Ver Resumen del Partido</span>
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   class="w-5 h-5 group-hover:translate-x-1 transition-transform shrink-0"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </a>
           </div>
         </div>

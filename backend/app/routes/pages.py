@@ -56,6 +56,13 @@ def resultados(request: Request):
     )
 
 
+@router.get("/resumen", response_class=HTMLResponse)
+def resumen(request: Request):
+    return templates.TemplateResponse(
+        "resumen.html", {"request": request, "active_page": "simulacion"}
+    )
+
+
 @router.get("/crear-jugador", response_class=HTMLResponse)
 def crear_jugador(request: Request):
     return templates.TemplateResponse(
