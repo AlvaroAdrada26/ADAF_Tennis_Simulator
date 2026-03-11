@@ -2,6 +2,7 @@
 API routes para consulta y guardado de partidos y estadísticas.
 """
 
+import logging
 from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -9,9 +10,11 @@ from sqlalchemy.orm import Session
 
 from backend.app.auth.database import get_db
 from backend.app.matches.models import Partido, EstadisticaPartido
+from backend.app.matches.stats import extract_player_stats
 from backend.app.players.models import Jugador
 
 router = APIRouter(prefix="/matches", tags=["matches"])
+logger = logging.getLogger(__name__)
 
 
 # ─── Schemas de entrada para guardar partido ───────────────────
@@ -30,93 +33,6 @@ class SaveMatchRequest(BaseModel):
     set_scores: List[List[int]]    # [[6,4],[3,6],[7,5]]
     config: SaveMatchConfig
     timeline: List[Dict[str, Any]] # timeline completa de puntos
-
-
-# ─── Helpers para calcular estadísticas ────────────────────────
-def _compute_stats(timeline: List[dict], player_tag: str) -> dict:
-    """
-    Recorre el timeline y acumula las estadísticas para un jugador
-    identificado por su tag ('P1' o 'P2').
-    """
-    aces = 0
-    dobles_faltas = 0
-    primeros_saques_in = 0
-    primeros_saques_total = 0
-    puntos_ganados_1er_saque = 0
-    puntos_ganados_2do_saque = 0
-    winners = 0
-    errores_no_forzados = 0
-    puntos_ganados_resto = 0
-    total_puntos_ganados = 0
-    break_points_convertidos = 0
-    break_points_oportunidades = 0
-
-    opponent = "P2" if player_tag == "P1" else "P1"
-
-    for pt in timeline:
-        server = pt.get("server_id")
-        winner = pt.get("winner") or pt.get("winner_id")
-        reason = pt.get("reason", "")
-        stats = pt.get("stats") or {}
-
-        is_server = server == player_tag
-        won_point = winner == player_tag
-
-        if won_point:
-            total_puntos_ganados += 1
-
-        if is_server:
-            # Este jugador sacaba
-            first_in = stats.get("first_in", 0)
-            first_total = stats.get("first_total", 0)
-            primeros_saques_in += first_in
-            primeros_saques_total += first_total
-
-            if "ace" in reason and won_point:
-                aces += 1
-            if "doble_falta" in reason and not won_point:
-                dobles_faltas += 1
-
-            if won_point:
-                if first_in > 0:
-                    puntos_ganados_1er_saque += 1
-                else:
-                    puntos_ganados_2do_saque += 1
-        else:
-            # El jugador restaba
-            if won_point:
-                puntos_ganados_resto += 1
-
-            # Winner / error no forzado (durante el rally)
-            if won_point and "winner" in reason:
-                winners += 1
-            if not won_point and "error" in reason:
-                errores_no_forzados += 1
-
-        # Break points: punto donde el restador puede ganar el game
-        # Simplificación: si game_end y el ganador es el restador => break
-        if pt.get("game_end") and winner != server:
-            if player_tag != server:
-                # Era el restador y rompió
-                break_points_convertidos += 1
-                break_points_oportunidades += 1
-            # TODO: detectar oportunidades fallidas requeriría
-            # rastrear cuándo el restador estuvo a un punto de ganar el game
-
-    return {
-        "aces": aces,
-        "dobles_faltas": dobles_faltas,
-        "primeros_saques_in": primeros_saques_in,
-        "primeros_saques_total": primeros_saques_total,
-        "puntos_ganados_1er_saque": puntos_ganados_1er_saque,
-        "puntos_ganados_2do_saque": puntos_ganados_2do_saque,
-        "winners": winners,
-        "errores_no_forzados": errores_no_forzados,
-        "puntos_ganados_resto": puntos_ganados_resto,
-        "total_puntos_ganados": total_puntos_ganados,
-        "break_points_convertidos": break_points_convertidos,
-        "break_points_oportunidades": break_points_oportunidades,
-    }
 
 
 def _build_marcador(set_scores: List[List[int]]) -> str:
@@ -156,8 +72,9 @@ def save_match(body: SaveMatchRequest, db: Session = Depends(get_db)):
     db.flush()  # Para obtener partido.id
 
     # Calcular y guardar estadísticas de cada jugador
+    all_stats = extract_player_stats(body.timeline)
     for player_tag, db_player_id in [("P1", body.id_jugador_1), ("P2", body.id_jugador_2)]:
-        stats = _compute_stats(body.timeline, player_tag)
+        stats = all_stats[player_tag]
         stat_row = EstadisticaPartido(
             id_partido=partido.id,
             id_jugador=db_player_id,

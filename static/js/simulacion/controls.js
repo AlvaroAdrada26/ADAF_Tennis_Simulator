@@ -105,7 +105,8 @@ export function bindSimulationControls() {
     if (pointData) {
       updateScoreboard(pointData);
     } else {
-      console.log("Inicio del partido");
+      // We're back at the very beginning
+      resetScoreboard();
     }
   });
 
@@ -179,8 +180,17 @@ export function bindSimulationControls() {
         const config = JSON.parse(sessionStorage.getItem("match_config") || "{}");
         const result = JSON.parse(sessionStorage.getItem("match_result") || "{}");
 
+        // Si simulate_match ya guardó automáticamente, no hacer doble POST
+        if (result.match_db_id) {
+          showSaveStatus(`✅ Partido ya guardado automáticamente (ID: ${result.match_db_id}).`);
+          saveBtn.textContent = "✅ Guardado";
+          return;
+        }
+
         if (!config.db_player1_id || !config.db_player2_id) {
           showSaveStatus("⚠️ No se encontraron los IDs de jugadores. No se puede guardar.", true);
+          saveBtn.disabled = false;
+          saveBtn.textContent = "💾 Guardar";
           return;
         }
 

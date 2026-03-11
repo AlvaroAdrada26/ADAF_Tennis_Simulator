@@ -9,6 +9,7 @@ def test_run_match_basic():
     # --- Jugadores de prueba (simples) ---
     player1 = {
         "name": "Alcaraz",
+        "id": "P1",
         "Primer_Saque": 82,
         "Segundo_Saque": 80,
         "Fisico": 88,
@@ -24,6 +25,7 @@ def test_run_match_basic():
 
     player2 = {
         "name": "Sinner",
+        "id": "P2",
         "Primer_Saque": 85,
         "Segundo_Saque": 82,
         "Fisico": 87,
@@ -49,32 +51,30 @@ def test_run_match_basic():
 
     # --- Validaciones básicas ---
     assert isinstance(result, dict)
-    assert "winner" in result
+    assert "winner_name" in result
+    assert "winner_id" in result
     assert "set_scores" in result
     assert "sets_won" in result
+    assert "timeline" in result
+    assert len(result["timeline"]) > 0
 
     # --- Impresión de resumen ---
     print("\n================= RESULTADO DEL TEST =================")
-    print(f"Ganador: {result['winner']}")
+    print(f"Ganador: {result['winner_name']} ({result['winner_id']})")
     print(f"Sets ganados: {result['sets_won']}")
     print(f"Marcadores por set: {result['set_scores']}")
     print(f"Formato best_of: {result['best_of']}, Tiebreak: {result['tiebreak']}")
-    if "summary" in result:
-        print(f"Resumen: {result['summary']}")
+    print(f"Puntos totales: {len(result['timeline'])}")
 
     # --- Reproducibilidad: repetir con la misma semilla ---
     same_seed = run_match(player1, player2, config)
     different_seed = run_match(player1, player2, {**config, "seed": 99})
 
     print("\n--- Comprobación de reproducibilidad ---")
-    if same_seed == result:
-        print("Mismo resultado con la misma semilla (reproducible).")
-    else:
-        print("Diferencia inesperada con la misma semilla.")
-    if different_seed != result:
+    assert same_seed["winner_id"] == result["winner_id"], "Diferencia inesperada con la misma semilla"
+    print("Mismo resultado con la misma semilla (reproducible).")
+    if different_seed["set_scores"] != result["set_scores"]:
         print("Resultado distinto con semilla diferente (aleatoriedad correcta).")
-    else:
-        print("Mismo resultado con semilla distinta (revisar aleatoriedad).")
 
     print("\nSimulación ejecutada correctamente.\n")
 

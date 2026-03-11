@@ -4,76 +4,53 @@
 import { getState } from "./state.js";  // importante para acceder a matchData del estado global
 
 export function updateScoreboard(pointData) {
-  const { matchData } = getState(); // obtienes matchData desde el estado
+  const { matchData } = getState();
 
   const setNum = pointData.set;
-  const games = pointData.score_after.set_games || { P1: 0, P2: 0 };
-  const serverPts = pointData.score_after.server_points || "0";
-  const returnerPts = pointData.score_after.returner_points || "0";
+  const games = pointData.score_after?.set_games || { P1: 0, P2: 0 };
   const serverId = pointData.server_id;
-  const winnerId = pointData.winner_id;
+  const isTiebreak = pointData.is_tiebreak || false;
 
-  // =========================
-  // 1. Actualizar juegos por set (sin spoilers)
-  // =========================
-  const setEls = [
-    ["p1-set1", "p2-set1"],
-    ["p1-set2", "p2-set2"],
-    ["p1-set3", "p2-set3"],
-  ];
+  // === 1. Juegos por set: anteriores, actual, futuros ===
+  for (let s = 1; s <= 3; s++) {
+    const el1 = document.getElementById(`p1-set${s}`);
+    const el2 = document.getElementById(`p2-set${s}`);
+    if (!el1 || !el2) continue;
 
-  // Limpiar todos los sets
-  setEls.forEach(([p1, p2]) => {
-    const el1 = document.getElementById(p1);
-    const el2 = document.getElementById(p2);
-    if (el1 && el2) {
+    if (s < setNum) {
+      const sc = matchData?.set_scores?.[s - 1];
+      el1.textContent = sc ? sc[0] : "";
+      el2.textContent = sc ? sc[1] : "";
+    } else if (s === setNum) {
+      el1.textContent = games.P1;
+      el2.textContent = games.P2;
+    } else {
       el1.textContent = "";
       el2.textContent = "";
     }
-  });
-
-  let games_actualSet_p1 = pointData.score_after.set_games.P1;
-  let games_actualSet_p2 = pointData.score_after.set_games.P2;
-
-  if (pointData.game_end) {
-    if (winnerId === "P1") games_actualSet_p1 += 1;
-    else if (winnerId === "P2") games_actualSet_p2 += 1;
   }
 
-  // =========================
-  // 2. Mostrar el set actual y los anteriores
-  // =========================
-  if (setNum === 1) {
-    document.getElementById("p1-set1").textContent = games.P1;
-    document.getElementById("p2-set1").textContent = games.P2;
-  } else if (setNum === 2) {
-    document.getElementById("p1-set1").textContent = matchData.set_scores[0]?.[0] || 0;
-    document.getElementById("p2-set1").textContent = matchData.set_scores[0]?.[1] || 0;
-    document.getElementById("p1-set2").textContent = games.P1;
-    document.getElementById("p2-set2").textContent = games.P2;
-  } else if (setNum === 3) {
-    document.getElementById("p1-set1").textContent = matchData.set_scores[0]?.[0] || 0;
-    document.getElementById("p2-set1").textContent = matchData.set_scores[0]?.[1] || 0;
-    document.getElementById("p1-set2").textContent = matchData.set_scores[1]?.[0] || 0;
-    document.getElementById("p2-set2").textContent = matchData.set_scores[1]?.[1] || 0;
-    document.getElementById("p1-set3").textContent = games.P1;
-    document.getElementById("p2-set3").textContent = games.P2;
-  }
+  // === 2. Puntos (juego normal o tie-break) ===
+  const ptsP1 = document.getElementById("p1-points");
+  const ptsP2 = document.getElementById("p2-points");
 
-  // =========================
-  // 3. Actualizar puntos del juego actual
-  // =========================
-  if (serverId === "P1") {
-    document.getElementById("p1-points").textContent = serverPts;
-    document.getElementById("p2-points").textContent = returnerPts;
+  if (isTiebreak) {
+    const tb = pointData.score_after?.tiebreak_score || { P1: 0, P2: 0 };
+    ptsP1.textContent = tb.P1;
+    ptsP2.textContent = tb.P2;
   } else {
-    document.getElementById("p1-points").textContent = returnerPts;
-    document.getElementById("p2-points").textContent = serverPts;
+    const serverPts = pointData.score_after?.server_points || "0";
+    const returnerPts = pointData.score_after?.returner_points || "0";
+    if (serverId === "P1") {
+      ptsP1.textContent = serverPts;
+      ptsP2.textContent = returnerPts;
+    } else {
+      ptsP1.textContent = returnerPts;
+      ptsP2.textContent = serverPts;
+    }
   }
 
-  // =========================
-  // 4. Mostrar quién saca
-  // =========================
+  // === 3. Indicador de saque ===
   const serveP1 = document.getElementById("serve-p1");
   const serveP2 = document.getElementById("serve-p2");
   if (serverId === "P1") {
@@ -84,36 +61,10 @@ export function updateScoreboard(pointData) {
     serveP1.classList.add("off");
   }
 
-  // =========================
-  // 5. Si termina el juego, resetear puntos y corregir juegos
-  // =========================
-  if (pointData.game_end) {
-    // Reset puntos
-    document.getElementById("p1-points").textContent = "0";
-    document.getElementById("p2-points").textContent = "0";
-
-    // Corregir marcador tras breve delay
-    setTimeout(() => {
-      if (winnerId === "P1") {
-        const el = document.getElementById(`p1-set${setNum}`);
-        el.textContent = parseInt(el.textContent || "0") + 1;
-      } else if (winnerId === "P2") {
-        const el = document.getElementById(`p2-set${setNum}`);
-        el.textContent = parseInt(el.textContent || "0") + 1;
-      }
-
-      console.log(`🎾 Fin del juego. Gana ${pointData.winner_name}`);
-    }, 50);
-
-    // Cambiar servidor
-    const nextServer = serverId === "P1" ? "P2" : "P1";
-    if (nextServer === "P1") {
-      serveP1.classList.remove("off");
-      serveP2.classList.add("off");
-    } else {
-      serveP2.classList.remove("off");
-      serveP1.classList.add("off");
-    }
+  // === 4. Fin de juego: resetear puntos ===
+  if (pointData.game_end && !isTiebreak) {
+    ptsP1.textContent = "0";
+    ptsP2.textContent = "0";
   }
 }
 
@@ -144,6 +95,10 @@ export function showFinalScore() {
 
   // Mensaje final
   console.log(`🏆 Partido finalizado: gana ${winnerName}`);
+
+  // Remove any existing winner message to avoid duplicates
+  const existing = document.getElementById("winner-msg");
+  if (existing) existing.remove();
 
   const panel = document.getElementById("scoreboard-panel");
   const msg = document.createElement("div");

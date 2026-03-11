@@ -40,16 +40,24 @@ export function updatePointsFeed(pointData) {
   const setNum = pointData.set || 1;
   const gameNum = pointData.game || 1;
   const rally = pointData.stats?.rally_shots ?? 0;
+  const winnerId = pointData.winner;
   const winner = pointData.winner_name || "Jugador desconocido";
   const reason = pointData.reason || "";
   const serverId = pointData.server_id || "";
   const server = serverId === "P1" ? matchData.players.P1 : matchData.players.P2;
   const returner = serverId === "P1" ? matchData.players.P2 : matchData.players.P1;
+  const loserId = winnerId === "P1" ? "P2" : "P1";
+  const loser = loserId === "P1" ? matchData.players.P1 : matchData.players.P2;
 
   const score = pointData.score_after || {};
   const games = score.set_games || { P1: 0, P2: 0 };
   const marcadorSet = `${games.P1}-${games.P2}`;
-  const marcadorJuego = `${score.server_points || "0"}-${score.returner_points || "0"}`;
+  let marcadorJuego;
+  if (pointData.is_tiebreak && score.tiebreak_score) {
+    marcadorJuego = `${score.tiebreak_score.P1}-${score.tiebreak_score.P2}`;
+  } else {
+    marcadorJuego = `${score.server_points || "0"}-${score.returner_points || "0"}`;
+  }
 
   // === 🎯 Descripción general del punto ===
   let desc = "";
@@ -58,11 +66,11 @@ export function updatePointsFeed(pointData) {
   } else if (reason.includes("doble_falta")) {
     desc = `⚠️ <span class="text-yellow-300 font-semibold">${server}</span> comete una doble falta.`;
   } else if (reason.includes("error_resto")) {
-    desc = `❌ <span class="text-yellow-300 font-semibold">${returner}</span> falla el resto. Punto directo para ${server}.`;
+    desc = `❌ <span class="text-yellow-300 font-semibold">${loser}</span> falla el resto. Punto directo para ${winner}.`;
   } else if (reason.includes("error_golpe")) {
-    desc = `😬 Error no forzado de <span class="text-yellow-300 font-semibold">${returner}</span> tras un intercambio corto.`;
+    desc = `😬 Error no forzado de <span class="text-yellow-300 font-semibold">${loser}</span> tras ${rally} golpe${rally === 1 ? "" : "s"} de intercambio.`;
   } else if (reason.includes("no_llega")) {
-    desc = `🏃‍♂️ <span class="text-yellow-300 font-semibold">${returner}</span> no logra alcanzar la bola tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
+    desc = `🏃‍♂️ <span class="text-yellow-300 font-semibold">${loser}</span> no logra alcanzar la bola tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
   } else {
     desc = `🎾 Punto para <span class="text-yellow-300 font-semibold">${winner}</span> tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
   }

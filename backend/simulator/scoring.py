@@ -122,9 +122,13 @@ class TennisGame:
         """Juega un juego completo y devuelve el ganador ('SACADOR' o 'RESTADOR')."""
         while True:
             clutch = self.is_clutch_point()
+            # Break point: restador a un punto de ganar el juego (antes del punto)
+            s, r = self.points[SACADOR], self.points[RESTADOR]
+            is_bp = r >= 3 and r > s  # cubre 40-0, 40-15, 40-30 y ventaja restador
             ps = PointSimulator(self.server, self.returner, clutch=clutch)
 
             res = ps.simulate(verbose=verbose)
+            res.is_break_point = is_bp
             self.points[res.winner] += 1
             self.point_counter += 1
             res.point_no = self.point_counter
@@ -392,13 +396,18 @@ class TennisSet:
                 tb_winner, tb_points = tb.play(verbose=verbose)
 
                 # Añadir puntos del tie-break al timeline del set
-                for p in tb_points:
+                for i, p in enumerate(tb_points):
                     p.set_no = self.set_no
                     p.winner_id = p.winner_id or ("P1" if p.winner == SACADOR and tb.p1 == self.p1 else "P2")
-                    # También guardar marcador de juegos
+                    p.is_tiebreak = True
+                    if p.score_after:
+                        p.server_id = p.score_after.get("server")
                     if not hasattr(p, "score_after") or p.score_after is None:
                         p.score_after = {}
                     p.score_after["set_games"] = self.games.copy()
+                    if i == len(tb_points) - 1:
+                        p.game_end = True
+                        p.set_end = True
                     self.points_timeline.append(p)
 
                 # Actualizar el resultado del set tras el tie-break
@@ -420,6 +429,10 @@ class TennisSet:
 
             fin = self.is_finished()
             if fin:
+                # Marcar último punto como fin de set
+                if self.points_timeline:
+                    self.points_timeline[-1].set_end = True
+
                 # Recuperación tras set normal
                 for jugador in [self.p1, self.p2]:
                     rec_set = 10 + 20 * (jugador.Fisico / 100)

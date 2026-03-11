@@ -78,7 +78,10 @@ export function nextPoint() {
 export function previousPoint() {
   if (state.currentPoint > 0) {
     state.currentPoint--;
-    return state.timeline[state.currentPoint];
+    state.matchEnded = false;
+    // Return the point whose score_after should be displayed,
+    // i.e. the point BEFORE the new currentPoint position.
+    return state.currentPoint > 0 ? state.timeline[state.currentPoint - 1] : null;
   }
   return null;
 }

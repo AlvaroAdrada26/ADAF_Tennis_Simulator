@@ -106,6 +106,7 @@ class PointResult:
     game_end: bool = False               # True si este punto termina el game
     set_end: bool = False                # True si este punto termina el set
     is_tiebreak: bool = False            # True si el punto es parte de un tie-break
+    is_break_point: bool = False         # True si era oportunidad de break para el restador
     actions: List[Action] = field(default_factory=list)
 
     # ============================================================
@@ -125,6 +126,7 @@ class PointResult:
             "game_end": self.game_end,
             "set_end": self.set_end,
             "is_tiebreak": self.is_tiebreak,
+            "is_break_point": self.is_break_point,
             "actions": [a.to_dict() for a in self.actions],
         }
 

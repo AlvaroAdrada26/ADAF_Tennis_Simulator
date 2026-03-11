@@ -29,37 +29,37 @@ class Color:
 
 PLAYERS = {
     "Alcaraz": dict(
-        name="Alcaraz", Primer_Saque=82, Segundo_Saque=80,
+        id="1", name="Alcaraz", Primer_Saque=82, Segundo_Saque=80,
         Fisico=88, Estamina=90, Consistencia=85,
         Clutch=88, Momentum=0, Derecha=89, Reves=86,
         Resto=84, Movilidad=90,
     ),
     "Sinner": dict(
-        name="Sinner", Primer_Saque=85, Segundo_Saque=82,
+        id="2", name="Sinner", Primer_Saque=85, Segundo_Saque=82,
         Fisico=87, Estamina=88, Consistencia=86,
         Clutch=85, Momentum=0, Derecha=88, Reves=90,
         Resto=83, Movilidad=88,
     ),
     "Nadal": dict(
-        name="Nadal", Primer_Saque=78, Segundo_Saque=75,
+        id="3", name="Nadal", Primer_Saque=78, Segundo_Saque=75,
         Fisico=94, Estamina=97, Consistencia=90,
         Clutch=95, Momentum=0, Derecha=94, Reves=82,
         Resto=90, Movilidad=88,
     ),
     "Djokovic": dict(
-        name="Djokovic", Primer_Saque=84, Segundo_Saque=81,
+        id="4", name="Djokovic", Primer_Saque=84, Segundo_Saque=81,
         Fisico=89, Estamina=95, Consistencia=92,
         Clutch=96, Momentum=0, Derecha=88, Reves=94,
         Resto=91, Movilidad=90,
     ),
     "Federer": dict(
-        name="Federer", Primer_Saque=86, Segundo_Saque=83,
+        id="5", name="Federer", Primer_Saque=86, Segundo_Saque=83,
         Fisico=85, Estamina=88, Consistencia=89,
         Clutch=94, Momentum=0, Derecha=92, Reves=90,
         Resto=88, Movilidad=86,
     ),
     "Amateur": dict(
-        name="Amateur", Primer_Saque=55, Segundo_Saque=50,
+        id="6", name="Amateur", Primer_Saque=55, Segundo_Saque=50,
         Fisico=60, Estamina=65, Consistencia=55,
         Clutch=50, Momentum=0, Derecha=58, Reves=52,
         Resto=50, Movilidad=58,
@@ -89,7 +89,7 @@ def simulate_league():
         p1, p2 = PLAYERS[p1_name], PLAYERS[p2_name]
         result = run_match(p1, p2, config)
 
-        winner = result["winner"]
+        winner = result["winner_name"]
         loser = p1_name if winner == p2_name else p2_name
         sets = result["set_scores"]
 

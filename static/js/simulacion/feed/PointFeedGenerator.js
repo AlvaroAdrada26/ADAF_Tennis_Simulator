@@ -144,7 +144,7 @@ export class PointFeedGenerator {
     }
 
     // Si es error/fallo, el nombre en la frase es el perdedor
-    const nameToUse = realKey.includes("error") || realKey === "no_llega" ? loser : winner;
+    const nameToUse = realKey.includes("error") || realKey === "no_llega" || realKey === "doble_falta" ? loser : winner;
     const phrase = this._pickRandom(phrases);
     const final = phrase ? phrase.replace("{name}", nameToUse) : `🎾 Punto para ${winner}.`;
 

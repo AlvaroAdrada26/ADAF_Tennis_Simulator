@@ -7,6 +7,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.sql import func
 from sqlalchemy.types import TIMESTAMP
+from sqlalchemy.orm import relationship
 
 from backend.app.auth.database import Base
 
@@ -31,9 +32,12 @@ class Partido(Base):
 
     activo = Column(Boolean, default=True)
 
+    # Relaciones ORM
+    estadisticas = relationship("EstadisticaPartido", back_populates="partido", cascade="all, delete-orphan")
+
     __table_args__ = (
-        CheckConstraint("superficie IN ('Dura','Tierra','Hierba')"),
-        CheckConstraint("formato_sets IN (1,3,5)"),
+        CheckConstraint("superficie IN ('Dura','Tierra','Hierba')", name="ck_superficie"),
+        CheckConstraint("formato_sets IN (1,3,5)", name="ck_formato_sets"),
     )
 
 
@@ -63,9 +67,12 @@ class EstadisticaPartido(Base):
     break_points_convertidos = Column(Integer, default=0)
     break_points_oportunidades = Column(Integer, default=0)
 
+    # Relación inversa
+    partido = relationship("Partido", back_populates="estadisticas")
+
     __table_args__ = (
-        CheckConstraint("aces >= 0"),
-        CheckConstraint("dobles_faltas >= 0"),
-        CheckConstraint("primeros_saques_in <= primeros_saques_total"),
-        CheckConstraint("break_points_convertidos <= break_points_oportunidades"),
+        CheckConstraint("aces >= 0", name="ck_aces"),
+        CheckConstraint("dobles_faltas >= 0", name="ck_dobles_faltas"),
+        CheckConstraint("primeros_saques_in <= primeros_saques_total", name="ck_saques_in"),
+        CheckConstraint("break_points_convertidos <= break_points_oportunidades", name="ck_break_points"),
     )

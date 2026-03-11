@@ -532,7 +532,7 @@
     function buildP(p, tag) {
       return {
         name: p.nombre + ' ' + p.apellido,
-        id: tag,
+        id: String(p.id),
         Primer_Saque: p.attr_primer_saque || 50,
         Segundo_Saque: p.attr_segundo_saque || 50,
         Fisico: p.attr_fisico || 50,
@@ -548,13 +548,17 @@
     }
 
     try {
+      var token = localStorage.getItem('access_token') || '';
+      var headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
       var res = await fetch('/api/simulate_match', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify({
           player1: buildP(sel1, 'P1'),
           player2: buildP(sel2, 'P2'),
-          config: { best_of: sets, tiebreak: tb }
+          config: { best_of: sets, tiebreak: tb, superficie: surf }
         })
       });
 
