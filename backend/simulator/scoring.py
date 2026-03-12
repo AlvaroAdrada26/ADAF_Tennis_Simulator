@@ -154,6 +154,10 @@ class TennisGame:
             ganador.Momentum *= 0.97
             perdedor.Momentum *= 0.97
 
+            # === Snapshot de momentum para exportación ===
+            res.momentum_p1 = self.p1.Momentum
+            res.momentum_p2 = self.p2.Momentum
+
             winner = self.is_finished()
 
             score_label_server = self.get_point_label(self.server)
@@ -243,6 +247,10 @@ class TieBreakGame:
                 "tiebreak_score": {"P1": self.points["P1"], "P2": self.points["P2"]},
                 "server": "P1" if server == self.p1 else "P2",
             }
+
+            # === Snapshot de momentum para exportación ===
+            res.momentum_p1 = self.p1.Momentum
+            res.momentum_p2 = self.p2.Momentum
 
             self.feed.append(res)
 

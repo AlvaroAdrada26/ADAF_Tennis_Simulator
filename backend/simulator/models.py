@@ -109,6 +109,10 @@ class PointResult:
     is_break_point: bool = False         # True si era oportunidad de break para el restador
     actions: List[Action] = field(default_factory=list)
 
+    # --- MOMENTUM SNAPSHOT (capturado tras cada punto) ---
+    momentum_p1: Optional[float] = None
+    momentum_p2: Optional[float] = None
+
     # ============================================================
     # Métodos útiles
     # ============================================================
@@ -130,6 +134,10 @@ class PointResult:
             "actions": [a.to_dict() for a in self.actions],
         }
 
+        if self.momentum_p1 is not None:
+            base["momentum_p1"] = round(self.momentum_p1, 2)
+        if self.momentum_p2 is not None:
+            base["momentum_p2"] = round(self.momentum_p2, 2)
         if names and self.winner_id in names:
             base["winner_name"] = names.get(self.winner_id)
         if self.score_after:

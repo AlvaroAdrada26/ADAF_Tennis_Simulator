@@ -45,6 +45,17 @@ var SUMMARY_T = {
     summaryReturnWon:        "Puntos Resto %",
     summaryRallyChart:       "Duración del Punto",
     summaryShots:            "golpes",
+    /* Momentum */
+    summaryMomentumChart:    "Momentum del Partido",
+    summaryMomentumP1:       "Momentum",
+    summaryMomentumP2:       "Momentum",
+    summaryMomentumTooltipSet:    "Set",
+    summaryMomentumTooltipGame:   "Game",
+    summaryMomentumTooltipPoint:  "Punto",
+    summaryMomentumTooltipWinner: "Ganador",
+    summaryMomentumTooltipScore:  "Marcador",
+    summaryMomentumTooltipEndSet: "🏆 Fin del Set",
+    summaryMomentumTooltipEndGame: "✅ Fin del Game",
   },
   en: {
     summaryChampion:         "CHAMPION",
@@ -83,6 +94,17 @@ var SUMMARY_T = {
     summaryReturnWon:        "Return Points %",
     summaryRallyChart:       "Rally Length",
     summaryShots:            "shots",
+    /* Momentum */
+    summaryMomentumChart:    "Match Momentum",
+    summaryMomentumP1:       "Momentum",
+    summaryMomentumP2:       "Momentum",
+    summaryMomentumTooltipSet:    "Set",
+    summaryMomentumTooltipGame:   "Game",
+    summaryMomentumTooltipPoint:  "Point",
+    summaryMomentumTooltipWinner: "Winner",
+    summaryMomentumTooltipScore:  "Score",
+    summaryMomentumTooltipEndSet: "🏆 Set End",
+    summaryMomentumTooltipEndGame: "✅ Game End",
   },
 };
 
@@ -123,6 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
   buildComparisonRows(s1, s2, result.timeline || []);
 
   /* 4. Charts */
+  buildMomentumChart(result.timeline || [], p1Name, p2Name);
   buildPointsDonut(s1, s2, p1Name, p2Name);
   buildKeyStatsBar(s1, s2, p1Name, p2Name);
   buildServeReturnRadar(s1, s2, p1Name, p2Name);
@@ -132,6 +155,12 @@ document.addEventListener("DOMContentLoaded", function () {
   if (typeof setLanguage === "function") {
     setLanguage(localStorage.getItem("lang") || "es");
   }
+
+  /* 5b. Set momentum legend names */
+  var momLabelP1 = document.getElementById("momentum-p1-label");
+  var momLabelP2 = document.getElementById("momentum-p2-label");
+  if (momLabelP1) momLabelP1.textContent = p1Name;
+  if (momLabelP2) momLabelP2.textContent = p2Name;
 
   /* 6. Animate bars after a short delay */
   setTimeout(animateBars, 350);
@@ -454,7 +483,295 @@ function animateBars() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   3. CHART: Doughnut – Points distribution
+   3. CHART: Line – Match Momentum (P1 & P2)
+   ══════════════════════════════════════════════════════════════ */
+function buildMomentumChart(timeline, p1Name, p2Name) {
+  console.log("[Momentum] START – timeline length:", timeline ? timeline.length : "null");
+  var canvas = document.getElementById("chart-momentum");
+  if (!canvas) { console.error("[Momentum] canvas #chart-momentum NOT FOUND"); return; }
+  if (!timeline || !timeline.length) { console.error("[Momentum] timeline empty"); return; }
+
+  var ctx2d = canvas.getContext("2d");
+  console.log("[Momentum] Canvas:", canvas.clientWidth, "x", canvas.clientHeight,
+              "| Parent:", canvas.parentElement.clientWidth, "x", canvas.parentElement.clientHeight);
+
+  /* ── Build data arrays ──────────────────────────────────── */
+  var labels       = [];
+  var dataP1       = [];
+  var dataP2       = [];
+  var pointMeta    = [];
+  var setBoundaries = [];
+
+  var hasBackendMomentum = timeline.some(function (pt) {
+    return typeof pt.momentum_p1 === "number" && pt.momentum_p1 !== 0;
+  });
+  console.log("[Momentum] Backend momentum:", hasBackendMomentum);
+
+  /* Fallback state */
+  var fMom1 = 0, fMom2 = 0, fStreak1 = 0, fStreak2 = 0;
+
+  for (var i = 0; i < timeline.length; i++) {
+    var pt = timeline[i];
+    labels.push(i + 1);
+
+    if (hasBackendMomentum) {
+      var m1 = (typeof pt.momentum_p1 === "number") ? pt.momentum_p1 : 0;
+      var m2 = (typeof pt.momentum_p2 === "number") ? pt.momentum_p2 : 0;
+      dataP1.push(Math.round(m1 * 10) / 10);
+      dataP2.push(Math.round(m2 * 10) / 10);
+    } else {
+      var w = pt.winner || "";
+      if (w === "P1") {
+        fStreak1 = Math.max(1, fStreak1 + 1);
+        fStreak2 = Math.min(-1, fStreak2 - 1);
+        fMom1 = Math.min(50, fMom1 + 2 * Math.abs(fStreak1));
+        fMom2 = Math.max(-50, fMom2 - 2 * Math.abs(fStreak2));
+      } else if (w === "P2") {
+        fStreak2 = Math.max(1, fStreak2 + 1);
+        fStreak1 = Math.min(-1, fStreak1 - 1);
+        fMom2 = Math.min(50, fMom2 + 2 * Math.abs(fStreak2));
+        fMom1 = Math.max(-50, fMom1 - 2 * Math.abs(fStreak1));
+      }
+      fMom1 *= 0.97;
+      fMom2 *= 0.97;
+      if (pt.game_end) {
+        if (w === "P1") { fMom1 = Math.min(50, fMom1 + 8); fMom2 = Math.max(-50, fMom2 - 8); }
+        else if (w === "P2") { fMom2 = Math.min(50, fMom2 + 8); fMom1 = Math.max(-50, fMom1 - 8); }
+      }
+      if (pt.set_end) {
+        if (w === "P1") { fMom1 = Math.min(50, fMom1 + 15); fMom2 = Math.max(-50, fMom2 - 15); }
+        else if (w === "P2") { fMom2 = Math.min(50, fMom2 + 15); fMom1 = Math.max(-50, fMom1 - 15); }
+      }
+      dataP1.push(Math.round(fMom1 * 10) / 10);
+      dataP2.push(Math.round(fMom2 * 10) / 10);
+    }
+
+    /* Score label for tooltip */
+    var scoreLabel = "";
+    var sa = pt.score_after || {};
+    if (sa.set_games) {
+      scoreLabel = (sa.set_games.P1 || 0) + "\u2013" + (sa.set_games.P2 || 0);
+    }
+    var pointScore = "";
+    if (sa.tiebreak_score) {
+      pointScore = "TB " + sa.tiebreak_score.P1 + "\u2013" + sa.tiebreak_score.P2;
+    } else if (sa.server_points !== undefined) {
+      var sp = sa.server_points, rp = sa.returner_points;
+      if (pt.server_id === "P1") pointScore = sp + "\u2013" + rp;
+      else pointScore = rp + "\u2013" + sp;
+    }
+
+    pointMeta.push({
+      set: pt.set,
+      game: pt.game,
+      winner: pt.winner_name || pt.winner,
+      reason: pt.reason,
+      gameScore: scoreLabel,
+      pointScore: pointScore,
+      gameEnd: pt.game_end,
+      setEnd: pt.set_end,
+      isTiebreak: pt.is_tiebreak
+    });
+
+    if (pt.set_end) setBoundaries.push(i);
+  }
+
+  /* ── Debug summary ───────────────────────────────────────── */
+  var p1Min = Math.min.apply(null, dataP1), p1Max = Math.max.apply(null, dataP1);
+  var p2Min = Math.min.apply(null, dataP2), p2Max = Math.max.apply(null, dataP2);
+  console.log("[Momentum] P1 [" + p1Min + " .. " + p1Max + "]  P2 [" + p2Min + " .. " + p2Max + "]");
+
+  /* ── Y axis range ────────────────────────────────────────── */
+  var absMax = Math.max(Math.abs(p1Min), Math.abs(p1Max), Math.abs(p2Min), Math.abs(p2Max), 10);
+  var yLimit = Math.ceil(absMax / 5) * 5 + 5;
+
+  /* ── Create chart ────────────────────────────────────────── */
+  try {
+    new Chart(ctx2d, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: p1Name,
+            data: dataP1,
+            borderColor: "#fbbf24",
+            backgroundColor: "rgba(250,204,21,0.10)",
+            borderWidth: 2.5,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "#fbbf24",
+            pointHoverBorderColor: "#fff",
+            pointHoverBorderWidth: 2,
+            tension: 0.35,
+            fill: "origin"
+          },
+          {
+            label: p2Name,
+            data: dataP2,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59,130,246,0.10)",
+            borderWidth: 2.5,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "#3b82f6",
+            pointHoverBorderColor: "#fff",
+            pointHoverBorderWidth: 2,
+            tension: 0.35,
+            fill: "origin"
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "rgba(2,6,23,0.92)",
+            titleColor: "#f8fafc",
+            bodyColor: "#cbd5e1",
+            borderColor: "rgba(250,204,21,0.3)",
+            borderWidth: 1,
+            cornerRadius: 10,
+            padding: 12,
+            titleFont: { size: 13, weight: "bold" },
+            bodyFont: { size: 11 },
+            displayColors: true,
+            boxWidth: 10,
+            boxHeight: 10,
+            callbacks: {
+              title: function (items) {
+                if (!items.length) return "";
+                var idx = items[0].dataIndex;
+                var m = pointMeta[idx];
+                if (!m) return _t("summaryMomentumTooltipPoint") + " #" + (idx + 1);
+                return _t("summaryMomentumTooltipSet") + " " + m.set +
+                       "  |  " + _t("summaryMomentumTooltipGame") + " " + m.game +
+                       "  |  " + _t("summaryMomentumTooltipPoint") + " " + (idx + 1);
+              },
+              afterTitle: function (items) {
+                if (!items.length) return "";
+                var idx = items[0].dataIndex;
+                var m = pointMeta[idx];
+                if (!m) return "";
+                var parts = [];
+                if (m.gameScore) parts.push(_t("summaryMomentumTooltipScore") + ": " + m.gameScore +
+                                            (m.pointScore ? "  (" + m.pointScore + ")" : ""));
+                if (m.winner) parts.push(_t("summaryMomentumTooltipWinner") + ": " + m.winner);
+                if (m.setEnd) parts.push(_t("summaryMomentumTooltipEndSet"));
+                else if (m.gameEnd) parts.push(_t("summaryMomentumTooltipEndGame"));
+                return parts.join("\n");
+              },
+              label: function (tipItem) {
+                var lbl = tipItem.dataset.label || "";
+                var val = tipItem.parsed.y;
+                return "  " + lbl + ": " + (val >= 0 ? "+" : "") + val.toFixed(1);
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            display: true,
+            ticks: {
+              color: "#475569",
+              font: { size: 9 },
+              maxTicksLimit: 20,
+              callback: function (value, index) {
+                var m = pointMeta[index];
+                if (m && (m.gameEnd || index === 0)) return index + 1;
+                return "";
+              }
+            },
+            grid: { color: "rgba(255,255,255,0.02)" },
+            title: {
+              display: true,
+              text: _t("summaryMomentumTooltipPoint"),
+              color: "#475569",
+              font: { size: 10, weight: "bold" }
+            }
+          },
+          y: {
+            min: -yLimit,
+            max: yLimit,
+            ticks: {
+              color: "#475569",
+              font: { size: 9 },
+              stepSize: 10,
+              callback: function (val) {
+                if (val === 0) return "0";
+                return (val > 0 ? "+" : "") + val;
+              }
+            },
+            grid: { color: "rgba(255,255,255,0.04)" },
+            title: {
+              display: true,
+              text: "Momentum",
+              color: "#475569",
+              font: { size: 10, weight: "bold" }
+            }
+          }
+        },
+        animation: { duration: 2000, easing: "easeOutQuart" }
+      },
+      plugins: [
+        /* Zero line */
+        {
+          id: "momentumZeroLine",
+          afterDraw: function (chart) {
+            var yA = chart.scales.y, xA = chart.scales.x;
+            if (!yA || !xA) return;
+            var y0 = yA.getPixelForValue(0);
+            var c = chart.ctx;
+            c.save();
+            c.beginPath();
+            c.strokeStyle = "rgba(148,163,184,0.22)";
+            c.lineWidth = 1;
+            c.setLineDash([4, 4]);
+            c.moveTo(xA.left, y0);
+            c.lineTo(xA.right, y0);
+            c.stroke();
+            c.restore();
+          }
+        },
+        /* Set boundaries */
+        {
+          id: "momentumSetBounds",
+          afterDraw: function (chart) {
+            var xA = chart.scales.x, yA = chart.scales.y;
+            if (!xA || !yA) return;
+            var c = chart.ctx;
+            setBoundaries.forEach(function (idx) {
+              if (idx >= timeline.length - 1) return;
+              var x = xA.getPixelForValue(idx);
+              c.save();
+              c.beginPath();
+              c.setLineDash([6, 4]);
+              c.strokeStyle = "rgba(250,204,21,0.35)";
+              c.lineWidth = 1.5;
+              c.moveTo(x, yA.top);
+              c.lineTo(x, yA.bottom);
+              c.stroke();
+              c.fillStyle = "rgba(250,204,21,0.55)";
+              c.font = "bold 9px system-ui";
+              c.textAlign = "center";
+              c.fillText("Set " + (pointMeta[idx] ? pointMeta[idx].set : ""), x, yA.top + 12);
+              c.restore();
+            });
+          }
+        }
+      ]
+    });
+    console.log("[Momentum] Chart created OK");
+  } catch (err) {
+    console.error("[Momentum] Chart FAILED:", err);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. CHART: Doughnut – Points distribution
    ══════════════════════════════════════════════════════════════ */
 function buildPointsDonut(s1, s2, p1Name, p2Name) {
   var canvas = document.getElementById("chart-points");
@@ -499,7 +816,7 @@ function buildPointsDonut(s1, s2, p1Name, p2Name) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   4. CHART: Grouped bar – Aces / DF / Winners / UE
+   5. CHART: Grouped bar – Aces / DF / Winners / UE
    ══════════════════════════════════════════════════════════════ */
 function buildKeyStatsBar(s1, s2, p1Name, p2Name) {
   var canvas = document.getElementById("chart-keystats");
@@ -564,7 +881,7 @@ function buildKeyStatsBar(s1, s2, p1Name, p2Name) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   5. CHART: Radar – Serve & Return
+   6. CHART: Radar – Serve & Return
    ══════════════════════════════════════════════════════════════ */
 function buildServeReturnRadar(s1, s2, p1Name, p2Name) {
   var canvas = document.getElementById("chart-serve-return");
@@ -655,7 +972,7 @@ function buildServeReturnRadar(s1, s2, p1Name, p2Name) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   6. CHART: Bar – Rally length histogram
+   7. CHART: Bar – Rally length histogram
    ══════════════════════════════════════════════════════════════ */
 function buildRallyHistogram(timeline) {
   var canvas = document.getElementById("chart-rally");
@@ -718,7 +1035,7 @@ function buildRallyHistogram(timeline) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   7.  CONFETTI
+   8.  CONFETTI
    ══════════════════════════════════════════════════════════════ */
 function launchConfetti() {
   var container = document.getElementById("confetti-container");
