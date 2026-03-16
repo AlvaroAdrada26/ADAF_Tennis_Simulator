@@ -11,7 +11,14 @@
     .set-in-game { color: #4fd1c5; text-shadow: 0 0 6px rgba(79, 209, 197, 0.6), 0 0 12px rgba(79, 209, 197, 0.4); font-weight: 700; }
     .serve-ball { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff 10%, #ffeb3b 40%, #facc15 80%); box-shadow: 0 0 8px rgba(255, 255, 0, 0.7); display: inline-block; margin-right: 18px; margin-left: -8px; vertical-align: middle; }
     .serve-ball.off { opacity: 0; filter: blur(2px); }
+    .player-leading { color: #fbbf24 !important; text-shadow: 0 0 10px rgba(251,191,36,0.5); transition: all 0.3s; }
+    .player-trailing { color: #6b7280 !important; text-shadow: none; transition: all 0.3s; }
     .control-btn:active { transform: scale(0.95); filter: brightness(1.1); }
+    .winner-glow { color: #fbbf24 !important; text-shadow: 0 0 15px rgba(251,191,36,0.7), 0 0 30px rgba(251,191,36,0.4); animation: winner-pulse 1.5s ease-in-out infinite; }
+    @keyframes winner-pulse {
+      0%, 100% { text-shadow: 0 0 15px rgba(251,191,36,0.7), 0 0 30px rgba(251,191,36,0.4); }
+      50% { text-shadow: 0 0 25px rgba(251,191,36,0.9), 0 0 50px rgba(251,191,36,0.6); }
+    }
     #live-events::-webkit-scrollbar { width: 8px; }
     #live-events::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); border-radius: 8px; }
     #live-events::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #1e3a8a, #2563eb); border-radius: 8px; transition: background 0.3s ease; }
@@ -97,79 +104,81 @@
                 }
 
                 grid.innerHTML = hdr + playerRow('player1', '') + playerRow('player2', 'off');
+
+                /* Surface & format subtitle inside scoreboard */
+                var surfLine = '<div class="text-center text-gray-400 text-sm mt-3 pt-3 border-t border-blue-800/20">';
+                if (cfg.surface) surfLine += '<span>\ud83c\udfbe ' + cfg.surface + '</span>';
+                var fmtParts = [];
+                if (cfg.best_of) fmtParts.push(cfg.best_of == 1 ? '1 Set' : 'Bo' + cfg.best_of);
+                if (cfg.tiebreak !== undefined) fmtParts.push(cfg.tiebreak ? 'Tie-Break' : 'Sin TB');
+                if (fmtParts.length) surfLine += '<span class="mx-2">\u00b7</span><span>' + fmtParts.join(' \u00b7 ') + '</span>';
+                surfLine += '</div>';
+                grid.innerHTML += surfLine;
               })();
             </script>
           </div>
 
-          <!-- PANEL DE CONTROL -->
-          <section id="control-panel" class="w-full flex flex-col items-center justify-center mt-2 mb-2">
-            <div class="bg-slate-900/50 border border-blue-800/40 rounded-2xl shadow-xl backdrop-blur-sm px-10 py-6 flex flex-col items-center">
-              <div class="flex items-center justify-center gap-16">
-                <div class="flex flex-col items-center">
-                  <button id="btn-restart" class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2" class="w-7 h-7">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v16m2-8l7 8V4l-7 8zm8 0l7 8V4l-7 8z" />
-                    </svg>
-                  </button>
-                  <span class="text-sm mt-2 text-gray-200 font-medium">Reiniciar</span>
-                </div>
-
-                <div class="flex flex-col items-center">
-                  <button id="btn-previous" class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2" class="w-7 h-7">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 20l-9-8 9-8v16zM5 4v16" />
-                    </svg>
-                  </button>
-                  <span class="text-sm mt-2 text-gray-200 font-medium">Anterior</span>
-                </div>
-
-                <div class="flex flex-col items-center">
-                  <button id="btn-play" class="control-btn w-20 h-20 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                    <svg id="icon-play" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5" class="w-9 h-9 transition-all duration-300">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z" />
-                    </svg>
-                  </button>
-                  <span class="text-sm mt-2 text-gray-200 font-medium">Reproducir / Pausar</span>
-                </div>
-
-                <div class="flex flex-col items-center">
-                  <button id="btn-next" class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2" class="w-7 h-7">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 4l9 8-9 8V4zm14 0v16" />
-                    </svg>
-                  </button>
-                  <span class="text-sm mt-2 text-gray-200 font-medium">Siguiente</span>
-                </div>
-
-                <div class="flex flex-col items-center">
-                  <button id="btn-end" class="control-btn w-16 h-16 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2" class="w-7 h-7">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M20 4v16m-2-8l-7 8V4l7 8zm-8 0l-7 8V4l7 8z" />
-                    </svg>
-                  </button>
-                  <span class="text-sm mt-2 text-gray-200 font-medium">Ir al Final</span>
-                </div>
-              </div>
-
-              <div class="mt-8 w-full max-w-md text-center">
-                <p class="text-sm text-gray-200 mb-2 font-medium">Velocidad</p>
-                <div class="flex justify-center gap-4">
-                  <button class="speed-btn px-4 py-2 rounded-md border border-yellow-400/60 font-semibold transition bg-yellow-400 text-slate-900 hover:bg-yellow-400 hover:text-slate-900" data-speed="1">x1</button>
-                  <button class="speed-btn px-4 py-2 rounded-md border border-yellow-400/60 text-yellow-300 font-semibold hover:bg-yellow-400 hover:text-slate-900 transition" data-speed="2">x2</button>
-                  <button class="speed-btn px-4 py-2 rounded-md border border-yellow-400/60 text-yellow-300 font-semibold hover:bg-yellow-400 hover:text-slate-900 transition" data-speed="4">x4</button>
-                </div>
-              </div>
+          <!-- CONTROLES COMPACTOS -->
+          <div id="control-panel" class="flex items-center justify-center gap-3 flex-wrap py-3 mb-2">
+            <button id="btn-restart" class="control-btn w-9 h-9 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow hover:scale-110 transition" title="Reiniciar">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v16m2-8l7 8V4l-7 8zm8 0l7 8V4l-7 8z"/></svg>
+            </button>
+            <button id="btn-previous" class="control-btn w-9 h-9 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow hover:scale-110 transition" title="Anterior">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20l-9-8 9-8v16zM5 4v16"/></svg>
+            </button>
+            <button id="btn-play" class="control-btn w-11 h-11 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow-lg hover:scale-110 transition" title="Play / Pausa">
+              <svg id="icon-play" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button id="btn-next" class="control-btn w-9 h-9 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow hover:scale-110 transition" title="Siguiente">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 4l9 8-9 8V4zm14 0v16"/></svg>
+            </button>
+            <button id="btn-end" class="control-btn w-9 h-9 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 rounded-full shadow hover:scale-110 transition" title="Ir al Final">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M20 4v16m-2-8l-7 8V4l7 8zm-8 0l-7 8V4l7 8z"/></svg>
+            </button>
+            <span class="h-6 border-l border-blue-800/30 mx-1"></span>
+            <p id="point-counter" class="text-xs text-yellow-300 font-semibold whitespace-nowrap">Punto 0 de 0</p>
+            <span class="h-6 border-l border-blue-800/30 mx-1"></span>
+            <div class="flex items-center gap-1">
+              <button class="speed-btn px-2.5 py-1 rounded border border-yellow-400/60 text-xs font-semibold transition bg-yellow-400 text-slate-900" data-speed="1">x1</button>
+              <button class="speed-btn px-2.5 py-1 rounded border border-yellow-400/60 text-xs text-yellow-300 font-semibold hover:bg-yellow-400 hover:text-slate-900 transition" data-speed="2">x2</button>
+              <button class="speed-btn px-2.5 py-1 rounded border border-yellow-400/60 text-xs text-yellow-300 font-semibold hover:bg-yellow-400 hover:text-slate-900 transition" data-speed="4">x4</button>
             </div>
-          </section>
+          </div>
+
+          <!-- PANEL DE ESTADÍSTICAS EN TIEMPO REAL -->
+          <div id="live-stats-panel" class="w-full bg-slate-900/40 border border-blue-800/30 rounded-xl shadow-lg backdrop-blur-sm px-6 py-3 mb-4">
+            <div class="grid grid-cols-[1fr_auto_1fr] text-center text-sm gap-x-6 gap-y-1 items-center">
+              <span id="stats-p1-name" class="text-blue-400 font-semibold text-xs uppercase tracking-wider">P1</span>
+              <span class="text-yellow-400/60 text-xs uppercase tracking-wider">Estadísticas</span>
+              <span id="stats-p2-name" class="text-amber-400 font-semibold text-xs uppercase tracking-wider">P2</span>
+
+              <span id="stat-p1-pts" class="text-gray-200 font-bold text-lg">0</span>
+              <span class="text-gray-500 text-xs">Puntos Ganados</span>
+              <span id="stat-p2-pts" class="text-gray-200 font-bold text-lg">0</span>
+
+              <span id="stat-p1-aces" class="text-gray-200 font-bold text-lg">0</span>
+              <span class="text-gray-500 text-xs">Aces</span>
+              <span id="stat-p2-aces" class="text-gray-200 font-bold text-lg">0</span>
+
+              <span id="stat-p1-df" class="text-gray-200 font-bold text-lg">0</span>
+              <span class="text-gray-500 text-xs">Dobles Faltas</span>
+              <span id="stat-p2-df" class="text-gray-200 font-bold text-lg">0</span>
+
+              <span id="stat-p1-ue" class="text-gray-200 font-bold text-lg">0</span>
+              <span class="text-gray-500 text-xs">Err. No Forzados</span>
+              <span id="stat-p2-ue" class="text-gray-200 font-bold text-lg">0</span>
+            </div>
+          </div>
         </div>
 
         <!-- COLUMNA DERECHA (feed de punto actual) -->
         <div class="flex-1">
           <section id="live-feed" class="w-full">
             <div class="bg-slate-900/40 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-5">
-              <h2 class="text-lg font-semibold text-yellow-400 mb-3 text-center uppercase tracking-wide">
+              <h2 class="text-lg font-semibold text-yellow-400 mb-1 text-center uppercase tracking-wide">
                 Simulación en tiempo real
               </h2>
+              <p id="live-feed-header" class="text-center text-sm text-gray-400 mb-3 font-mono"></p>
               <div id="live-events" class="h-[500px] overflow-y-auto px-3 py-2 bg-slate-950/30 rounded-lg border border-blue-800/20 scroll-smooth shadow-inner">
                 <ul id="live-feed-list" class="space-y-2 text-gray-300 text-sm leading-relaxed font-mono"></ul>
               </div>
@@ -178,52 +187,51 @@
         </div>
       </div>
 
-      <!-- FEED HISTORIAL DE PUNTOS -->
-      <section id="points-feed" class="w-full px-8 pb-6">
-        <div class="bg-slate-900/40 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-5">
-          <h2 class="text-lg font-semibold text-yellow-400 mb-3 text-center uppercase tracking-wide">
-            Historial de puntos recientes
-          </h2>
-          <div id="points-feed-container" class="h-[500px] overflow-y-auto px-3 py-2 bg-slate-950/30 rounded-lg border border-blue-800/20 scroll-smooth shadow-inner">
-            <ul id="points-feed-list" class="space-y-2 text-gray-300 text-sm leading-relaxed font-mono"></ul>
+      <!-- HISTORIAL DE PUNTOS + MOMENTUM -->
+      <section class="w-full px-8 pb-6">
+        <div class="flex flex-col lg:flex-row gap-4">
+          <!-- Historial de puntos -->
+          <div id="points-feed" class="flex-1 bg-slate-900/40 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-5">
+            <h2 class="text-lg font-semibold text-yellow-400 mb-3 text-center uppercase tracking-wide">
+              Historial de puntos recientes
+            </h2>
+            <div id="points-feed-container" class="h-[300px] overflow-y-auto px-3 py-2 bg-slate-950/30 rounded-lg border border-blue-800/20 scroll-smooth shadow-inner">
+              <ul id="points-feed-list" class="space-y-2 text-gray-300 text-sm leading-relaxed font-mono"></ul>
+            </div>
+          </div>
+          <!-- Momentum (bloques de colores) -->
+          <div id="momentum-section" class="w-full lg:w-52 bg-slate-900/40 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-5 flex flex-col items-center">
+            <h2 class="text-sm font-semibold text-yellow-400 mb-3 uppercase tracking-wide">Momentum</h2>
+            <div class="flex items-center gap-1.5 mb-3 text-xs text-gray-400">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+              <span id="momentum-p1-name" class="truncate max-w-[60px]">P1</span>
+              <span class="mx-0.5 text-gray-600">—</span>
+              <span id="momentum-p2-name" class="truncate max-w-[60px]">P2</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            </div>
+            <div id="momentum-bar" class="flex flex-wrap gap-1 justify-center"></div>
           </div>
         </div>
       </section>
 
-      <!-- BARRA POST-PARTIDO (guardar + volver) — Aparece al terminar -->
+      <!-- BARRA POST-PARTIDO — Aparece al terminar -->
       <section id="post-match-bar" class="w-full px-8 pb-10 hidden">
-        <div class="bg-slate-900/50 border border-yellow-400/40 rounded-2xl shadow-xl backdrop-blur-sm p-6 flex flex-col items-center gap-5">
-          <p id="save-status" class="text-lg text-gray-300"></p>
+        <div class="bg-slate-900/50 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-6 flex flex-col items-center gap-4">
+          <p id="save-status" class="text-sm text-gray-400"></p>
           <div class="flex flex-wrap gap-4 justify-center">
-            <button id="btn-save-match"
-              class="px-8 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-bold rounded-lg shadow-lg hover:scale-105 transition text-lg">
-              💾 Guardar partido en la BD
-            </button>
-            <a href="/partido_rapido"
-              class="px-8 py-3 border-2 border-yellow-400 text-yellow-400 font-bold rounded-lg hover:bg-yellow-400 hover:text-slate-900 transition text-lg text-center">
-              🔄 Jugar otro partido
-            </a>
-            <!-- ══ VER RESUMEN BUTTON ══ -->
             <a href="/resumen"
-               class="relative overflow-hidden inline-flex items-center gap-3 px-10 py-3
-                      bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500
-                      text-slate-900 font-black rounded-lg text-lg
-                      shadow-[0_0_28px_rgba(250,204,21,0.45)]
-                      hover:shadow-[0_0_50px_rgba(250,204,21,0.75)]
-                      hover:scale-110 hover:from-yellow-300 hover:to-amber-400
-                      transition-all duration-300 group">
-              <!-- Sheen sweep -->
-              <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent
-                           -translate-x-full skew-x-[-12deg]
-                           group-hover:translate-x-[250%] transition-transform duration-700 pointer-events-none">
-              </span>
-              <span class="text-xl">📊</span>
-              <span data-i18n="summaryBtnGoToSummary">Ver Resumen del Partido</span>
-              <svg xmlns="http://www.w3.org/2000/svg"
-                   class="w-5 h-5 group-hover:translate-x-1 transition-transform shrink-0"
-                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+               class="inline-flex items-center gap-2 px-6 py-2.5 bg-yellow-400/10 border border-yellow-400/40 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-400/20 hover:border-yellow-400/60 transition-all duration-300 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
               </svg>
+              <span data-i18n="summaryBtnGoToSummary">Ver Resumen Estadístico</span>
+            </a>
+            <a href="/partido_rapido"
+               class="inline-flex items-center gap-2 px-6 py-2.5 border border-blue-500/40 text-blue-400 font-semibold rounded-lg hover:bg-blue-500/10 hover:border-blue-500/60 transition-all duration-300 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              Crear Otro Partido
             </a>
           </div>
         </div>

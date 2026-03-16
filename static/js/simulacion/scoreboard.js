@@ -26,6 +26,10 @@ export function updateScoreboard(pointData) {
     const el2 = document.getElementById(`p2-set${s}`);
     if (!el1 || !el2) continue;
 
+    // Remove previous active-set highlights
+    el1.classList.remove("set-in-game");
+    el2.classList.remove("set-in-game");
+
     if (s < setNum) {
       const sc = matchData?.set_scores?.[s - 1];
       el1.textContent = sc ? sc[0] : "";
@@ -33,6 +37,9 @@ export function updateScoreboard(pointData) {
     } else if (s === setNum) {
       el1.textContent = games.P1;
       el2.textContent = games.P2;
+      // Highlight active set column
+      el1.classList.add("set-in-game");
+      el2.classList.add("set-in-game");
     } else {
       el1.textContent = "";
       el2.textContent = "";
@@ -59,21 +66,56 @@ export function updateScoreboard(pointData) {
     }
   }
 
-  // === 3. Indicador de saque ===
+  // === 3. Indicador de saque (con animate-pulse) ===
   const serveP1 = document.getElementById("serve-p1");
   const serveP2 = document.getElementById("serve-p2");
   if (serverId === "P1") {
     serveP1.classList.remove("off");
+    serveP1.classList.add("animate-pulse");
     serveP2.classList.add("off");
+    serveP2.classList.remove("animate-pulse");
   } else {
     serveP2.classList.remove("off");
+    serveP2.classList.add("animate-pulse");
     serveP1.classList.add("off");
+    serveP1.classList.remove("animate-pulse");
   }
 
   // === 4. Fin de juego: resetear puntos ===
   if (pointData.game_end && !isTiebreak) {
     ptsP1.textContent = "0";
     ptsP2.textContent = "0";
+  }
+}
+
+/** Resalta el nombre del jugador que va ganando el partido */
+export function updateLeadingPlayer(pointData) {
+  const { matchData } = getState();
+  const p1Name = document.getElementById("player1-name");
+  const p2Name = document.getElementById("player2-name");
+  if (!p1Name || !p2Name) return;
+
+  let p1Sets = 0, p2Sets = 0;
+  for (let i = 0; i < (pointData.set - 1); i++) {
+    const sc = matchData?.set_scores?.[i];
+    if (sc) { if (sc[0] > sc[1]) p1Sets++; else if (sc[1] > sc[0]) p2Sets++; }
+  }
+  const games = pointData.score_after?.set_games || { P1: 0, P2: 0 };
+
+  let leader = null;
+  if (p1Sets > p2Sets) leader = "P1";
+  else if (p2Sets > p1Sets) leader = "P2";
+  else if (games.P1 > games.P2) leader = "P1";
+  else if (games.P2 > games.P1) leader = "P2";
+
+  p1Name.classList.remove("player-leading", "player-trailing");
+  p2Name.classList.remove("player-leading", "player-trailing");
+  if (leader === "P1") {
+    p1Name.classList.add("player-leading");
+    p2Name.classList.add("player-trailing");
+  } else if (leader === "P2") {
+    p2Name.classList.add("player-leading");
+    p1Name.classList.add("player-trailing");
   }
 }
 
@@ -102,11 +144,18 @@ export function showFinalScore() {
   document.getElementById("p1-points").textContent = "0";
   document.getElementById("p2-points").textContent = "0";
   document.getElementById("serve-p1").classList.add("off");
+  document.getElementById("serve-p1").classList.remove("animate-pulse");
   document.getElementById("serve-p2").classList.add("off");
+  document.getElementById("serve-p2").classList.remove("animate-pulse");
 
   // Mensaje final
   console.log(`🏆 Partido finalizado: gana ${winnerName}`);
-
+  // Animate winner's name in scoreboard
+  const winnerId = matchData.winner_id || matchData.winner;
+  const winnerEl = winnerId === "P1"
+    ? document.getElementById("player1-name")
+    : document.getElementById("player2-name");
+  if (winnerEl) winnerEl.classList.add("winner-glow");
   // Remove any existing winner message to avoid duplicates
   const existing = document.getElementById("winner-msg");
   if (existing) existing.remove();
@@ -123,21 +172,24 @@ export function showFinalScore() {
  * Reinicia el marcador visual a su estado inicial (todo a 0 / vacío).
  */
 export function resetScoreboard() {
-  // Sets
   const numSets = _getNumSets();
   for (let s = 1; s <= numSets; s++) {
     const p1 = document.getElementById(`p1-set${s}`);
     const p2 = document.getElementById(`p2-set${s}`);
-    if (p1) p1.textContent = s === 1 ? "0" : "";
-    if (p2) p2.textContent = s === 1 ? "0" : "";
+    if (p1) { p1.textContent = s === 1 ? "0" : ""; p1.classList.remove("set-in-game"); }
+    if (p2) { p2.textContent = s === 1 ? "0" : ""; p2.classList.remove("set-in-game"); }
   }
-  // Puntos
   document.getElementById("p1-points").textContent = "0";
   document.getElementById("p2-points").textContent = "0";
-  // Saque: P1 saca por defecto
-  document.getElementById("serve-p1")?.classList.remove("off");
-  document.getElementById("serve-p2")?.classList.add("off");
-  // Quitar mensaje de ganador si existe
+  const sp1 = document.getElementById("serve-p1");
+  const sp2 = document.getElementById("serve-p2");
+  sp1?.classList.remove("off", "animate-pulse");
+  sp2?.classList.add("off");
+  sp2?.classList.remove("animate-pulse");
   const msg = document.getElementById("winner-msg");
   if (msg) msg.remove();
+  const p1n = document.getElementById("player1-name");
+  const p2n = document.getElementById("player2-name");
+  p1n?.classList.remove("player-leading", "player-trailing", "winner-glow");
+  p2n?.classList.remove("player-leading", "player-trailing", "winner-glow");
 }
