@@ -10,7 +10,9 @@ const state = {
   currentPoint: 0,     // Índice actual en el timeline
   matchLoaded: false,  // Evita recargar el partido varias veces
   matchEnded: false,   // Bandera de fin de partido
-  feedGenerator: null  // Instancia de PointFeedGenerator (se inicializa en liveFeed.js)
+  feedGenerator: null, // Instancia de PointFeedGenerator (se inicializa en liveFeed.js)
+  liveStats: { P1: { aces: 0, doubleFaults: 0, unforcedErrors: 0, pointsWon: 0 }, P2: { aces: 0, doubleFaults: 0, unforcedErrors: 0, pointsWon: 0 } },
+  recentWinners: []  // últimos 25 ganadores para momentum visual
 };
 
 /* =========================================================
@@ -103,7 +105,35 @@ export function resetState() {
   state.matchLoaded = false;
   state.matchEnded = false;
   state.feedGenerator = null;
+  state.liveStats = { P1: { aces: 0, doubleFaults: 0, unforcedErrors: 0, pointsWon: 0 }, P2: { aces: 0, doubleFaults: 0, unforcedErrors: 0, pointsWon: 0 } };
+  state.recentWinners = [];
   console.log("🔄 Estado reiniciado.");
+}
+
+/* ── Acumulación de estadísticas en tiempo real ── */
+function _accumulateOne(pt) {
+  const reason = pt.reason || "";
+  const winnerId = pt.winner;
+  const loserId = winnerId === "P1" ? "P2" : "P1";
+  const serverId = pt.server_id || "P1";
+  if (reason.includes("ace"))         state.liveStats[serverId].aces++;
+  if (reason.includes("doble_falta")) state.liveStats[serverId].doubleFaults++;
+  if (reason.includes("error_golpe") || reason.includes("error_resto"))
+    state.liveStats[loserId].unforcedErrors++;
+  state.liveStats[winnerId].pointsWon++;
+  state.recentWinners.push(winnerId);
+}
+
+export function accumulatePointStats(pointData) {
+  _accumulateOne(pointData);
+  if (state.recentWinners.length > 25) state.recentWinners.shift();
+}
+
+export function recomputeStats() {
+  state.liveStats = { P1: { aces: 0, doubleFaults: 0, unforcedErrors: 0, pointsWon: 0 }, P2: { aces: 0, doubleFaults: 0, unforcedErrors: 0, pointsWon: 0 } };
+  state.recentWinners = [];
+  for (let i = 0; i < state.currentPoint; i++) _accumulateOne(state.timeline[i]);
+  if (state.recentWinners.length > 25) state.recentWinners = state.recentWinners.slice(-25);
 }
 
 /* =========================================================

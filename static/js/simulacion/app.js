@@ -1,7 +1,7 @@
 import { fetchMatchData, setPlayerNames } from "./api.js";
 import { setMatchData } from "./state.js";
 import { bindSimulationControls } from "./controls.js";
-import { initLiveFeed } from "./liveFeed.js";
+import { initLiveFeed, updateLiveStatsPanel, updateMomentumBar } from "./liveFeed.js";
 
 async function initSimulation() {
   try {
@@ -16,6 +16,14 @@ async function initSimulation() {
 
     // Pinta nombres
     setPlayerNames(data.players);
+
+    // Inicializa paneles en tiempo real
+    updateLiveStatsPanel();
+    updateMomentumBar();
+
+    // Inicializa contador de puntos
+    const counterEl = document.getElementById("point-counter");
+    if (counterEl) counterEl.textContent = `Punto 0 de ${data.timeline?.length || 0}`;
 
     // Activa controles de simulación
     bindSimulationControls();

@@ -532,7 +532,7 @@
     function buildP(p, tag) {
       return {
         name: p.nombre + ' ' + p.apellido,
-        id: String(p.id),
+        id: tag,
         Primer_Saque: p.attr_primer_saque || 50,
         Segundo_Saque: p.attr_segundo_saque || 50,
         Fisico: p.attr_fisico || 50,

@@ -7,16 +7,16 @@
 
 import {
   getState, nextPoint, previousPoint,
-  endMatch, resetState
+  endMatch, resetState, accumulatePointStats, recomputeStats
 } from "./state.js";
-import { updateScoreboard, showFinalScore, resetScoreboard } from "./scoreboard.js";
-import { updatePointsFeed, playPointFeed, clearFeeds } from "./liveFeed.js";
+import { updateScoreboard, showFinalScore, resetScoreboard, updateLeadingPlayer } from "./scoreboard.js";
+import { updatePointsFeed, playPointFeed, clearFeeds, cancelFeed, showPointSummary, updateLiveStatsPanel, updateMomentumBar } from "./liveFeed.js";
 import { fetchMatchData, setPlayerNames } from "./api.js";
 import { setMatchData } from "./state.js";
 import { initLiveFeed } from "./liveFeed.js";
 
 /* ---------- estado interno del reproductor ---------- */
-let autoplayTimer = null;   // setInterval id
+let autoplayTimer = null;   // setTimeout id
 let isPlaying    = false;
 let speedMs      = 1200;    // ms entre puntos (x1)
 let speedFactor  = 1;
@@ -31,13 +31,20 @@ function setPlayIcon(playing) {
 }
 
 function stopAutoplay() {
-  if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; }
+  if (autoplayTimer) { clearTimeout(autoplayTimer); autoplayTimer = null; }
   isPlaying = false;
   setPlayIcon(false);
 }
 
+/** Updates the point counter display */
+function updatePointCounter() {
+  const { currentPoint, timeline } = getState();
+  const el = document.getElementById("point-counter");
+  if (el) el.textContent = `Punto ${currentPoint} de ${timeline.length}`;
+}
+
 /** Avanza un punto con todas las actualizaciones visuales */
-async function advanceOnePoint() {
+async function advanceOnePoint({ playFeed = true } = {}) {
   const { timeline, matchEnded } = getState();
   if (matchEnded || !timeline?.length) { stopAutoplay(); return; }
 
@@ -52,7 +59,33 @@ async function advanceOnePoint() {
 
   updateScoreboard(pointData);
   updatePointsFeed(pointData);
-  await playPointFeed(pointData);
+  accumulatePointStats(pointData);
+  updateLiveStatsPanel();
+  updateMomentumBar();
+  updateLeadingPlayer(pointData);
+  updatePointCounter();
+  if (playFeed) await playPointFeed(pointData);
+}
+
+/** Recursive async autoplay loop using setTimeout */
+async function autoplayLoop() {
+  const { matchEnded } = getState();
+  if (!isPlaying || matchEnded) {
+    if (matchEnded) { stopAutoplay(); showPostMatchBar(); }
+    return;
+  }
+  await advanceOnePoint({ playFeed: false });
+  // Show summary phrase in feed during autoplay
+  const { currentPoint, timeline } = getState();
+  if (currentPoint > 0 && currentPoint <= timeline.length) {
+    showPointSummary(timeline[currentPoint - 1]);
+  }
+  if (isPlaying && !getState().matchEnded) {
+    autoplayTimer = setTimeout(() => autoplayLoop(), speedMs / speedFactor);
+  } else if (getState().matchEnded) {
+    stopAutoplay();
+    showPostMatchBar();
+  }
 }
 
 /* ==========================================================
@@ -82,44 +115,48 @@ export function bindSimulationControls() {
     } else {
       isPlaying = true;
       setPlayIcon(true);
-      // Primer punto inmediato, luego intervalo
-      advanceOnePoint();
-      autoplayTimer = setInterval(() => {
-        const { matchEnded } = getState();
-        if (matchEnded) { stopAutoplay(); showPostMatchBar(); return; }
-        advanceOnePoint();
-      }, speedMs / speedFactor);
+      cancelFeed();
+      autoplayLoop();
     }
   });
 
   /* ───── ⏭ Siguiente ───── */
   nextBtn.addEventListener("click", async () => {
     stopAutoplay();
+    cancelFeed();
     await advanceOnePoint();
   });
 
   /* ───── ⏮ Anterior ───── */
   prevBtn.addEventListener("click", () => {
     stopAutoplay();
+    cancelFeed();
     const pointData = previousPoint();
     if (pointData) {
       updateScoreboard(pointData);
+      updateLeadingPlayer(pointData);
     } else {
-      // We're back at the very beginning
       resetScoreboard();
     }
+    recomputeStats();
+    updateLiveStatsPanel();
+    updateMomentumBar();
+    updatePointCounter();
   });
 
   /* ───── ⏩ Ir al Final ───── */
   endBtn.addEventListener("click", () => {
     stopAutoplay();
-    // Avanza todos los puntos restantes de golpe
-    const { timeline } = getState();
+    cancelFeed();
     let pt;
     while ((pt = nextPoint())) {
       updateScoreboard(pt);
       updatePointsFeed(pt);
+      accumulatePointStats(pt);
     }
+    updateLiveStatsPanel();
+    updateMomentumBar();
+    updatePointCounter();
     endMatch();
     showFinalScore();
     showPostMatchBar();
@@ -128,15 +165,18 @@ export function bindSimulationControls() {
   /* ───── ⏪⏪ Reiniciar ───── */
   restartBtn.addEventListener("click", async () => {
     stopAutoplay();
+    cancelFeed();
     resetState();
     resetScoreboard();
     clearFeeds();
 
-    // Recargar datos y reiniciar
     try {
       const data = await fetchMatchData();
       setMatchData(data);
       setPlayerNames(data.players);
+      updateLiveStatsPanel();
+      updateMomentumBar();
+      updatePointCounter();
       console.log("🔄 Simulación reiniciada");
     } catch (e) {
       console.error("Error reiniciando simulación:", e);
@@ -156,81 +196,8 @@ export function bindSimulationControls() {
 
       speedFactor = parseInt(btn.dataset.speed) || 1;
       console.log(`🏎️ Velocidad: x${speedFactor}`);
-
-      // Si está reproduciéndose, reiniciar el intervalo con la nueva velocidad
-      if (isPlaying) {
-        clearInterval(autoplayTimer);
-        autoplayTimer = setInterval(() => {
-          const { matchEnded } = getState();
-          if (matchEnded) { stopAutoplay(); showPostMatchBar(); return; }
-          advanceOnePoint();
-        }, speedMs / speedFactor);
-      }
     });
   });
-
-  /* ───── 💾 Guardar partido en BD ───── */
-  const saveBtn = document.getElementById("btn-save-match");
-  if (saveBtn) {
-    saveBtn.addEventListener("click", async () => {
-      saveBtn.disabled = true;
-      saveBtn.textContent = "⏳ Guardando…";
-
-      try {
-        const config = JSON.parse(sessionStorage.getItem("match_config") || "{}");
-        const result = JSON.parse(sessionStorage.getItem("match_result") || "{}");
-
-        // Si simulate_match ya guardó automáticamente, no hacer doble POST
-        if (result.match_db_id) {
-          showSaveStatus(`✅ Partido ya guardado automáticamente (ID: ${result.match_db_id}).`);
-          saveBtn.textContent = "✅ Guardado";
-          return;
-        }
-
-        if (!config.db_player1_id || !config.db_player2_id) {
-          showSaveStatus("⚠️ No se encontraron los IDs de jugadores. No se puede guardar.", true);
-          saveBtn.disabled = false;
-          saveBtn.textContent = "💾 Guardar";
-          return;
-        }
-
-        const payload = {
-          id_jugador_1: config.db_player1_id,
-          id_jugador_2: config.db_player2_id,
-          id_usuario_creador: null,
-          winner_id: result.winner_id,
-          set_scores: result.set_scores,
-          config: {
-            surface: config.surface || "Dura",
-            best_of: config.best_of || 3,
-            tiebreak: config.tiebreak !== undefined ? config.tiebreak : true,
-          },
-          timeline: result.timeline || [],
-        };
-
-        const res = await fetch("/api/matches/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          showSaveStatus(`✅ Partido guardado (ID: ${data.partido_id}). Marcador: ${data.marcador}`);
-          saveBtn.textContent = "✅ Guardado";
-        } else {
-          const err = await res.json().catch(() => ({}));
-          showSaveStatus(`❌ Error: ${err.detail || "No se pudo guardar"}`, true);
-          saveBtn.disabled = false;
-          saveBtn.textContent = "💾 Reintentar";
-        }
-      } catch (e) {
-        showSaveStatus("❌ Error de conexión al guardar", true);
-        saveBtn.disabled = false;
-        saveBtn.textContent = "💾 Reintentar";
-      }
-    });
-  }
 }
 
 /* ==========================================================
@@ -239,11 +206,16 @@ export function bindSimulationControls() {
 function showPostMatchBar() {
   const bar = document.getElementById("post-match-bar");
   if (bar) bar.classList.remove("hidden");
-}
 
-function showSaveStatus(msg, isError = false) {
-  const el = document.getElementById("save-status");
-  if (!el) return;
-  el.textContent = msg;
-  el.className = `text-lg font-medium ${isError ? "text-red-400" : "text-green-400"}`;
+  // Show auto-save status from backend
+  const result = JSON.parse(sessionStorage.getItem("match_result") || "{}");
+  const statusEl = document.getElementById("save-status");
+  if (statusEl) {
+    if (result.match_db_id) {
+      statusEl.textContent = "Partido guardado automáticamente";
+      statusEl.className = "text-sm text-green-400/80";
+    } else {
+      statusEl.textContent = "";
+    }
+  }
 }
