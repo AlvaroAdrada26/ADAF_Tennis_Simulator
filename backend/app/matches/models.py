@@ -48,6 +48,7 @@ class EstadisticaPartido(Base):
 
     id_partido = Column(Integer, ForeignKey("partidos.id", ondelete="CASCADE"))
     id_jugador = Column(Integer, ForeignKey("jugadores.id", ondelete="CASCADE"))
+    id_usuario = Column(Integer, ForeignKey("usuarios.id", ondelete="SET NULL"), nullable=True)
 
     # Servicio
     aces = Column(Integer, default=0)

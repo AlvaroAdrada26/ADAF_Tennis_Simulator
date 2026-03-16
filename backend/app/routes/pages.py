@@ -84,6 +84,20 @@ def partido_rapido(request: Request):
     )
 
 
+@router.get("/torneo", response_class=HTMLResponse)
+def torneo_setup(request: Request):
+    return templates.TemplateResponse(
+        "torneo_setup.html", {"request": request, "active_page": "torneo"}
+    )
+
+
+@router.get("/torneo/{torneo_id}", response_class=HTMLResponse)
+def torneo_bracket(request: Request, torneo_id: int):
+    return templates.TemplateResponse(
+        "torneo_bracket.html", {"request": request, "active_page": "torneo", "torneo_id": torneo_id}
+    )
+
+
 @router.get("/simulacion-rapida", response_class=HTMLResponse)
 def simulacion_rapida(request: Request):
     return templates.TemplateResponse(

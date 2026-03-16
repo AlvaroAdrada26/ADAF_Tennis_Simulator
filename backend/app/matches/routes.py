@@ -78,6 +78,7 @@ def save_match(body: SaveMatchRequest, db: Session = Depends(get_db)):
         stat_row = EstadisticaPartido(
             id_partido=partido.id,
             id_jugador=db_player_id,
+            id_usuario=body.id_usuario_creador,
             **stats,
         )
         db.add(stat_row)

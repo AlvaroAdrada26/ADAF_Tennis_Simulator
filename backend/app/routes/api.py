@@ -132,6 +132,7 @@ def _try_save_match(
             est = EstadisticaPartido(
                 id_partido=partido.id,
                 id_jugador=db_id,
+                id_usuario=id_usuario_creador,
                 **s,
             )
             db.add(est)

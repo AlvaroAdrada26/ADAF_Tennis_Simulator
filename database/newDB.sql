@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS torneo_partidos;
+DROP TABLE IF EXISTS torneos;
 DROP TABLE IF EXISTS estadisticas_partido;
 DROP TABLE IF EXISTS partidos;
 DROP TABLE IF EXISTS jugadores;
@@ -80,6 +82,7 @@ CREATE TABLE estadisticas_partido (
     -- Relaciones (Claves Foráneas)
     id_partido INT REFERENCES partidos(id) ON DELETE CASCADE, -- Si se borra el partido, se borran sus stats
     id_jugador INT REFERENCES jugadores(id) ON DELETE CASCADE, -- De quién son estos números
+    id_usuario INT REFERENCES usuarios(id) ON DELETE SET NULL, -- Qué usuario generó estas estadísticas
     
     -- BLOQUE A: SERVICIO (SAQUE)
     aces INT DEFAULT 0,
@@ -107,6 +110,40 @@ CREATE TABLE estadisticas_partido (
     CHECK (dobles_faltas >= 0),
     CHECK (primeros_saques_in <= primeros_saques_total), -- No puedes meter más saques de los que tiras
     CHECK (break_points_convertidos <= break_points_oportunidades) -- No puedes convertir más BPs de los que tienes
+);
+
+-- ==========================================================
+-- 6. TABLA DE TORNEOS
+-- ==========================================================
+CREATE TABLE torneos (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    id_usuario_creador INT REFERENCES usuarios(id) ON DELETE SET NULL,
+    superficie VARCHAR(20) CHECK (superficie IN ('Dura', 'Arcilla', 'Hierba')),
+    formato_sets INT CHECK (formato_sets IN (1, 3, 5)) DEFAULT 3,
+    tiebreak_ultimo_set BOOLEAN DEFAULT TRUE,
+    num_jugadores INT NOT NULL CHECK (num_jugadores IN (4, 8, 16)),
+    id_ganador INT REFERENCES jugadores(id) ON DELETE SET NULL,
+    ids_jugadores TEXT,                      -- IDs de jugadores participantes separados por coma (ej: '1,3,5,7')
+    ids_partidos TEXT,                       -- IDs de partidos generados separados por coma (ej: '10,11,12')
+    completado BOOLEAN DEFAULT FALSE,
+    fecha_creado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    activo BOOLEAN DEFAULT TRUE
+);
+
+-- ==========================================================
+-- 7. TABLA DE PARTIDOS DE TORNEO (une torneos con partidos)
+-- ==========================================================
+CREATE TABLE torneo_partidos (
+    id SERIAL PRIMARY KEY,
+    id_torneo INT REFERENCES torneos(id) ON DELETE CASCADE,
+    id_partido INT REFERENCES partidos(id) ON DELETE CASCADE,
+    ronda INT NOT NULL,          -- 1 = final, 2 = semifinal, 4 = cuartos, 8 = octavos...
+    posicion INT NOT NULL,       -- Posición dentro de la ronda (1, 2, 3...)
+    id_jugador_1 INT REFERENCES jugadores(id) ON DELETE CASCADE,
+    id_jugador_2 INT REFERENCES jugadores(id) ON DELETE CASCADE,
+    id_ganador INT REFERENCES jugadores(id) ON DELETE SET NULL,
+    completado BOOLEAN DEFAULT FALSE
 );
 
 -- ==========================================================

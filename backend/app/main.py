@@ -17,6 +17,7 @@ from backend.app.routes.api import router as api_router
 from backend.app.auth.routes import router as auth_router
 from backend.app.players.routes import router as jugadores_router
 from backend.app.matches.routes import router as matches_router
+from backend.app.tournaments.routes import router as tournaments_router
 
 
 
@@ -56,3 +57,4 @@ app.include_router(api_router, prefix="/api")    # API JSON bajo /api
 app.include_router(auth_router, prefix="/api")   # Auth bajo /api/auth
 app.include_router(jugadores_router, prefix="/api")  # Jugadores bajo /api/players
 app.include_router(matches_router, prefix="/api")    # Partidos bajo /api/matches
+app.include_router(tournaments_router, prefix="/api")  # Torneos bajo /api/tournaments

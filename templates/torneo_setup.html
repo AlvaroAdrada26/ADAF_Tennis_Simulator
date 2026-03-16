@@ -1,0 +1,330 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Crear Torneo - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<style>
+  .player-chip {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+  .player-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+  .player-chip.selected {
+    border-color: #facc15;
+    background: rgba(250, 204, 21, 0.15);
+    box-shadow: 0 0 15px rgba(250, 204, 21, 0.2);
+  }
+  .player-chip .check-icon { display: none; }
+  .player-chip.selected .check-icon { display: flex; }
+  .player-chip.selected .chip-number { display: flex; }
+
+  .surface-card {
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 0.75rem;
+    border-radius: 0.75rem;
+    flex: 1;
+  }
+  .surface-card:hover {
+    border-color: rgba(250, 204, 21, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .surface-card.active {
+    border-color: #facc15;
+    background-color: rgba(250, 204, 21, 0.08);
+    box-shadow: 0 0 15px rgba(250, 204, 21, 0.15);
+  }
+  .surface-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .surface-swatch.hard  { background-color: #1e3a6e; }
+  .surface-swatch.clay  { background-color: #b85c38; }
+  .surface-swatch.grass { background-color: #2d8a4e; }
+  .format-btn.active {
+    border-color: #facc15;
+    background: rgba(250, 204, 21, 0.15);
+    color: #facc15;
+  }
+  .size-btn.active {
+    border-color: #facc15;
+    background: rgba(250, 204, 21, 0.15);
+    color: #facc15;
+  }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+  .delay-1 { animation-delay: 0.1s; opacity: 0; }
+  .delay-2 { animation-delay: 0.2s; opacity: 0; }
+  .delay-3 { animation-delay: 0.3s; opacity: 0; }
+</style>
+{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 px-8 py-10">
+  <div class="max-w-5xl mx-auto">
+
+    <!-- Título -->
+    <div class="mb-10 fade-in-up">
+      <h1 class="text-3xl font-bold text-yellow-400 mb-2">🏆 Crear Torneo</h1>
+      <p class="text-gray-400">Configura tu torneo de eliminación directa y selecciona los participantes.</p>
+    </div>
+
+    <!-- Config section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10 fade-in-up delay-1">
+
+      <!-- Nombre del torneo -->
+      <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-blue-800/30 p-6">
+        <label class="block text-sm font-semibold text-gray-300 mb-3">Nombre del Torneo</label>
+        <input id="torneo-nombre" type="text" placeholder="Ej: Grand Slam ADAF"
+          class="w-full bg-slate-700/50 border border-blue-800/30 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-yellow-400/50 focus:ring-1 focus:ring-yellow-400/30"
+          maxlength="150">
+      </div>
+
+      <!-- Tamaño del torneo -->
+      <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-blue-800/30 p-6">
+        <label class="block text-sm font-semibold text-gray-300 mb-3">Jugadores</label>
+        <div class="flex gap-3">
+          <button class="size-btn active flex-1 py-2 rounded-lg border border-blue-800/30 text-sm font-medium text-gray-300 hover:border-yellow-400/50 transition" data-size="4">4</button>
+          <button class="size-btn flex-1 py-2 rounded-lg border border-blue-800/30 text-sm font-medium text-gray-300 hover:border-yellow-400/50 transition" data-size="8">8</button>
+          <button class="size-btn flex-1 py-2 rounded-lg border border-blue-800/30 text-sm font-medium text-gray-300 hover:border-yellow-400/50 transition" data-size="16">16</button>
+        </div>
+      </div>
+
+      <!-- Superficie -->
+      <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-blue-800/30 p-6">
+        <label class="block text-sm font-semibold text-gray-300 mb-3">Superficie</label>
+        <div class="flex gap-3">
+          <button class="surface-card active" data-surface="Dura">
+            <div class="surface-swatch hard"></div>
+            <span class="text-sm font-medium text-gray-300">Dura</span>
+          </button>
+          <button class="surface-card" data-surface="Arcilla">
+            <div class="surface-swatch clay"></div>
+            <span class="text-sm font-medium text-gray-300">Tierra Batida</span>
+          </button>
+          <button class="surface-card" data-surface="Hierba">
+            <div class="surface-swatch grass"></div>
+            <span class="text-sm font-medium text-gray-300">Hierba</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formato sets -->
+    <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-blue-800/30 p-6 mb-10 fade-in-up delay-2">
+      <label class="block text-sm font-semibold text-gray-300 mb-3">Formato</label>
+      <div class="flex gap-4 flex-wrap">
+        <button class="format-btn px-5 py-2 rounded-lg border border-blue-800/30 text-sm font-medium text-gray-300 hover:border-yellow-400/50 transition" data-format="1">Al mejor de 1 set</button>
+        <button class="format-btn active px-5 py-2 rounded-lg border border-blue-800/30 text-sm font-medium text-gray-300 hover:border-yellow-400/50 transition" data-format="3">Al mejor de 3 sets</button>
+        <button class="format-btn px-5 py-2 rounded-lg border border-blue-800/30 text-sm font-medium text-gray-300 hover:border-yellow-400/50 transition" data-format="5">Al mejor de 5 sets</button>
+      </div>
+    </div>
+
+    <!-- Selección de jugadores -->
+    <div class="mb-6 fade-in-up delay-3">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-100">Selecciona Jugadores</h2>
+        <span id="selection-counter" class="text-sm text-gray-400">0 / 4 seleccionados</span>
+      </div>
+
+      <div id="players-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- Se llena dinámicamente -->
+      </div>
+
+      <div id="players-loading" class="text-center py-8 text-gray-400">
+        <svg class="animate-spin h-8 w-8 mx-auto mb-3 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        Cargando jugadores...
+      </div>
+    </div>
+
+    <!-- Botón crear -->
+    <div class="text-center mt-10 fade-in-up delay-3">
+      <button id="btn-crear-torneo" disabled
+        class="px-10 py-3 bg-yellow-400 text-slate-900 font-bold rounded-full text-lg hover:bg-yellow-300 transition duration-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-yellow-400 shadow-lg shadow-yellow-400/20">
+        🏆 Crear y Comenzar Torneo
+      </button>
+      <p id="btn-error" class="text-red-400 text-sm mt-3 hidden"></p>
+    </div>
+
+  </div>
+</main>
+
+<script>
+(function() {
+  const token = localStorage.getItem('access_token');
+  if (!token) { window.location.href = '/login'; return; }
+
+  let allPlayers = [];
+  let selectedIds = [];
+  let tournamentSize = 4;
+  let surface = 'Dura';
+  let formatSets = 3;
+
+  // ─── Cargar jugadores ───────────────────────────────────
+  async function loadPlayers() {
+    try {
+      const res = await fetch('/api/players', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) throw new Error('Error cargando jugadores');
+      allPlayers = await res.json();
+      renderPlayers();
+    } catch(e) {
+      document.getElementById('players-loading').innerHTML =
+        '<p class="text-red-400">Error al cargar jugadores</p>';
+    }
+  }
+
+  function renderPlayers() {
+    const grid = document.getElementById('players-grid');
+    const loading = document.getElementById('players-loading');
+    loading.classList.add('hidden');
+
+    grid.innerHTML = allPlayers.map(p => {
+      const overall = Math.round(
+        ((p.attr_primer_saque||50) + (p.attr_segundo_saque||50) + (p.attr_resto||50) +
+         (p.attr_derecha||50) + (p.attr_reves||50) + (p.attr_movilidad||50) +
+         (p.attr_consistencia||50) + (p.attr_clutch||50) + (p.attr_fisico||50)) / 9
+      );
+      const isSelected = selectedIds.includes(p.id);
+      const idx = selectedIds.indexOf(p.id);
+
+      return `
+        <div class="player-chip ${isSelected ? 'selected' : ''} bg-slate-800/60 rounded-xl border border-blue-800/30 p-4 relative"
+             data-id="${p.id}" onclick="window._togglePlayer(${p.id})">
+          <div class="check-icon absolute top-2 right-2 w-6 h-6 bg-yellow-400 rounded-full items-center justify-center">
+            <svg class="w-4 h-4 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <div class="chip-number absolute top-2 left-2 w-6 h-6 bg-yellow-400/20 border border-yellow-400/50 rounded-full items-center justify-center text-xs font-bold text-yellow-400 hidden">
+            ${isSelected ? idx + 1 : ''}
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold ${overall >= 90 ? 'text-yellow-400' : overall >= 80 ? 'text-gray-200' : 'text-gray-400'} mb-1">${overall}</div>
+            <div class="text-sm font-semibold text-gray-100 truncate">${p.nombre} ${p.apellido}</div>
+            <div class="text-xs text-gray-500 mt-1">${p.nacionalidad || '---'}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window._togglePlayer = function(id) {
+    const idx = selectedIds.indexOf(id);
+    if (idx >= 0) {
+      selectedIds.splice(idx, 1);
+    } else {
+      if (selectedIds.length >= tournamentSize) return;
+      selectedIds.push(id);
+    }
+    updateUI();
+  };
+
+  function updateUI() {
+    renderPlayers();
+    const counter = document.getElementById('selection-counter');
+    counter.textContent = `${selectedIds.length} / ${tournamentSize} seleccionados`;
+    const btn = document.getElementById('btn-crear-torneo');
+    btn.disabled = selectedIds.length !== tournamentSize;
+  }
+
+  // ─── Botones de configuración ────────────────────────────
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      tournamentSize = parseInt(btn.dataset.size);
+      // Recortar selección si excede el nuevo tamaño
+      if (selectedIds.length > tournamentSize) {
+        selectedIds = selectedIds.slice(0, tournamentSize);
+      }
+      updateUI();
+    });
+  });
+
+  document.querySelectorAll('.surface-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.surface-card').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      surface = btn.dataset.surface;
+    });
+  });
+
+  document.querySelectorAll('.format-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      formatSets = parseInt(btn.dataset.format);
+    });
+  });
+
+  // ─── Crear torneo ────────────────────────────────────────
+  document.getElementById('btn-crear-torneo').addEventListener('click', async () => {
+    const nombre = document.getElementById('torneo-nombre').value.trim() || 'Torneo ADAF';
+    const errorEl = document.getElementById('btn-error');
+    errorEl.classList.add('hidden');
+
+    if (selectedIds.length !== tournamentSize) {
+      errorEl.textContent = `Selecciona exactamente ${tournamentSize} jugadores`;
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/tournaments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+        body: JSON.stringify({
+          nombre,
+          jugador_ids: selectedIds,
+          superficie: surface,
+          formato_sets: formatSets,
+          tiebreak: true,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || 'Error creando torneo');
+      }
+
+      const data = await res.json();
+      window.location.href = '/torneo/' + data.torneo_id;
+    } catch(e) {
+      errorEl.textContent = e.message;
+      errorEl.classList.remove('hidden');
+    }
+  });
+
+  loadPlayers();
+})();
+</script>
+{% endblock %}
+
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}

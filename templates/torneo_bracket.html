@@ -1,0 +1,722 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Torneo - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<style>
+  /* ─── Split Bracket Layout ─── */
+  .bracket-split {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+    padding: 2.5rem 1rem;
+    min-height: 600px;
+  }
+  .bracket-half {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .bracket-half.right { flex-direction: row-reverse; }
+
+  .bracket-round {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 1.5rem;
+    min-width: 280px;
+    position: relative;
+    padding: 0 0.5rem;
+  }
+  .bracket-round-title {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #facc15;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ─── Match Card (bigger) ─── */
+  .match-card {
+    background: rgba(30, 41, 59, 0.75);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 1rem;
+    padding: 0;
+    margin: 0.75rem 0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    min-width: 260px;
+  }
+  .match-card.completed { cursor: pointer; }
+  .match-card.completed:hover {
+    border-color: rgba(250, 204, 21, 0.5);
+    box-shadow: 0 0 24px rgba(250, 204, 21, 0.18);
+    transform: scale(1.03);
+  }
+  .match-card.pending {
+    opacity: 0.45;
+    border-style: dashed;
+  }
+  .match-card.active-match {
+    border-color: rgba(250, 204, 21, 0.35);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.1);
+  }
+
+  .match-sim-btn {
+    display: block;
+    width: 100%;
+    padding: 0.4rem 0;
+    background: rgba(250, 204, 21, 0.12);
+    border: none;
+    border-top: 1px solid rgba(250, 204, 21, 0.2);
+    color: #facc15;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .match-sim-btn:hover { background: rgba(250, 204, 21, 0.22); }
+  .match-sim-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .match-player {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+  }
+  .match-player:first-child { border-bottom: 1px solid rgba(59, 130, 246, 0.15); }
+
+  /* ─── Winner: glow + highlighted ─── */
+  .match-player.winner {
+    background: rgba(250, 204, 21, 0.1);
+    color: #facc15;
+    font-weight: 700;
+  }
+  .match-player.winner .player-name {
+    text-shadow: 0 0 8px rgba(250, 204, 21, 0.3);
+  }
+
+  /* ─── Loser: dimmed but NO strikethrough ─── */
+  .match-player.loser {
+    color: #475569;
+    opacity: 0.55;
+  }
+
+  .match-player .player-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.95rem;
+  }
+  .match-player .player-flag {
+    margin-right: 0.6rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .match-player.winner .player-flag { color: #facc15; }
+
+  .match-score {
+    text-align: center;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.75rem;
+    background: rgba(15, 23, 42, 0.5);
+    color: #94a3b8;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  /* ─── Connector Lines (SVG drawn) ─── */
+  .bracket-connector {
+    width: 40px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  /* ─── Center Column (Final + Champion) ─── */
+  .bracket-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    min-width: 300px;
+    padding: 0 1rem;
+  }
+
+  /* ─── Champion Box (bigger) ─── */
+  .champion-box {
+    background: linear-gradient(135deg, rgba(250, 204, 21, 0.18), rgba(250, 204, 21, 0.05));
+    border: 2px solid rgba(250, 204, 21, 0.45);
+    border-radius: 1.25rem;
+    padding: 2rem 2.5rem;
+    text-align: center;
+    min-width: 220px;
+  }
+  .champion-box .trophy { font-size: 3.5rem; margin-bottom: 0.75rem; }
+  .champion-box .name { font-size: 1.3rem; font-weight: 800; color: #facc15; }
+  .champion-box .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #94a3b8;
+    margin-top: 0.4rem;
+    font-weight: 600;
+  }
+
+  .champion-placeholder {
+    background: rgba(30, 41, 59, 0.4);
+    border: 2px dashed rgba(250, 204, 21, 0.2);
+    border-radius: 1.25rem;
+    padding: 2rem 2.5rem;
+    text-align: center;
+    min-width: 220px;
+  }
+  .champion-placeholder .trophy { font-size: 3rem; margin-bottom: 0.5rem; opacity: 0.4; }
+  .champion-placeholder .label { font-size: 0.8rem; color: #64748b; font-weight: 500; }
+
+  /* ─── Surface Swatch (like partido rápido) ─── */
+  .surface-swatch-sm {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  .surface-swatch-sm.hard  { background-color: #1e3a6e; }
+  .surface-swatch-sm.clay  { background-color: #b85c38; }
+  .surface-swatch-sm.grass { background-color: #2d8a4e; }
+
+  /* ─── Stats Modal ─── */
+  .stats-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .stats-modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+  .stats-modal {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    max-width: 600px;
+    width: 95%;
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+  }
+  .stats-modal-overlay.active .stats-modal { transform: translateY(0); }
+
+  .stat-row {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-val { width: 60px; text-align: center; font-weight: 600; font-size: 0.95rem; }
+  .stat-val.highlight { color: #facc15; }
+  .stat-label { flex: 1; text-align: center; font-size: 0.85rem; color: #94a3b8; }
+
+  /* ─── Spinner ─── */
+  .sim-spinner {
+    display: inline-block;
+    width: 1.5rem; height: 1.5rem;
+    border: 3px solid rgba(250, 204, 21, 0.2);
+    border-top-color: #facc15;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+
+  @keyframes match-reveal {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .match-reveal { animation: match-reveal 0.5s ease-out forwards; }
+
+  /* ─── Linear fallback (4 players) ─── */
+  .bracket-linear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 2.5rem 1rem;
+    min-height: 500px;
+  }
+</style>
+{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 px-6 py-8">
+  <div class="max-w-[1600px] mx-auto">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 fade-in-up">
+      <div>
+        <h1 id="torneo-title" class="text-4xl font-bold text-yellow-400 mb-2">🏆 Torneo</h1>
+        <p id="torneo-info" class="text-gray-400 text-base flex items-center gap-1"></p>
+      </div>
+      <div class="flex gap-3 mt-4 md:mt-0">
+        <button id="btn-simulate-round"
+          class="px-7 py-3 bg-yellow-400 text-slate-900 font-bold rounded-full hover:bg-yellow-300 transition shadow-lg shadow-yellow-400/20 flex items-center gap-2 text-base">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+          </svg>
+          Simular Ronda
+        </button>
+        <a href="/torneo" class="px-5 py-3 bg-slate-700/50 border border-blue-800/30 text-gray-300 rounded-full hover:bg-slate-700 transition text-sm font-medium flex items-center gap-2">
+          Nuevo Torneo
+        </a>
+      </div>
+    </div>
+
+    <!-- Bracket -->
+    <div id="bracket-wrapper" class="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-blue-800/20 p-8 overflow-x-auto fade-in-up">
+      <div id="bracket-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loading-state" class="text-center py-20">
+      <div class="sim-spinner mx-auto mb-4"></div>
+      <p class="text-gray-400">Cargando torneo...</p>
+    </div>
+
+  </div>
+</main>
+
+<!-- Stats Modal -->
+<div id="stats-modal-overlay" class="stats-modal-overlay" onclick="window._closeModal(event)">
+  <div class="stats-modal" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between mb-6">
+      <h3 id="modal-title" class="text-lg font-bold text-gray-100">Estadísticas del Partido</h3>
+      <button onclick="window._closeModal()" class="text-gray-500 hover:text-gray-300 transition">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Player names header -->
+    <div class="flex items-center justify-between mb-4">
+      <span id="modal-p1-name" class="text-sm font-semibold text-gray-200"></span>
+      <span id="modal-score" class="text-xs text-yellow-400 font-mono"></span>
+      <span id="modal-p2-name" class="text-sm font-semibold text-gray-200"></span>
+    </div>
+
+    <!-- Stats body -->
+    <div id="modal-stats-body">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const token = localStorage.getItem('access_token');
+  if (!token) { window.location.href = '/login'; return; }
+
+  const TORNEO_ID = {{ torneo_id }};
+  let torneoData = null;
+  let isSimulating = false;
+
+  const roundNames = {
+    1: 'Final',
+    2: 'Semifinales',
+    4: 'Cuartos de Final',
+    8: 'Octavos de Final',
+  };
+
+  const surfaceSwatchClass = { 'Dura': 'hard', 'Arcilla': 'clay', 'Hierba': 'grass' };
+
+  // ─── Load tournament data ──────────────────────────────
+  async function loadTorneo() {
+    try {
+      const res = await fetch(`/api/tournaments/${TORNEO_ID}`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) throw new Error('Torneo no encontrado');
+      torneoData = await res.json();
+      render();
+    } catch(e) {
+      document.getElementById('loading-state').innerHTML =
+        `<p class="text-red-400">${e.message}</p>`;
+    }
+  }
+
+  // ─── Build a single match card HTML ────────────────────
+  function buildMatchCard(m) {
+    const p1 = m.jugador_1;
+    const p2 = m.jugador_2;
+    const isCompleted = m.completado;
+    const isPending = !p1 || !p2;
+    const isReady = p1 && p2 && !isCompleted;
+
+    const p1Name = p1 ? `${p1.nombre} ${p1.apellido}` : 'Por definir';
+    const p2Name = p2 ? `${p2.nombre} ${p2.apellido}` : 'Por definir';
+    const p1Flag = p1?.nacionalidad || '';
+    const p2Flag = p2?.nacionalidad || '';
+
+    let p1Class = 'text-gray-300';
+    let p2Class = 'text-gray-300';
+    if (isCompleted) {
+      p1Class = m.ganador_id === p1?.id ? 'winner' : 'loser';
+      p2Class = m.ganador_id === p2?.id ? 'winner' : 'loser';
+    }
+
+    const cardClass = isCompleted ? 'completed match-reveal'
+                    : isPending ? 'pending'
+                    : 'active-match';
+    const clickAttr = isCompleted && m.partido_id
+      ? `onclick="window._showMatchStats(${TORNEO_ID}, ${m.partido_id})"`
+      : '';
+
+    const simBtn = isReady
+      ? `<button class="match-sim-btn" onclick="event.stopPropagation(); window._simulateMatch(${m.id})">▶ Simular</button>`
+      : '';
+
+    return `
+      <div class="match-card ${cardClass}" ${clickAttr}>
+        <div class="match-player ${p1Class}">
+          <span class="player-flag">${p1Flag}</span>
+          <span class="player-name">${p1Name}</span>
+        </div>
+        <div class="match-player ${p2Class}">
+          <span class="player-flag">${p2Flag}</span>
+          <span class="player-name">${p2Name}</span>
+        </div>
+        ${m.marcador ? `<div class="match-score">${m.marcador}</div>` : ''}
+        ${simBtn}
+      </div>
+    `;
+  }
+
+  // ─── Build a round column ─────────────────────────────
+  function buildRoundColumn(roundNum, matches) {
+    const roundName = roundNames[roundNum] || `Ronda ${roundNum}`;
+    let html = `<div class="bracket-round">`;
+    html += `<div class="bracket-round-title">${roundName}</div>`;
+    matches.sort((a, b) => a.posicion - b.posicion).forEach(m => {
+      html += buildMatchCard(m);
+    });
+    html += `</div>`;
+    return html;
+  }
+
+  // ─── Champion / placeholder ────────────────────────────
+  function buildChampionBox() {
+    const t = torneoData.torneo;
+    if (t.completado && t.ganador) {
+      return `
+        <div class="champion-box">
+          <div class="trophy">🏆</div>
+          <div class="name">${t.ganador.nombre} ${t.ganador.apellido}</div>
+          <div class="label">Campeón</div>
+        </div>
+      `;
+    }
+    return `
+      <div class="champion-placeholder">
+        <div class="trophy">🏆</div>
+        <div class="label">Por decidir</div>
+      </div>
+    `;
+  }
+
+  // ─── Render bracket ────────────────────────────────────
+  function render() {
+    document.getElementById('loading-state').classList.add('hidden');
+
+    const t = torneoData.torneo;
+    document.getElementById('torneo-title').textContent = '🏆 ' + t.nombre;
+
+    const swCls = surfaceSwatchClass[t.superficie] || 'hard';
+    document.getElementById('torneo-info').innerHTML =
+      `<span class="surface-swatch-sm ${swCls}"></span>${t.superficie || 'Dura'}&nbsp;&nbsp;·&nbsp;&nbsp;Al mejor de ${t.formato_sets} sets&nbsp;&nbsp;·&nbsp;&nbsp;${t.num_jugadores} jugadores`;
+
+    if (t.completado) {
+      const btn = document.getElementById('btn-simulate-round');
+      btn.disabled = true;
+      btn.innerHTML = '✅ Torneo Completado';
+      btn.classList.remove('bg-yellow-400', 'hover:bg-yellow-300', 'text-slate-900');
+      btn.classList.add('bg-green-600/20', 'text-green-400', 'border', 'border-green-600/30', 'cursor-default');
+    }
+
+    renderBracket();
+  }
+
+  function renderBracket() {
+    const container = document.getElementById('bracket-container');
+    const bracket = torneoData.bracket;
+    const numPlayers = torneoData.torneo.num_jugadores;
+
+    // Group matches by round
+    const rounds = {};
+    bracket.forEach(m => {
+      if (!rounds[m.ronda]) rounds[m.ronda] = [];
+      rounds[m.ronda].push(m);
+    });
+
+    const sortedRoundKeys = Object.keys(rounds).map(Number).sort((a, b) => b - a);
+
+    if (numPlayers >= 8) {
+      // ─── SPLIT LAYOUT: left half + center (final+champion) + right half ───
+      // First round (highest round number) splits in half
+      const firstRound = sortedRoundKeys[0];
+      const firstRoundMatches = rounds[firstRound] || [];
+      const halfCount = Math.ceil(firstRoundMatches.length / 2);
+      const leftFirstMatches = firstRoundMatches.filter(m => m.posicion <= halfCount);
+      const rightFirstMatches = firstRoundMatches.filter(m => m.posicion > halfCount);
+
+      // Subsequent rounds (excluding final) also split
+      const midRounds = sortedRoundKeys.filter(r => r > 1 && r < firstRound);
+      const leftMidRounds = [];
+      const rightMidRounds = [];
+      midRounds.forEach(r => {
+        const ms = rounds[r] || [];
+        const midHalf = Math.ceil(ms.length / 2);
+        leftMidRounds.push({ round: r, matches: ms.filter(m => m.posicion <= midHalf) });
+        rightMidRounds.push({ round: r, matches: ms.filter(m => m.posicion > midHalf) });
+      });
+
+      // Build LEFT half (left-to-right: first round → mid rounds)
+      let leftHtml = '<div class="bracket-half left">';
+      leftHtml += buildRoundColumn(firstRound, leftFirstMatches);
+      leftMidRounds.forEach(lr => {
+        leftHtml += `<div class="bracket-connector"></div>`;
+        leftHtml += buildRoundColumn(lr.round, lr.matches);
+      });
+      leftHtml += '</div>';
+
+      // Build CENTER (Final + Champion)
+      const finalMatches = rounds[1] || [];
+      let centerHtml = '<div class="bracket-center">';
+      centerHtml += buildRoundColumn(1, finalMatches);
+      centerHtml += buildChampionBox();
+      centerHtml += '</div>';
+
+      // Build RIGHT half (right-to-left: first round → mid rounds, reversed visually)
+      let rightHtml = '<div class="bracket-half right">';
+      rightHtml += buildRoundColumn(firstRound, rightFirstMatches);
+      rightMidRounds.forEach(rr => {
+        rightHtml += `<div class="bracket-connector"></div>`;
+        rightHtml += buildRoundColumn(rr.round, rr.matches);
+      });
+      rightHtml += '</div>';
+
+      container.className = 'bracket-split';
+      container.innerHTML = leftHtml + `<div class="bracket-connector"></div>` + centerHtml + `<div class="bracket-connector"></div>` + rightHtml;
+
+    } else {
+      // ─── LINEAR LAYOUT (4 players): Semifinales → Final → Champion ───
+      let html = '';
+      sortedRoundKeys.forEach((roundNum, ri) => {
+        const matches = rounds[roundNum] || [];
+        html += buildRoundColumn(roundNum, matches);
+        if (ri < sortedRoundKeys.length - 1) {
+          html += `<div class="bracket-connector"></div>`;
+        }
+      });
+
+      html += `<div class="bracket-connector"></div>`;
+      html += buildChampionBox();
+
+      container.className = 'bracket-linear';
+      container.innerHTML = html;
+    }
+  }
+
+  // ─── Simulate single match ─────────────────────────────
+  window._simulateMatch = async function(torneoPartidoId) {
+    if (isSimulating || torneoData?.torneo?.completado) return;
+    isSimulating = true;
+
+    // Disable all sim buttons
+    document.querySelectorAll('.match-sim-btn').forEach(b => { b.disabled = true; });
+    const btn = document.querySelector(`.match-sim-btn[onclick*="_simulateMatch(${torneoPartidoId})"]`);
+    if (btn) btn.textContent = '⏳ Simulando...';
+
+    try {
+      const res = await fetch('/api/tournaments/simulate-match', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+        body: JSON.stringify({ id_torneo: TORNEO_ID, torneo_partido_id: torneoPartidoId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || 'Error simulando partido');
+      }
+
+      await loadTorneo();
+    } catch(e) {
+      alert('Error: ' + e.message);
+      isSimulating = false;
+      document.querySelectorAll('.match-sim-btn').forEach(b => { b.disabled = false; b.textContent = '▶ Simular'; });
+    } finally {
+      isSimulating = false;
+    }
+  };
+
+  // ─── Simulate round ───────────────────────────────────
+  document.getElementById('btn-simulate-round').addEventListener('click', async () => {
+    if (isSimulating || torneoData?.torneo?.completado) return;
+    isSimulating = true;
+
+    const btn = document.getElementById('btn-simulate-round');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="sim-spinner"></span> Simulando...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/tournaments/simulate-round', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+        body: JSON.stringify({ id_torneo: TORNEO_ID }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.detail || 'Error simulando ronda');
+      }
+
+      await loadTorneo();
+
+    } catch(e) {
+      alert('Error: ' + e.message);
+    } finally {
+      isSimulating = false;
+      const btn2 = document.getElementById('btn-simulate-round');
+      if (!torneoData?.torneo?.completado) {
+        btn2.innerHTML = originalText;
+        btn2.disabled = false;
+      }
+    }
+  });
+
+  // ─── Stats modal ──────────────────────────────────────
+  window._showMatchStats = async function(torneoId, partidoId) {
+    const overlay = document.getElementById('stats-modal-overlay');
+
+    try {
+      const res = await fetch(`/api/tournaments/${torneoId}/match/${partidoId}`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (!res.ok) throw new Error('Error cargando estadísticas');
+      const data = await res.json();
+
+      document.getElementById('modal-p1-name').textContent = data.jugador_1.nombre;
+      document.getElementById('modal-p2-name').textContent = data.jugador_2.nombre;
+      document.getElementById('modal-score').textContent = data.partido.marcador_final;
+
+      const winnerId = data.partido.id_ganador;
+      const p1Winner = data.jugador_1.id === winnerId;
+
+      const stats = [
+        { label: 'Aces', p1: data.jugador_1.stats?.aces, p2: data.jugador_2.stats?.aces },
+        { label: 'Dobles Faltas', p1: data.jugador_1.stats?.dobles_faltas, p2: data.jugador_2.stats?.dobles_faltas, inverse: true },
+        { label: '% Primer Saque', p1: data.jugador_1.stats?.pct_primer_saque, p2: data.jugador_2.stats?.pct_primer_saque, suffix: '%' },
+        { label: 'Pts ganados 1er saque', p1: data.jugador_1.stats?.puntos_ganados_1er_saque, p2: data.jugador_2.stats?.puntos_ganados_1er_saque },
+        { label: 'Winners', p1: data.jugador_1.stats?.winners, p2: data.jugador_2.stats?.winners },
+        { label: 'Errores No Forzados', p1: data.jugador_1.stats?.errores_no_forzados, p2: data.jugador_2.stats?.errores_no_forzados, inverse: true },
+        { label: 'Total Puntos', p1: data.jugador_1.stats?.total_puntos_ganados, p2: data.jugador_2.stats?.total_puntos_ganados },
+        { label: 'Break Points', p1: data.jugador_1.stats?.break_points, p2: data.jugador_2.stats?.break_points, raw: true },
+      ];
+
+      let statsHtml = '';
+      stats.forEach(s => {
+        const v1 = s.p1 ?? 0;
+        const v2 = s.p2 ?? 0;
+        const suffix = s.suffix || '';
+
+        let h1 = '', h2 = '';
+        if (!s.raw) {
+          const better1 = s.inverse ? v1 < v2 : v1 > v2;
+          const better2 = s.inverse ? v2 < v1 : v2 > v1;
+          h1 = better1 ? 'highlight' : '';
+          h2 = better2 ? 'highlight' : '';
+        }
+
+        statsHtml += `
+          <div class="stat-row">
+            <div class="stat-val ${h1}">${s.raw ? v1 : v1 + suffix}</div>
+            <div class="stat-label">${s.label}</div>
+            <div class="stat-val ${h2}">${s.raw ? v2 : v2 + suffix}</div>
+          </div>
+        `;
+      });
+
+      const winnerName = p1Winner ? data.jugador_1.nombre : data.jugador_2.nombre;
+      statsHtml += `
+        <div class="mt-4 text-center py-3 bg-yellow-400/10 rounded-lg border border-yellow-400/20">
+          <span class="text-yellow-400 font-bold">🏆 ${winnerName}</span>
+          <span class="text-gray-400 text-sm ml-2">ganó el partido</span>
+        </div>
+      `;
+
+      document.getElementById('modal-stats-body').innerHTML = statsHtml;
+      overlay.classList.add('active');
+
+    } catch(e) {
+      console.error(e);
+    }
+  };
+
+  window._closeModal = function(event) {
+    if (event && event.target !== event.currentTarget) return;
+    document.getElementById('stats-modal-overlay').classList.remove('active');
+  };
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') window._closeModal();
+  });
+
+  loadTorneo();
+})();
+</script>
+{% endblock %}
+
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}

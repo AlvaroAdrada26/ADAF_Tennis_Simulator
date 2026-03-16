@@ -54,6 +54,9 @@ def crear_jugador(
         raise HTTPException(status_code=401, detail="Token requerido")
 
     payload = decode_access_token(credentials.credentials)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Token inválido o expirado")
+
     user_id = payload.get("sub")
 
     usuario = db.query(Usuario).filter(Usuario.id == int(user_id)).first()
