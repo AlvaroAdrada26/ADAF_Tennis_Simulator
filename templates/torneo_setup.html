@@ -172,7 +172,7 @@
 <script>
 (function() {
   const token = localStorage.getItem('access_token');
-  if (!token) { window.location.href = '/login'; return; }
+  if (!token) { window.location.href = '/'; return; }
 
   let allPlayers = [];
   let selectedIds = [];

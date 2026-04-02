@@ -56,9 +56,9 @@
       </div>
 
       <!-- Tarjeta de usuario -->
-      <div class="user-card rounded-2xl border border-blue-800/30 p-5 flex items-center gap-5 min-w-[320px]">
+      <a href="/perfil" class="user-card rounded-2xl border border-blue-800/30 p-5 flex items-center gap-5 min-w-[320px] hover:border-yellow-400/40 transition cursor-pointer group">
         <!-- Avatar -->
-        <div class="w-14 h-14 rounded-full bg-yellow-400/20 border-2 border-yellow-400/40 flex items-center justify-center flex-shrink-0">
+        <div class="w-14 h-14 rounded-full bg-yellow-400/20 border-2 border-yellow-400/40 flex items-center justify-center flex-shrink-0 group-hover:bg-yellow-400/30 transition">
           <svg class="w-7 h-7 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
           </svg>
@@ -76,7 +76,11 @@
             </span>
           </div>
         </div>
-      </div>
+        <!-- Flecha -->
+        <svg class="w-5 h-5 text-gray-500 group-hover:text-yellow-400 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
     </div>
 
     <!-- GRID DE MODOS DE JUEGO -->
@@ -183,9 +187,9 @@
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   const token = localStorage.getItem('access_token');
 
-  // Si no hay sesión, redirigir al login
+  // Si no hay sesión, redirigir al inicio
   if (!token || !user) {
-    window.location.href = '/login';
+    window.location.href = '/';
     return;
   }
 

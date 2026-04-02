@@ -27,6 +27,9 @@
 
     <!-- USER MENU (cuando SÍ está logueado) -->
     <div id="user-menu" class="hidden items-center gap-3 relative">
+      <a href="/menu" class="px-4 py-2 text-sm font-semibold bg-yellow-400 hover:bg-yellow-500 text-black rounded-full transition shadow-lg">
+        Ir al Menú
+      </a>
       <button id="user-menu-btn" class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/50 transition">
         <div class="w-8 h-8 rounded-full bg-yellow-400/20 border border-yellow-400/40 flex items-center justify-center">
           <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -46,12 +49,6 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
           </svg>
           Mi Perfil
-        </a>
-        <a href="/mis-jugadores" class="block px-4 py-2 text-sm text-gray-200 hover:bg-slate-800 transition">
-          <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-          </svg>
-          Mis Jugadores
         </a>
         <hr class="border-blue-800/30">
         <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-800 transition">

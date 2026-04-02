@@ -35,6 +35,13 @@ def menu(request: Request):
     )
 
 
+@router.get("/perfil", response_class=HTMLResponse)
+def perfil(request: Request):
+    return templates.TemplateResponse(
+        "perfil.html", {"request": request, "active_page": "perfil"}
+    )
+
+
 @router.get("/simulacion2", response_class=HTMLResponse)
 def simulacion2(request: Request):
     return templates.TemplateResponse(

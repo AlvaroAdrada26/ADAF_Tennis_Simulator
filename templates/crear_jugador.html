@@ -333,6 +333,9 @@
 
 {% block scripts %}
 <script>
+// ─── Auth guard ───
+if (!localStorage.getItem('access_token')) { window.location.href = '/'; }
+
 // ─────── Países con códigos ISO ───────
 const COUNTRIES = {
   "Afganistán": "af", "Albania": "al", "Alemania": "de", "Andorra": "ad", "Angola": "ao",

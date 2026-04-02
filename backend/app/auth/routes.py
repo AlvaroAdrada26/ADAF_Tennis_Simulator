@@ -7,6 +7,8 @@ Endpoints:
   GET  /api/auth/me        →  Datos del usuario autenticado (requiere token)
 """
 
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
@@ -25,6 +27,8 @@ from backend.app.auth.security import (
     hash_password,
     verify_password,
 )
+from backend.app.matches.models import Partido
+from backend.app.players.models import Jugador
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -128,3 +132,120 @@ def get_current_user(
         )
 
     return user
+
+
+# ─── GET /api/auth/me/matches ─────────────────────────────────
+@router.get("/me/matches")
+def get_my_matches(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+):
+    """Devuelve el historial de partidos simulados por el usuario autenticado."""
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de acceso requerido.",
+        )
+
+    payload = decode_access_token(credentials.credentials)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido o expirado.",
+        )
+
+    user_id = int(payload.get("sub"))
+
+    partidos = (
+        db.query(Partido)
+        .filter(Partido.id_usuario_creador == user_id, Partido.activo == True)
+        .order_by(Partido.fecha_jugado.desc())
+        .all()
+    )
+
+    resultado = []
+    for p in partidos:
+        j1 = db.query(Jugador).filter(Jugador.id == p.id_jugador_1).first()
+        j2 = db.query(Jugador).filter(Jugador.id == p.id_jugador_2).first()
+
+        nombre_j1 = f"{j1.nombre} {j1.apellido}" if j1 else "Desconocido"
+        nombre_j2 = f"{j2.nombre} {j2.apellido}" if j2 else "Desconocido"
+
+        # Determinar nombre del ganador
+        if p.id_ganador == p.id_jugador_1:
+            nombre_ganador = nombre_j1
+        elif p.id_ganador == p.id_jugador_2:
+            nombre_ganador = nombre_j2
+        else:
+            nombre_ganador = "—"
+
+        superficie_icons = {"Dura": "🏟️", "Arcilla": "🧱", "Hierba": "🌿"}
+
+        resultado.append({
+            "id": p.id,
+            "jugador_1": nombre_j1,
+            "jugador_2": nombre_j2,
+            "marcador_final": p.marcador_final,
+            "ganador": nombre_ganador,
+            "superficie": p.superficie or "—",
+            "superficie_icon": superficie_icons.get(p.superficie, ""),
+            "formato_sets": p.formato_sets,
+            "fecha": p.fecha_jugado.strftime("%d/%m/%Y %H:%M") if p.fecha_jugado else "—",
+            "duracion_minutos": p.duracion_minutos,
+        })
+
+    return resultado
+
+
+# ─── GET /api/auth/me/players ──────────────────────────────────
+@router.get("/me/players")
+def get_my_players(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+):
+    """Devuelve solo los jugadores creados por el usuario autenticado."""
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de acceso requerido.",
+        )
+
+    payload = decode_access_token(credentials.credentials)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido o expirado.",
+        )
+
+    user_id = int(payload.get("sub"))
+
+    jugadores = (
+        db.query(Jugador)
+        .filter(Jugador.id_creador == user_id, Jugador.activo == True)
+        .order_by(Jugador.created_at.desc())
+        .all()
+    )
+
+    brazo_map = {"R": "Diestro", "L": "Zurdo"}
+
+    return [
+        {
+            "id": j.id,
+            "nombre": j.nombre,
+            "apellido": j.apellido,
+            "nombre_completo": f"{j.nombre} {j.apellido}",
+            "nacionalidad": j.nacionalidad or "—",
+            "altura_cm": j.altura_cm,
+            "brazo_bueno": brazo_map.get(j.brazo_bueno, "—"),
+            "attr_primer_saque": j.attr_primer_saque,
+            "attr_segundo_saque": j.attr_segundo_saque,
+            "attr_resto": j.attr_resto,
+            "attr_derecha": j.attr_derecha,
+            "attr_reves": j.attr_reves,
+            "attr_movilidad": j.attr_movilidad,
+            "attr_consistencia": j.attr_consistencia,
+            "attr_clutch": j.attr_clutch,
+            "attr_fisico": j.attr_fisico,
+        }
+        for j in jugadores
+    ]

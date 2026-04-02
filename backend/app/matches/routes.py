@@ -94,6 +94,48 @@ def save_match(body: SaveMatchRequest, db: Session = Depends(get_db)):
     }
 
 
+# ─── GET  /api/matches/player/{player_id}  — Partidos de un jugador ──
+# (Must be defined before /{match_id} to avoid path conflicts)
+@router.get("/player/{player_id}")
+def get_player_matches(player_id: int, db: Session = Depends(get_db)):
+    """Devuelve todos los partidos en los que ha participado un jugador."""
+    jugador = db.query(Jugador).filter(Jugador.id == player_id, Jugador.activo == True).first()
+    if not jugador:
+        raise HTTPException(status_code=404, detail="Jugador no encontrado")
+
+    partidos = (
+        db.query(Partido)
+        .filter(
+            Partido.activo == True,
+            (Partido.id_jugador_1 == player_id) | (Partido.id_jugador_2 == player_id),
+        )
+        .order_by(Partido.fecha_jugado.desc())
+        .all()
+    )
+
+    superficie_icons = {"Dura": "🏟️", "Tierra": "🧱", "Hierba": "🌿"}
+
+    result = []
+    for p in partidos:
+        j1 = db.query(Jugador).filter(Jugador.id == p.id_jugador_1).first()
+        j2 = db.query(Jugador).filter(Jugador.id == p.id_jugador_2).first()
+        ganador = j1 if p.id_ganador == j1.id else j2
+        result.append({
+            "id": p.id,
+            "jugador_1": f"{j1.nombre} {j1.apellido}" if j1 else "?",
+            "jugador_2": f"{j2.nombre} {j2.apellido}" if j2 else "?",
+            "marcador_final": p.marcador_final,
+            "ganador": f"{ganador.nombre} {ganador.apellido}" if ganador else "?",
+            "superficie": p.superficie,
+            "superficie_icon": superficie_icons.get(p.superficie, ""),
+            "formato_sets": p.formato_sets,
+            "fecha": p.fecha_jugado.strftime("%d/%m/%Y") if p.fecha_jugado else "",
+            "duracion_minutos": p.duracion_minutos,
+        })
+
+    return result
+
+
 # ─── GET  /api/matches/{id}  — Consultar partido ───────────────
 @router.get("/{match_id}")
 def get_match_summary(match_id: int, db: Session = Depends(get_db)):

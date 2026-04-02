@@ -349,7 +349,7 @@
 <script>
 (function() {
   const token = localStorage.getItem('access_token');
-  if (!token) { window.location.href = '/login'; return; }
+  if (!token) { window.location.href = '/'; return; }
 
   const TORNEO_ID = {{ torneo_id }};
   let torneoData = null;

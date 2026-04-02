@@ -28,30 +28,7 @@
 {% block main_class %}ml-0{% endblock %}
 
 {% block header %}
-<!-- HEADER HOME (sin menú de usuario, solo para visitantes) -->
-<header class="w-full flex justify-between items-center px-10 py-4 bg-slate-950/40 backdrop-blur-sm border-b border-blue-800/30">
-  <div class="flex items-center space-x-3">
-    <span class="text-xl font-semibold text-yellow-400 tracking-wide">ADAF Tennis Simulator</span>
-  </div>
-  <div class="flex items-center space-x-8">
-    <nav class="hidden md:flex space-x-8 text-sm">
-      <a href="/documentacion" class="hover:text-yellow-400 transition" data-i18n="headerDocumentacion">Documentación del modelo</a>
-      <a href="/creditos" class="hover:text-yellow-400 transition" data-i18n="headerCreditos">Créditos / Sobre el TFG</a>
-    </nav>
-    <div class="flex items-center gap-3">
-      <a href="/login" class="px-4 py-2 text-sm font-medium text-yellow-400 hover:text-yellow-300 transition">Iniciar Sesión</a>
-      <a href="/registro" class="px-4 py-2 text-sm font-semibold bg-yellow-400 hover:bg-yellow-500 text-black rounded-full transition shadow-lg">Registrarse</a>
-    </div>
-    <div class="flex items-center gap-3">
-      <button id="lang-es" title="Versión en Español" class="cursor-pointer hover:scale-110 transition">
-        <img src="/static/images/flag_es.png" alt="Español" class="lang-flag w-8 h-8 rounded-full border-2 border-yellow-400 shadow-lg">
-      </button>
-      <button id="lang-en" title="English version" class="cursor-pointer hover:scale-110 transition">
-        <img src="/static/images/flag_uk.png" alt="English" class="lang-flag w-8 h-8 rounded-full border border-gray-400 shadow-sm">
-      </button>
-    </div>
-  </div>
-</header>
+{% include "partials/header_home.html" %}
 {% endblock %}
 
 {% block content %}
@@ -71,8 +48,8 @@
           Comenzar Simulación
         </a>
 
-        <!-- AUTH CTAs (siempre visible para visitantes) -->
-        <div class="mt-8 animate-fade-up">
+        <!-- AUTH CTAs (para visitantes) -->
+        <div id="hero-auth-ctas" class="mt-8 animate-fade-up hidden">
           <p class="text-gray-400 text-sm mb-4">¿Nuevo en ADAF Tennis?</p>
           <div class="flex gap-4 justify-center">
             <a href="/registro" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full shadow-lg transition transform hover:scale-105">
@@ -82,6 +59,13 @@
               Iniciar sesión
             </a>
           </div>
+        </div>
+        <!-- CTA para usuarios logueados -->
+        <div id="hero-logged-ctas" class="mt-8 animate-fade-up hidden">
+          <p class="text-gray-400 text-sm mb-4">¡Bienvenido de nuevo!</p>
+          <a href="/menu" class="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg rounded-full shadow-lg transition transform hover:scale-105">
+            Ir al Menú
+          </a>
         </div>
       </main>
 
@@ -215,5 +199,18 @@
       });
     }, observerOptions);
     observer.observe(footer);
+
+    // Mostrar CTAs según estado de autenticación
+    (function() {
+      const token = localStorage.getItem('access_token');
+      const user  = JSON.parse(localStorage.getItem('user') || 'null');
+      const heroAuth   = document.getElementById('hero-auth-ctas');
+      const heroLogged = document.getElementById('hero-logged-ctas');
+      if (token && user) {
+        heroLogged?.classList.remove('hidden');
+      } else {
+        heroAuth?.classList.remove('hidden');
+      }
+    })();
   </script>
 {% endblock %}
