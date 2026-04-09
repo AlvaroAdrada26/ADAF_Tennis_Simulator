@@ -81,21 +81,19 @@
 
 <script>
 // Verificar autenticación y mostrar botones apropiados
-(function() {
-  const token = localStorage.getItem('access_token');
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  
+document.addEventListener('auth:ready', function(e) {
   const authButtons = document.getElementById('auth-buttons');
   const userMenu = document.getElementById('user-menu');
   
-  if (token && user) {
+  if (e.detail.authenticated) {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
     // Mostrar menú de usuario
     authButtons?.classList.add('hidden');
     userMenu?.classList.remove('hidden');
     userMenu?.classList.add('flex');
     
     const userName = document.getElementById('user-name');
-    if (userName) userName.textContent = user.username || user.nombre;
+    if (userName) userName.textContent = user?.username || user?.nombre || '';
     
     // Toggle dropdown
     const menuBtn = document.getElementById('user-menu-btn');
@@ -116,7 +114,7 @@
     authButtons?.classList.add('flex');
     userMenu?.classList.add('hidden');
   }
-})();
+});
 
 function logout() {
   localStorage.removeItem('access_token');

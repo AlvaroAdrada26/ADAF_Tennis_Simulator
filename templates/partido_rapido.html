@@ -303,11 +303,11 @@
 
 {% block scripts %}
 <script>
-(function() {
+document.addEventListener('auth:ready', function(e) {
   'use strict';
 
   // ── Auth guard ──
-  if (!localStorage.getItem('access_token')) { window.location.href = '/'; return; }
+  if (!e.detail.authenticated) { window.location.href = '/'; return; }
 
   // ── Estado ──────────────────────────────────────────────
   let players = [];
@@ -592,6 +592,6 @@
     }
   });
 
-})();
+});
 </script>
 {% endblock %}

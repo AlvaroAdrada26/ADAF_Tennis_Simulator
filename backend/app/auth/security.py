@@ -12,7 +12,7 @@ from passlib.context import CryptContext
 # ─── Configuración ─────────────────────────────────────────────
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "adaf-tennis-super-secret-change-in-production")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))  # 15 min
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))  # 7 días
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -334,7 +334,9 @@
 {% block scripts %}
 <script>
 // ─── Auth guard ───
-if (!localStorage.getItem('access_token')) { window.location.href = '/'; }
+document.addEventListener('auth:ready', function(e) {
+  if (!e.detail.authenticated) { window.location.href = '/'; }
+});
 
 // ─────── Países con códigos ISO ───────
 const COUNTRIES = {

@@ -520,7 +520,12 @@
 
 {% block scripts %}
 <script>
-(function() {
+document.addEventListener('auth:ready', function(ev) {
+  if (!ev.detail.authenticated) {
+    window.location.href = '/';
+    return;
+  }
+
   const token = localStorage.getItem('access_token');
   const user = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -1138,6 +1143,6 @@
     div.textContent = text;
     return div.innerHTML;
   }
-})();
+});
 </script>
 {% endblock %}

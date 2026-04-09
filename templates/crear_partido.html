@@ -222,9 +222,9 @@ let selectedPlayer1 = null;
 let selectedPlayer2 = null;
 
 // ─── Init ─────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('auth:ready', (e) => {
   const token = localStorage.getItem('access_token');
-  if (!token) {
+  if (!e.detail.authenticated || !token) {
     document.getElementById('notLoggedIn').classList.remove('hidden');
     return;
   }

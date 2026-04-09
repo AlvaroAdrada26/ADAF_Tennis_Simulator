@@ -170,9 +170,9 @@
 </main>
 
 <script>
-(function() {
+document.addEventListener('auth:ready', function(e) {
+  if (!e.detail.authenticated) { window.location.href = '/'; return; }
   const token = localStorage.getItem('access_token');
-  if (!token) { window.location.href = '/'; return; }
 
   let allPlayers = [];
   let selectedIds = [];
@@ -321,7 +321,7 @@
   });
 
   loadPlayers();
-})();
+});
 </script>
 {% endblock %}
 

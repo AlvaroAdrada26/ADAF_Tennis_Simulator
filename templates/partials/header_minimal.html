@@ -40,20 +40,18 @@
 </header>
 
 <script>
-(function() {
-  const token = localStorage.getItem('access_token');
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  
+document.addEventListener('auth:ready', function(e) {
   const authButtons = document.getElementById('auth-buttons-minimal');
   const userMenu = document.getElementById('user-menu-minimal');
   
-  if (token && user) {
+  if (e.detail.authenticated) {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
     authButtons?.classList.add('hidden');
     userMenu?.classList.remove('hidden');
     userMenu?.classList.add('flex');
     
     const userName = document.getElementById('user-name-minimal');
-    if (userName) userName.textContent = user.username || user.nombre;
+    if (userName) userName.textContent = user?.username || user?.nombre || '';
     
     const menuBtn = document.getElementById('user-menu-btn-minimal');
     const dropdown = document.getElementById('user-dropdown-minimal');
@@ -67,7 +65,7 @@
     authButtons?.classList.add('flex');
     userMenu?.classList.add('hidden');
   }
-})();
+});
 
 function logoutMinimal() {
   localStorage.removeItem('access_token');

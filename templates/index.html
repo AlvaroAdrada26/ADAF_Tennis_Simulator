@@ -201,16 +201,14 @@
     observer.observe(footer);
 
     // Mostrar CTAs según estado de autenticación
-    (function() {
-      const token = localStorage.getItem('access_token');
-      const user  = JSON.parse(localStorage.getItem('user') || 'null');
+    document.addEventListener('auth:ready', function(e) {
       const heroAuth   = document.getElementById('hero-auth-ctas');
       const heroLogged = document.getElementById('hero-logged-ctas');
-      if (token && user) {
+      if (e.detail.authenticated) {
         heroLogged?.classList.remove('hidden');
       } else {
         heroAuth?.classList.remove('hidden');
       }
-    })();
+    });
   </script>
 {% endblock %}
