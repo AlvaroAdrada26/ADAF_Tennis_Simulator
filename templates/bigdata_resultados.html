@@ -1,0 +1,200 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Resultados Big Data - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  .chart-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px dashed rgba(59, 130, 246, 0.3);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .chart-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .kpi-card {
+    background: rgba(30, 41, 59, 0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  .kpi-card:hover { transform: translateY(-2px); }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 54px 136px 54px 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+  }
+  .stat-row:last-child { border-bottom: none; }
+
+  .bar-container { height: 10px; background: rgba(30, 41, 59, 0.6); border-radius: 5px; overflow: hidden; }
+  .bar-fill-p1 { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #f59e0b, #facc15); }
+  .bar-fill-p2 { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in-up { animation: fade-in-up 0.6s ease-out forwards; opacity: 0; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+  .delay-5 { animation-delay: 0.5s; }
+</style>
+{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 px-8 py-12 space-y-10 max-w-7xl mx-auto w-full">
+
+  <!-- No data state -->
+  <div id="no-data" class="hidden text-center py-20">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
+      <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold text-gray-200 mb-2" data-i18n="bigdataNoData">No hay datos disponibles</h2>
+    <p class="text-gray-400 mb-6">Ejecuta una simulación Big Data primero.</p>
+    <a href="/modo-big-data" class="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-full transition shadow-lg shadow-yellow-400/20">
+      <span data-i18n="bigdataNewSim">Nueva Simulación</span>
+    </a>
+  </div>
+
+  <!-- Results dashboard -->
+  <div id="dashboard" class="hidden space-y-10">
+
+    <!-- HEADER -->
+    <div class="text-center fade-in-up">
+      <h1 class="text-4xl font-bold text-yellow-400 mb-2" data-i18n="bigdataResultsTitle">Resultados Big Data</h1>
+      <p id="results-subtitle" class="text-gray-400 text-lg"></p>
+    </div>
+
+    <!-- SECCIÓN 1: KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 fade-in-up delay-1">
+      <div class="kpi-card">
+        <p class="text-xs uppercase tracking-widest text-gray-500 mb-1" data-i18n="bigdataWinRateP1">Victoria P1</p>
+        <p id="kpi-p1-winrate" class="text-3xl font-extrabold text-yellow-400">—</p>
+        <p id="kpi-p1-wins" class="text-sm text-gray-400"></p>
+      </div>
+      <div class="kpi-card">
+        <p class="text-xs uppercase tracking-widest text-gray-500 mb-1" data-i18n="bigdataWinRateP2">Victoria P2</p>
+        <p id="kpi-p2-winrate" class="text-3xl font-extrabold text-blue-400">—</p>
+        <p id="kpi-p2-wins" class="text-sm text-gray-400"></p>
+      </div>
+      <div class="kpi-card">
+        <p class="text-xs uppercase tracking-widest text-gray-500 mb-1" data-i18n="bigdataAvgPoints">Puntos promedio</p>
+        <p id="kpi-avg-points" class="text-3xl font-extrabold text-gray-100">—</p>
+        <p class="text-sm text-gray-400" data-i18n="bigdataPerMatch">por partido</p>
+      </div>
+      <div class="kpi-card">
+        <p class="text-xs uppercase tracking-widest text-gray-500 mb-1" data-i18n="bigdataAvgSets">Sets promedio</p>
+        <p id="kpi-avg-sets" class="text-3xl font-extrabold text-gray-100">—</p>
+        <p id="kpi-duration" class="text-sm text-gray-400"></p>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: Donut + Score Distribution -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 fade-in-up delay-2">
+      <div class="chart-card">
+        <h3 class="text-lg font-semibold text-gray-200 mb-4" data-i18n="bigdataWinDistribution">Distribución de Victorias</h3>
+        <div class="flex justify-center">
+          <canvas id="chart-winrate" width="300" height="300"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3 class="text-lg font-semibold text-gray-200 mb-4" data-i18n="bigdataScoreDistribution">Distribución de Marcadores</h3>
+        <canvas id="chart-scores" height="250"></canvas>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: Marcadores parciales frecuentes -->
+    <div class="chart-card fade-in-up delay-3">
+      <h3 class="text-lg font-semibold text-gray-200 mb-4" data-i18n="bigdataSetScores">Marcadores Parciales Más Frecuentes</h3>
+      <canvas id="chart-set-scores" height="200"></canvas>
+    </div>
+
+    <!-- SECCIÓN 4: Tabla de estadísticas comparativas -->
+    <div class="bg-slate-900/60 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 fade-in-up delay-3">
+      <h3 class="text-lg font-semibold text-yellow-400 mb-6" data-i18n="bigdataCompStats">Estadísticas Comparativas (Promedios por partido)</h3>
+
+      <div class="flex justify-between mb-4 px-4">
+        <span id="cmp-p1-name" class="text-yellow-400 font-bold text-sm"></span>
+        <span class="text-gray-500 text-xs uppercase tracking-widest">Stat</span>
+        <span id="cmp-p2-name" class="text-blue-400 font-bold text-sm"></span>
+      </div>
+
+      <div id="stats-table" class="space-y-0">
+        <!-- Filas generadas por JS -->
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5: Gráficos avanzados -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 fade-in-up delay-4">
+      <div class="chart-card">
+        <h3 class="text-lg font-semibold text-gray-200 mb-4" data-i18n="bigdataWinProgression">Win Rate Acumulativo</h3>
+        <canvas id="chart-progression" height="250"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3 class="text-lg font-semibold text-gray-200 mb-4" data-i18n="bigdataRadar">Comparación de Habilidades</h3>
+        <div class="flex justify-center">
+          <canvas id="chart-radar" width="350" height="350"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 fade-in-up delay-5">
+      <div class="chart-card">
+        <h3 class="text-lg font-semibold text-gray-200 mb-4" data-i18n="bigdataRallyDist">Duración de los Puntos</h3>
+        <canvas id="chart-rally" height="250"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3 class="text-lg font-semibold text-gray-200 mb-4" data-i18n="bigdataKeyTotals">Totales Acumulados</h3>
+        <canvas id="chart-totals" height="250"></canvas>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 6: Acciones -->
+    <div class="flex flex-wrap justify-center gap-4 fade-in-up delay-5">
+      <button id="btn-export-csv" class="px-6 py-3 bg-slate-800/60 border border-blue-800/30 text-gray-300 font-semibold rounded-full hover:bg-slate-700/60 hover:border-yellow-400/30 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span data-i18n="bigdataExportCSV">Exportar CSV</span>
+      </button>
+      <a href="/modo-big-data" class="px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-full transition shadow-lg shadow-yellow-400/20 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        <span data-i18n="bigdataNewSim">Nueva Simulación</span>
+      </a>
+      <a href="/menu" class="px-6 py-3 bg-slate-800/60 border border-blue-800/30 text-gray-300 font-semibold rounded-full hover:bg-slate-700/60 hover:border-yellow-400/30 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span data-i18n="bigdataGoMenu">Menú</span>
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/bigdata/results.js"></script>
+{% endblock %}

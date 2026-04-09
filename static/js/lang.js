@@ -138,6 +138,35 @@ const translations = {
     summaryNoData:           "No hay datos de partido disponibles.",
     summaryReturnToSim:      "Volver a la Simulación",
 
+    // =============================
+    // MODO BIG DATA
+    // =============================
+    sidebarBigData:          "Modo Big Data",
+    bigdataTitle:            "Modo Big Data",
+    bigdataSubtitle:         "Simula cientos o miles de partidos y analiza patrones estadísticos.",
+    bigdataConfigTitle:      "Configuración de la Simulación",
+    bigdataNumMatches:       "Número de Partidos",
+    bigdataTimeEstimate:     "Tiempo estimado",
+    bigdataStartBtn:         "Iniciar Simulación Masiva",
+    bigdataSimulating:       "Simulando...",
+    bigdataComplete:         "¡Simulación Completada!",
+    bigdataResultsTitle:     "Resultados Big Data",
+    bigdataNoData:           "No hay datos de simulación. Ejecuta una simulación primero.",
+    bigdataNewSim:           "Nueva Simulación",
+    bigdataGoMenu:           "Volver al Menú",
+    bigdataExportCSV:        "Exportar CSV",
+    bigdataWinDistribution:  "Distribución de Victorias",
+    bigdataScoreDistribution:"Distribución de Resultados",
+    bigdataSetScores:        "Marcadores de Sets Más Frecuentes",
+    bigdataCompStats:        "Estadísticas Comparativas (Promedio por Partido)",
+    bigdataWinProgression:   "Progresión del Win Rate",
+    bigdataRadar:            "Comparativa General",
+    bigdataRallyDist:        "Distribución de Duración de Puntos",
+    bigdataKeyTotals:        "Totales Acumulados",
+    bigdataPerMatch:         "por partido",
+    bigdataAvgPoints:        "Puntos Promedio",
+    bigdataAvgSets:          "Sets Promedio",
+
   },
   en: {
     // ********************************
@@ -276,6 +305,35 @@ const translations = {
     summaryBtnGoToSummary:   "View Match Summary",
     summaryNoData:           "No match data available.",
     summaryReturnToSim:      "Back to Simulation",
+
+    // =============================
+    // BIG DATA MODE
+    // =============================
+    sidebarBigData:          "Big Data Mode",
+    bigdataTitle:            "Big Data Mode",
+    bigdataSubtitle:         "Simulate hundreds or thousands of matches and analyze statistical patterns.",
+    bigdataConfigTitle:      "Simulation Configuration",
+    bigdataNumMatches:       "Number of Matches",
+    bigdataTimeEstimate:     "Estimated time",
+    bigdataStartBtn:         "Start Mass Simulation",
+    bigdataSimulating:       "Simulating...",
+    bigdataComplete:         "Simulation Complete!",
+    bigdataResultsTitle:     "Big Data Results",
+    bigdataNoData:           "No simulation data. Run a simulation first.",
+    bigdataNewSim:           "New Simulation",
+    bigdataGoMenu:           "Back to Menu",
+    bigdataExportCSV:        "Export CSV",
+    bigdataWinDistribution:  "Win Distribution",
+    bigdataScoreDistribution:"Score Distribution",
+    bigdataSetScores:        "Most Frequent Set Scores",
+    bigdataCompStats:        "Comparative Stats (Avg. per Match)",
+    bigdataWinProgression:   "Win Rate Progression",
+    bigdataRadar:            "Overall Comparison",
+    bigdataRallyDist:        "Rally Length Distribution",
+    bigdataKeyTotals:        "Cumulative Totals",
+    bigdataPerMatch:         "per match",
+    bigdataAvgPoints:        "Avg. Points",
+    bigdataAvgSets:          "Avg. Sets",
 
   }
 };

@@ -29,6 +29,7 @@
   .delay-2 { animation-delay: 0.2s; opacity: 0; }
   .delay-3 { animation-delay: 0.3s; opacity: 0; }
   .delay-4 { animation-delay: 0.4s; opacity: 0; }
+  .delay-5 { animation-delay: 0.5s; opacity: 0; }
 
   .user-card {
     background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
@@ -135,7 +136,7 @@
 
       <!-- CARD 3: Modo Big Data -->
       <div class="mode-card bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-blue-800/30 p-8 cursor-pointer group fade-in-up delay-3"
-           onclick="window.location.href='#'">
+           onclick="window.location.href='/modo-big-data'">
         <div class="flex items-start gap-6">
           <div class="card-icon w-16 h-16 rounded-xl bg-yellow-400/15 border border-yellow-400/30 flex items-center justify-center flex-shrink-0 transition duration-300">
             <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -172,6 +173,29 @@
             </p>
             <span class="card-btn inline-block px-5 py-2 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 text-sm font-semibold rounded-full transition duration-300">
               Crear jugador
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 5: Modo Entrenador -->
+      <div class="mode-card bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-blue-800/30 p-8 cursor-pointer group fade-in-up delay-5 md:col-span-2"
+           onclick="window.location.href='/modo-entrenador'">
+        <div class="flex items-start gap-6">
+          <div class="card-icon w-16 h-16 rounded-xl bg-yellow-400/15 border border-yellow-400/30 flex items-center justify-center flex-shrink-0 transition duration-300">
+            <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-bold text-gray-100 mb-2 group-hover:text-yellow-400 transition">Modo Entrenador</h3>
+            <p class="text-gray-400 text-sm leading-relaxed mb-4">
+              Dirige a tu jugador punto a punto cambiando de estrategia en tiempo real: agresiva, neutral o defensiva.
+              Observa cómo tus decisiones afectan al rendimiento, la estamina y el momentum durante el partido.
+            </p>
+            <span class="card-btn inline-block px-5 py-2 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 text-sm font-semibold rounded-full transition duration-300">
+              Entrenar
             </span>
           </div>
         </div>

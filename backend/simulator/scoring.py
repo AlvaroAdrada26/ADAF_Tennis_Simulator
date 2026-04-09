@@ -137,7 +137,7 @@ class TennisGame:
             # Actualizar estamina de ambos jugadores
             for jugador in [self.server, self.returner]:
                 # Fatiga proporcional a la duración del punto e inversa al físico
-                fatiga = 0.08 * (res.stats["rally_shots"] / 10) * (1 - jugador.Fisico / 100)
+                fatiga = (0.5 + res.stats["rally_shots"] * 0.2) * (1.5 - jugador.Fisico / 100)
                 jugador.Estamina = max(0.0, jugador.Estamina - fatiga)
 
             # === Actualizar momentum según el resultado del punto ===
@@ -173,7 +173,7 @@ class TennisGame:
             if winner:
                 # Actualizar estamina de ambos jugadores
                 for jugador in [self.p1, self.p2]:
-                    rec = 2 + 8 * (jugador.Fisico / 100)
+                    rec = 0.3 + 0.8 * (jugador.Fisico / 100)
                     jugador.Estamina = min(100.0, jugador.Estamina + rec)
 
                 # Bonus de momentum por ganar/perder juego
@@ -426,7 +426,7 @@ class TennisSet:
 
                 # Recuperación larga tras set (post tie-break)
                 for jugador in [self.p1, self.p2]:
-                    rec_set = 10 + 20 * (jugador.Fisico / 100)
+                    rec_set = 2 + 5 * (jugador.Fisico / 100)
                     jugador.Estamina = min(100.0, jugador.Estamina + rec_set)
 
                 return tb_winner, (self.games["P1"], self.games["P2"]), self.points_timeline
@@ -443,7 +443,7 @@ class TennisSet:
 
                 # Recuperación tras set normal
                 for jugador in [self.p1, self.p2]:
-                    rec_set = 10 + 20 * (jugador.Fisico / 100)
+                    rec_set = 2 + 5 * (jugador.Fisico / 100)
                     jugador.Estamina = min(100.0, jugador.Estamina + rec_set)
 
                 # Bonus adicional de momentum

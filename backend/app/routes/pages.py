@@ -112,6 +112,21 @@ def simulacion_rapida(request: Request):
     )
 
 
+# ─── Modo Entrenador ─────────────────────────────────────────────────────
+@router.get("/modo-entrenador", response_class=HTMLResponse)
+def modo_entrenador_setup(request: Request):
+    return templates.TemplateResponse(
+        "modo_entrenador_setup.html", {"request": request, "active_page": "modo_entrenador"}
+    )
+
+
+@router.get("/modo-entrenador/partido", response_class=HTMLResponse)
+def modo_entrenador_partido(request: Request):
+    return templates.TemplateResponse(
+        "modo_entrenador_partido.html", {"request": request, "active_page": "modo_entrenador"}
+    )
+
+
 # ─── Autenticación ────────────────────────────────────────────────────────
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
@@ -182,6 +197,21 @@ def tutoriales(request: Request):
 @router.get("/analisis", response_class=HTMLResponse)
 def analisis(request: Request):
     return _placeholder(request, "Análisis", "estadisticas")
+
+
+# ─── Modo Big Data ────────────────────────────────────────────────────────
+@router.get("/modo-big-data", response_class=HTMLResponse)
+def modo_big_data(request: Request):
+    return templates.TemplateResponse(
+        "bigdata.html", {"request": request, "active_page": "bigdata"}
+    )
+
+
+@router.get("/modo-big-data/resultados", response_class=HTMLResponse)
+def modo_big_data_resultados(request: Request):
+    return templates.TemplateResponse(
+        "bigdata_resultados.html", {"request": request, "active_page": "bigdata"}
+    )
 
 
 @router.get("/api-docs", response_class=HTMLResponse)

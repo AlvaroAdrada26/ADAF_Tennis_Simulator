@@ -24,13 +24,25 @@ class Shot:
     Clase base para los diferentes tipos de golpes.
     Contiene referencias al jugador que golpea (hitter) y al rival (receiver),
     así como un registro opcional de eventos (feed).
+    
+    Si se pasa un dict `strategy` con multiplicadores, estos se aplican
+    después de los cálculos base (Modo Entrenador).
     """
 
-    def __init__(self, hitter: Player, receiver: Player, feed: Optional[List[str]] = None, clutch: bool = False):
+    def __init__(self, hitter: Player, receiver: Player, feed: Optional[List[str]] = None,
+                 clutch: bool = False, strategy: Optional[Dict[str, float]] = None):
         self.hitter = hitter
         self.receiver = receiver
         self.feed = feed if feed is not None else []
         self.clutch = clutch
+        self.strategy = strategy  # multiplicadores de estrategia (o None)
+
+    # --- Helpers de estrategia ---
+    def _sm(self, key: str, default: float = 1.0) -> float:
+        """Devuelve el multiplicador de estrategia para `key`, o `default` si no hay estrategia."""
+        if self.strategy is None:
+            return default
+        return self.strategy.get(key, default)
 
     def log(self, text: str):
         """Añade una línea al feed si está activo."""
@@ -96,16 +108,19 @@ class Serve(Shot):
         momentum_boost = 0.05 * m       # ±5%
 
         p_final = base_prob * (1.0 + clutch_boost + momentum_boost)
+        p_final *= self._sm("p_in_mult")
         return clip(p_final, 0.0, 1.0)
 
     def _sample_pot_prec_first(self) -> Tuple[float, float]:
         j = self.hitter
         pot_base = 0.5*j.S1 + 0.35*j.F + 0.15*j.E
         sig_pot  = 0.04 + 0.08*(1-j.C) + 0.04*(1-j.E)
+        sig_pot *= self._sm("sigma_pot_mult")
         pot = clip(np.random.normal(pot_base, sig_pot), 0.01, 1.0)
 
         prec_base = 0.42*j.S1 + 0.38*j.C + 0.20*j.E
         sig_prec  = 0.05 + 0.10*(1-j.C) + 0.05*(1-j.E)
+        sig_prec *= self._sm("sigma_prec_mult")
         prec = clip(np.random.normal(prec_base, sig_prec), 0.01, 1.0)
 
         # --- Ajuste por momentum ---
@@ -113,6 +128,10 @@ class Serve(Shot):
         momentum_factor = 1.0 + 0.15 * m
         pot *= momentum_factor
         prec *= momentum_factor
+
+        # --- Estrategia ---
+        pot *= self._sm("pot_mult")
+        prec *= self._sm("prec_mult")
 
         pot = clip(pot, 0.01, 1.0)
         prec = clip(prec, 0.01, 1.0)
@@ -122,6 +141,7 @@ class Serve(Shot):
         j = self.hitter
         pot_base = 0.5*j.S2 + 0.35*j.F + 0.15*j.E
         sig_pot  = 0.02 + 0.04*(1-j.C) + 0.02*(1-j.E)
+        sig_pot *= self._sm("sigma_pot_mult")
         pot = clip(np.random.normal(pot_base, sig_pot), 0.01, 1.0)
         r = random.uniform(0.70, 0.80)
         pot = clip(pot*r + random.uniform(-0.02, 0.02),
@@ -129,6 +149,7 @@ class Serve(Shot):
 
         prec_base = 0.42*j.S2 + 0.38*j.C + 0.20*j.E
         sig_prec  = 0.025 + 0.10*(1-j.C) + 0.05*(1-j.E)
+        sig_prec *= self._sm("sigma_prec_mult")
         prec = clip(np.random.normal(prec_base, sig_prec), 0.01, 1.0)
 
         # --- Ajuste por momentum ---
@@ -142,6 +163,10 @@ class Serve(Shot):
             k = self.hitter.K
             clutch_boost = 1.0 + (k - 0.5) * 0.20  # ±10 %
             prec *= clutch_boost
+
+        # --- Estrategia ---
+        pot *= self._sm("pot_mult")
+        prec *= self._sm("prec_mult")
 
         pot = clip(pot, 0.01, 1.0)
         prec = clip(prec, 0.01, 1.0)
@@ -217,6 +242,9 @@ class ReturnShot(Shot):
         # --- Momentum mejora ligeramente la capacidad de llegar ---
         m = self.receiver.Momentum / 100
         pr *= (1.0 + 0.05 * m)
+
+        # --- Estrategia: reach_mult ---
+        pr *= self._sm("reach_mult")
         pr = clip(pr, 0.02, 0.98)
 
         ok = rand() < pr
@@ -242,6 +270,10 @@ class ReturnShot(Shot):
       sigma_p = clip(0.03 + 0.04 * pot_star - 0.02 * hitter.E, 0.01, 0.10)
       sigma_r = clip(0.02 + 0.03 * prec_star - 0.01 * hitter.E, 0.01, 0.10)
 
+      # --- Estrategia: varianza ---
+      sigma_p *= self._sm("sigma_pot_mult")
+      sigma_r *= self._sm("sigma_prec_mult")
+
       pot_out = clip(np.random.normal(pot_star, sigma_p), 0.10, 0.95)
       prec_out = clip(np.random.normal(prec_star, sigma_r), 0.10, 0.97)
 
@@ -259,6 +291,10 @@ class ReturnShot(Shot):
 
       # Aplicar clutch a precisión
       prec_out *= clutch_boost
+
+      # === Estrategia: pot/prec ===
+      pot_out *= self._sm("pot_mult")
+      prec_out *= self._sm("prec_mult")
       prec_out = clip(prec_out, 0.10, 0.97)
 
       # === Probabilidad de meter la bola ===
@@ -270,6 +306,7 @@ class ReturnShot(Shot):
       p_final = clip(p_in + eps, 0.02, 0.99)
       p_final *= (1.0 + 0.10 * m)
       p_final *= clutch_boost
+      p_final *= self._sm("p_in_mult")
       p_final = clip(p_final, 0.02, 0.99)
 
       in_flag = rand() < p_final
@@ -327,6 +364,9 @@ class RallyShot(Shot):
         # --- Momentum mejora un poco la capacidad de alcanzar la bola ---
         m = self.receiver.Momentum / 100
         pr *= (1.0 + 0.05 * m)
+
+        # --- Estrategia: reach_mult ---
+        pr *= self._sm("reach_mult")
         pr = clip(pr, 0.02, 0.98)
 
         ok = rand() < pr
@@ -350,6 +390,11 @@ class RallyShot(Shot):
 
       sigma_p = clip(0.03 + 0.04 * pot_star - 0.02 * hitter.E, 0.01, 0.10)
       sigma_r = clip(0.02 + 0.03 * prec_star - 0.01 * hitter.E, 0.01, 0.10)
+
+      # --- Estrategia: varianza ---
+      sigma_p *= self._sm("sigma_pot_mult")
+      sigma_r *= self._sm("sigma_prec_mult")
+
       pot_out  = clip(np.random.normal(pot_star, sigma_p), 0.10, 0.95)
       prec_out = clip(np.random.normal(prec_star, sigma_r), 0.10, 0.97)
 
@@ -367,6 +412,10 @@ class RallyShot(Shot):
 
       # Aplicar clutch a precisión
       prec_out *= clutch_boost
+
+      # === Estrategia: pot/prec ===
+      pot_out *= self._sm("pot_mult")
+      prec_out *= self._sm("prec_mult")
       prec_out = clip(prec_out, 0.10, 0.97)
 
       # === Probabilidad final ===
@@ -379,6 +428,7 @@ class RallyShot(Shot):
 
       p_final *= (1.0 + 0.10 * m)
       p_final *= clutch_boost
+      p_final *= self._sm("p_in_mult")
       p_final = clip(p_final, 0.02, 0.99)
 
       in_flag = rand() < p_final

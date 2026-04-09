@@ -1,0 +1,304 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Modo Entrenador · Partido - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<style>
+  .score-glow { text-shadow: 0 0 8px rgba(255, 255, 0, 0.7); }
+  .set-winner { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6); }
+  .set-loser { color: #6b7280; }
+  .set-in-game { color: #4fd1c5; text-shadow: 0 0 6px rgba(79, 209, 197, 0.6); font-weight: 700; }
+  .serve-ball { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff 10%, #ffeb3b 40%, #facc15 80%); box-shadow: 0 0 8px rgba(255, 255, 0, 0.7); display: inline-block; margin-right: 18px; margin-left: -8px; vertical-align: middle; }
+  .serve-ball.off { opacity: 0; filter: blur(2px); }
+  .player-leading { color: #fbbf24 !important; text-shadow: 0 0 10px rgba(251,191,36,0.5); transition: all 0.3s; }
+  .player-trailing { color: #6b7280 !important; text-shadow: none; transition: all 0.3s; }
+  .winner-glow { color: #fbbf24 !important; text-shadow: 0 0 15px rgba(251,191,36,0.7), 0 0 30px rgba(251,191,36,0.4); animation: winner-pulse 1.5s ease-in-out infinite; }
+  @keyframes winner-pulse {
+    0%, 100% { text-shadow: 0 0 15px rgba(251,191,36,0.7), 0 0 30px rgba(251,191,36,0.4); }
+    50% { text-shadow: 0 0 25px rgba(251,191,36,0.9), 0 0 50px rgba(251,191,36,0.6); }
+  }
+
+  /* Strategy cards */
+  .strat-card { transition: all 0.3s ease; cursor: pointer; border: 2px solid rgba(59,130,246,0.2); position: relative; overflow: hidden; }
+  .strat-card:hover { transform: translateY(-3px); border-color: rgba(250,204,21,0.4); }
+  .strat-card.active { border-color: var(--strat-color); box-shadow: 0 0 20px var(--strat-glow); }
+  .strat-card.active::before { content: ''; position: absolute; inset: 0; background: var(--strat-bg); pointer-events: none; }
+  .strat-card[data-val="aggressive"] { --strat-color: #ef4444; --strat-glow: rgba(239,68,68,0.25); --strat-bg: rgba(239,68,68,0.08); }
+  .strat-card[data-val="neutral"]    { --strat-color: #3b82f6; --strat-glow: rgba(59,130,246,0.25); --strat-bg: rgba(59,130,246,0.08); }
+  .strat-card[data-val="defensive"]  { --strat-color: #22c55e; --strat-glow: rgba(34,197,94,0.25);  --strat-bg: rgba(34,197,94,0.08); }
+
+  /* Indicator bars */
+  .bar-fill { transition: width 0.5s ease-out; }
+  .bar-fill-stamina { background: linear-gradient(90deg, #ef4444, #facc15, #22c55e); }
+  .bar-fill-momentum-pos { background: linear-gradient(90deg, #3b82f6, #22c55e); }
+  .bar-fill-momentum-neg { background: linear-gradient(90deg, #ef4444, #f97316); }
+
+  /* Feed scroll */
+  .custom-scroll::-webkit-scrollbar { width: 6px; }
+  .custom-scroll::-webkit-scrollbar-track { background: rgba(15,23,42,0.4); border-radius: 8px; }
+  .custom-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #1e3a8a, #2563eb); border-radius: 8px; }
+
+  @keyframes bounce-in { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
+  .bounce-in { animation: bounce-in 0.4s ease forwards; }
+
+  @keyframes toast-in  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes toast-out { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(20px); } }
+  .toast-show { animation: toast-in .4s ease forwards; }
+  .toast-hide { animation: toast-out .4s ease forwards; }
+</style>
+{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 flex flex-col">
+
+  <!-- TÍTULO -->
+  <section class="text-center mt-8 mb-4">
+    <h2 id="match-title" class="text-3xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/></svg> Modo Entrenador</h2>
+    <p id="match-subtitle" class="text-gray-400 text-base"></p>
+  </section>
+
+  <script>
+    (function() {
+      try {
+        var cfg = JSON.parse(sessionStorage.getItem('coach_config') || '{}');
+        var title = document.getElementById('match-title');
+        var subtitle = document.getElementById('match-subtitle');
+        if (cfg.surface) title.innerHTML = '<svg class="w-8 h-8 inline-block align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/></svg> Modo Entrenador &middot; ' + cfg.surface;
+        var parts = [];
+        if (cfg.best_of) parts.push(cfg.best_of == 1 ? '1 Set' : 'Al mejor de ' + cfg.best_of + ' sets');
+        if (cfg.tiebreak !== undefined) parts.push(cfg.tiebreak ? 'Tie-Break' : 'Sin Tie-Break');
+        if (parts.length) subtitle.textContent = parts.join(' · ');
+      } catch(e) {}
+    })();
+  </script>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="flex flex-1 px-8 py-6 gap-6 items-start justify-center">
+
+    <!-- COLUMNA IZQUIERDA: Marcador + Estrategia + Indicadores -->
+    <div class="flex flex-col w-2/3 max-w-4xl items-center gap-4">
+
+      <!-- MARCADOR -->
+      <div id="scoreboard-panel" class="w-full">
+        <div id="scoreboard-grid" class="w-full bg-slate-900/50 border border-blue-800/40 rounded-2xl shadow-lg backdrop-blur-sm p-8 text-center">
+          <!-- Generado dinámicamente -->
+        </div>
+        <script>
+          (function() {
+            var cfg = JSON.parse(sessionStorage.getItem('coach_config') || '{}');
+            var numSets = parseInt(cfg.best_of, 10) || 3;
+            var grid = document.getElementById('scoreboard-grid');
+
+            var hdr = '<div class="grid text-center text-yellow-400 mb-4 text-lg uppercase tracking-wider" style="grid-template-columns: 2fr repeat(' + numSets + ', 1fr) 1fr;">';
+            hdr += '<span></span>';
+            for (var i = 1; i <= numSets; i++) hdr += '<span>Set ' + i + '</span>';
+            hdr += '<span>Puntos</span></div>';
+
+            function playerRow(pid, serveCls) {
+              var tag = pid === 'player1' ? 'p1' : 'p2';
+              var r = '<div class="grid items-center text-center py-4 border-t border-blue-800/30" id="' + pid + '-row" style="grid-template-columns: 2fr repeat(' + numSets + ', 1fr) 1fr;">';
+              r += '<div class="text-right pr-6 font-semibold text-yellow-300 flex items-center justify-end text-3xl">';
+              r += '<span id="serve-' + tag + '" class="serve-ball ' + serveCls + '"></span>';
+              r += '<span id="' + pid + '-name">Jugador</span></div>';
+              for (var s = 1; s <= numSets; s++) {
+                r += '<div id="' + tag + '-set' + s + '" class="text-4xl font-bold">' + (s === 1 ? '0' : ' ') + '</div>';
+              }
+              r += '<div id="' + tag + '-points" class="text-4xl font-extrabold text-yellow-400 score-glow">0</div>';
+              r += '</div>';
+              return r;
+            }
+
+            grid.innerHTML = hdr + playerRow('player1', '') + playerRow('player2', 'off');
+          })();
+        </script>
+      </div>
+
+      <!-- PANEL DE ESTRATEGIA -->
+      <div id="strategy-panel" class="w-full bg-slate-900/50 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-semibold text-yellow-400 uppercase tracking-wider flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Estrategia para <span id="coached-name" class="text-gray-200">—</span>
+          </h3>
+          <span id="strategy-badge" class="text-xs font-mono px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">neutral</span>
+        </div>
+        <div class="grid grid-cols-3 gap-4" id="strat-cards">
+          <button data-val="aggressive" class="strat-card rounded-xl p-4 text-center relative z-10">
+            <div class="mb-2 flex justify-center"><svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg></div>
+            <p class="text-sm font-bold text-red-400">Agresiva</p>
+            <p class="text-[11px] text-gray-500 mt-1">+Potencia, −Precisión</p>
+          </button>
+          <button data-val="neutral" class="strat-card rounded-xl p-4 text-center active relative z-10">
+            <div class="mb-2 flex justify-center"><svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg></div>
+            <p class="text-sm font-bold text-blue-400">Neutral</p>
+            <p class="text-[11px] text-gray-500 mt-1">Equilibrado</p>
+          </button>
+          <button data-val="defensive" class="strat-card rounded-xl p-4 text-center relative z-10">
+            <div class="mb-2 flex justify-center"><svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+            <p class="text-sm font-bold text-green-400">Defensiva</p>
+            <p class="text-[11px] text-gray-500 mt-1">+Precisión, −Potencia</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- INDICADORES: Stamina + Momentum -->
+      <div class="w-full grid grid-cols-2 gap-4">
+        <!-- Estamina -->
+        <div class="bg-slate-900/50 border border-blue-800/30 rounded-xl p-4">
+          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Estamina</h4>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs text-gray-400 mb-1">
+                <span id="stam-p1-name" class="text-blue-400 font-medium">P1</span>
+                <span id="stam-p1-val" class="text-gray-300">100%</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-700/50 rounded-full overflow-hidden">
+                <div id="stam-p1-bar" class="bar-fill bar-fill-stamina h-full rounded-full" style="width: 100%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs text-gray-400 mb-1">
+                <span id="stam-p2-name" class="text-amber-400 font-medium">P2</span>
+                <span id="stam-p2-val" class="text-gray-300">100%</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-700/50 rounded-full overflow-hidden">
+                <div id="stam-p2-bar" class="bar-fill bar-fill-stamina h-full rounded-full" style="width: 100%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Momentum -->
+        <div class="bg-slate-900/50 border border-blue-800/30 rounded-xl p-4">
+          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Momentum</h4>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs text-gray-400 mb-1">
+                <span id="mom-p1-name" class="text-blue-400 font-medium">P1</span>
+                <span id="mom-p1-val" class="text-gray-300">0</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-700/50 rounded-full overflow-hidden">
+                <div id="mom-p1-bar" class="bar-fill h-full rounded-full bg-blue-500" style="width: 50%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs text-gray-400 mb-1">
+                <span id="mom-p2-name" class="text-amber-400 font-medium">P2</span>
+                <span id="mom-p2-val" class="text-gray-300">0</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-700/50 rounded-full overflow-hidden">
+                <div id="mom-p2-bar" class="bar-fill h-full rounded-full bg-amber-500" style="width: 50%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTROLES DE REPRODUCCIÓN -->
+      <div class="w-full bg-slate-900/50 border border-blue-800/30 rounded-xl p-4">
+        <div class="flex items-center justify-center gap-3">
+          <!-- Punto manual -->
+          <button id="btn-play-point" title="Jugar siguiente punto"
+                  class="w-12 h-12 flex items-center justify-center bg-gradient-to-b from-yellow-400 to-amber-500 text-black font-bold rounded-full shadow-lg shadow-yellow-400/20 hover:scale-105 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+            </svg>
+          </button>
+
+          <!-- Separador -->
+          <div class="w-px h-8 bg-blue-800/40"></div>
+
+          <!-- Auto-play toggle -->
+          <button id="btn-autoplay" title="Reproducción automática"
+                  class="w-12 h-12 flex items-center justify-center border-2 border-yellow-400/40 text-yellow-400 font-bold rounded-full hover:bg-yellow-400/10 transition">
+            <svg id="icon-autoplay" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+
+          <!-- Velocidad -->
+          <div class="flex items-center gap-1 ml-1">
+            <button data-speed="1" class="coach-speed-btn text-xs px-2.5 py-1.5 rounded-lg border border-yellow-400/30 bg-yellow-400 text-slate-900 font-bold transition hover:bg-yellow-400/90">x1</button>
+            <button data-speed="2" class="coach-speed-btn text-xs px-2.5 py-1.5 rounded-lg border border-yellow-400/30 text-yellow-300 font-bold transition hover:bg-yellow-400/10">x2</button>
+            <button data-speed="4" class="coach-speed-btn text-xs px-2.5 py-1.5 rounded-lg border border-yellow-400/30 text-yellow-300 font-bold transition hover:bg-yellow-400/10">x4</button>
+            <button data-speed="8" class="coach-speed-btn text-xs px-2.5 py-1.5 rounded-lg border border-yellow-400/30 text-yellow-300 font-bold transition hover:bg-yellow-400/10">x8</button>
+          </div>
+
+          <!-- Separador -->
+          <div class="w-px h-8 bg-blue-800/40"></div>
+
+          <!-- Simular resto -->
+          <button id="btn-auto-finish" title="Simular resto del partido"
+                  class="px-5 py-2 border border-yellow-400/40 text-yellow-400 font-semibold rounded-full hover:bg-yellow-400/10 transition text-sm hidden">
+            <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg> Simular Resto
+          </button>
+
+          <!-- Contador -->
+          <span id="point-counter" class="text-xs text-yellow-300 font-semibold ml-2">Punto 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: Feed de puntos -->
+    <div class="flex-1 flex flex-col gap-4">
+      <!-- Último punto -->
+      <div id="last-point-card" class="bg-slate-900/50 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-5 hidden">
+        <h3 class="text-sm font-semibold text-yellow-400 uppercase tracking-wider mb-3">Último Punto</h3>
+        <div id="last-point-content" class="text-sm text-gray-300 space-y-1 font-mono"></div>
+      </div>
+
+      <!-- Historial de puntos -->
+      <div class="bg-slate-900/50 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-5 flex-1">
+        <h3 class="text-sm font-semibold text-yellow-400 uppercase tracking-wider mb-3">Historial de Puntos</h3>
+        <div id="points-feed" class="h-[420px] overflow-y-auto custom-scroll px-2 py-1 bg-slate-950/30 rounded-lg border border-blue-800/20">
+          <ul id="points-list" class="space-y-1.5 text-sm text-gray-300 font-mono"></ul>
+        </div>
+      </div>
+
+      <!-- Racha -->
+      <div class="bg-slate-900/50 border border-blue-800/30 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Racha Actual</span>
+          <span id="streak-display" class="text-lg font-bold text-yellow-400">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA POST-PARTIDO -->
+  <section id="post-match-bar" class="w-full px-8 pb-10 hidden">
+    <div class="bg-slate-900/50 border border-yellow-400/30 rounded-2xl shadow-lg backdrop-blur-sm p-8 flex flex-col items-center gap-4">
+      <div class="text-center">
+        <p class="text-3xl font-bold text-yellow-400 mb-2 flex items-center justify-center gap-2" id="final-winner-text"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg> ¡Partido Terminado!</p>
+        <p id="final-score-text" class="text-gray-400 text-lg"></p>
+      </div>
+      <div class="flex flex-wrap gap-4 justify-center mt-2">
+        <a href="/modo-entrenador"
+           class="inline-flex items-center gap-2 px-6 py-2.5 bg-yellow-400/10 border border-yellow-400/40 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-400/20 transition text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          Nuevo Entrenamiento
+        </a>
+        <a href="/menu"
+           class="inline-flex items-center gap-2 px-6 py-2.5 border border-blue-500/40 text-blue-400 font-semibold rounded-lg hover:bg-blue-500/10 transition text-sm">
+          Volver al Menú
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl"></div>
+{% endblock %}
+
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="/static/js/entrenador/match.js"></script>
+{% endblock %}

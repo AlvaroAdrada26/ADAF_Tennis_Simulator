@@ -20,12 +20,17 @@ from .utils import SACADOR, RESTADOR
 
 
 class PointSimulator:
-    def __init__(self, server: Player, returner: Player, clutch: bool = False, tags: Optional[Dict[str, str]] = None):
+    def __init__(self, server: Player, returner: Player, clutch: bool = False,
+                 tags: Optional[Dict[str, str]] = None,
+                 server_strategy: Optional[Dict[str, float]] = None,
+                 returner_strategy: Optional[Dict[str, float]] = None):
         self.S = server
         self.R = returner
         self.clutch = clutch
         self.tags = tags or {"SACADOR": "P1", "RESTADOR": "P2"}
         self.actions: List[Dict] = []
+        self.server_strategy = server_strategy
+        self.returner_strategy = returner_strategy
 
 
     def simulate(self, verbose: bool = True) -> PointResult:
@@ -47,7 +52,7 @@ class PointSimulator:
         # ============================================================
         # SAQUE
         # ============================================================
-        srv = Serve(self.S, self.R, feed, clutch=self.clutch)
+        srv = Serve(self.S, self.R, feed, clutch=self.clutch, strategy=self.server_strategy)
         ball, slog = srv.serve_sequence()
 
         # Registrar primer saque
@@ -97,7 +102,7 @@ class PointSimulator:
         # ============================================================
         # RESTO
         # ============================================================
-        ret = ReturnShot(self.S, self.R, feed, clutch=self.clutch)
+        ret = ReturnShot(self.S, self.R, feed, clutch=self.clutch, strategy=self.returner_strategy)
         ok, pr_reach = ret.attempt_reach(ball, isFirst)
 
         # --- Intento de alcanzar saque ---
@@ -153,10 +158,12 @@ class PointSimulator:
 
             if ball.by in (SACADOR, "RALLY_S"):
                 hitter_obj, other_obj, tag_prev = self.R, self.S, SACADOR
+                hitter_strategy = self.returner_strategy
             else:
                 hitter_obj, other_obj, tag_prev = self.S, self.R, RESTADOR
+                hitter_strategy = self.server_strategy
 
-            rally = RallyShot(hitter_obj, other_obj, feed, clutch=self.clutch)
+            rally = RallyShot(hitter_obj, other_obj, feed, clutch=self.clutch, strategy=hitter_strategy)
             ok, pr = rally.attempt_reach(ball)
 
             # --- Intento de alcanzar durante rally ---
