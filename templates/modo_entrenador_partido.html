@@ -45,6 +45,12 @@
   @keyframes toast-out { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(20px); } }
   .toast-show { animation: toast-in .4s ease forwards; }
   .toast-hide { animation: toast-out .4s ease forwards; }
+
+  /* Help panel */
+  .help-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; }
+  .help-card { background: linear-gradient(145deg, #0f172a, #1e293b); border: 1px solid rgba(250,204,21,0.3); border-radius: 1.5rem; max-width: 560px; width: 90%; padding: 2rem; box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 40px rgba(250,204,21,0.08); position: relative; max-height: 85vh; overflow-y: auto; }
+  @keyframes help-in { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .help-animate { animation: help-in 0.35s ease forwards; }
 </style>
 {% endblock %}
 
@@ -59,6 +65,10 @@
   <section class="text-center mt-8 mb-4">
     <h2 id="match-title" class="text-3xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/></svg> Modo Entrenador</h2>
     <p id="match-subtitle" class="text-gray-400 text-base"></p>
+    <button id="btn-match-help" class="mt-2 inline-flex items-center gap-1.5 px-4 py-1.5 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 font-medium rounded-full hover:bg-yellow-400/20 transition text-xs">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Ayuda
+    </button>
   </section>
 
   <script>
@@ -290,6 +300,93 @@
     </div>
   </section>
 </div>
+
+<!-- Help Modal -->
+<div id="help-overlay" class="help-overlay hidden">
+  <div class="help-card help-animate">
+    <button id="help-close" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-yellow-400 hover:bg-yellow-400/10 transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <h3 class="text-xl font-bold text-yellow-400 mb-4 flex items-center gap-2">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Guía Rápida
+    </h3>
+    <div class="space-y-4 text-sm">
+      <div class="bg-slate-800/60 rounded-xl p-4 border border-blue-800/20">
+        <h4 class="font-bold text-red-400 mb-1.5 flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Estrategias
+        </h4>
+        <ul class="space-y-1 text-gray-400">
+          <li><span class="text-red-400 font-semibold">🔥 Agresiva:</span> +12% Potencia, -4% Precisión, -3% P. de meter. Más winners y más errores.</li>
+          <li><span class="text-blue-400 font-semibold">⚖️ Neutral:</span> Sin modificadores. Juego equilibrado.</li>
+          <li><span class="text-green-400 font-semibold">🛡️ Defensiva:</span> -8% Potencia, +2% Precisión, +1.5% P. de meter. Más consistente.</li>
+        </ul>
+        <p class="text-gray-500 text-xs mt-2">Haz clic en una tarjeta de estrategia para cambiarla. Se aplica al siguiente punto.</p>
+      </div>
+
+      <div class="bg-slate-800/60 rounded-xl p-4 border border-blue-800/20">
+        <h4 class="font-bold text-amber-400 mb-1.5 flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Controles
+        </h4>
+        <ul class="space-y-1 text-gray-400">
+          <li><strong class="text-yellow-400">⏩</strong> Jugar un punto manualmente</li>
+          <li><strong class="text-gray-200">▶ / ⏸</strong> Activar/pausar reproducción automática</li>
+          <li><strong class="text-gray-200">x1 x2 x4 x8</strong> Velocidad del autoplay</li>
+          <li><strong class="text-gray-200">Simular Resto</strong> Completa todo el partido de golpe (aparece tras 10 puntos)</li>
+        </ul>
+      </div>
+
+      <div class="bg-slate-800/60 rounded-xl p-4 border border-blue-800/20">
+        <h4 class="font-bold text-cyan-400 mb-1.5 flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Indicadores
+        </h4>
+        <ul class="space-y-1 text-gray-400">
+          <li><strong class="text-gray-200">Estamina</strong> (0-100%): Baja con rallies largos, se recupera entre juegos y sets</li>
+          <li><strong class="text-gray-200">Momentum</strong> (-50 a +50): Sube con rachas de puntos ganados. Azul/verde = positivo, Rojo = negativo</li>
+          <li><strong class="text-gray-200">Racha</strong>: Muestra puntos consecutivos ganados (🔥 cuando lleva 2+)</li>
+        </ul>
+      </div>
+
+      <div class="bg-slate-800/60 rounded-xl p-4 border border-blue-800/20">
+        <h4 class="font-bold text-purple-400 mb-1.5 flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          Consejos
+        </h4>
+        <ul class="space-y-1 text-gray-400">
+          <li>Usa <span class="text-red-400">Agresiva</span> cuando necesites recuperar un break o en puntos de break a favor</li>
+          <li>Usa <span class="text-green-400">Defensiva</span> cuando tu jugador tenga poca estamina o para consolidar un break</li>
+          <li>Observa el momentum: si tu oponente tiene una racha, cambiar de estrategia puede cortar su ritmo</li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-4 text-center">
+      <button id="help-got-it" class="px-6 py-2 text-sm font-bold text-black bg-yellow-400 hover:bg-yellow-500 rounded-lg transition shadow-lg shadow-yellow-400/20">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var overlay = document.getElementById('help-overlay');
+  var btnOpen = document.getElementById('btn-match-help');
+  var btnClose = document.getElementById('help-close');
+  var btnGotIt = document.getElementById('help-got-it');
+
+  function open() { overlay.classList.remove('hidden'); }
+  function close() { overlay.classList.add('hidden'); }
+
+  btnOpen.addEventListener('click', open);
+  btnClose.addEventListener('click', close);
+  btnGotIt.addEventListener('click', close);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', function(e) {
+    if (!overlay.classList.contains('hidden') && e.key === 'Escape') close();
+  });
+})();
+</script>
 
 <!-- Toast -->
 <div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl"></div>
