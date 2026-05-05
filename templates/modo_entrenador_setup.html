@@ -42,6 +42,16 @@
   .custom-scroll::-webkit-scrollbar { width: 6px; }
   .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.4); border-radius: 8px; }
   .custom-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #1e3a8a, #2563eb); border-radius: 8px; }
+
+  /* Tutorial modal */
+  .tutorial-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; }
+  .tutorial-card { background: linear-gradient(145deg, #0f172a, #1e293b); border: 1px solid rgba(250,204,21,0.3); border-radius: 1.5rem; max-width: 640px; width: 90%; padding: 2.5rem; box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 40px rgba(250,204,21,0.08); position: relative; }
+  .tutorial-step-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; }
+  .tutorial-dots { display: flex; gap: 8px; justify-content: center; margin-top: 1.5rem; }
+  .tutorial-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(250,204,21,0.2); transition: all 0.3s; }
+  .tutorial-dot.active { background: #facc15; box-shadow: 0 0 8px rgba(250,204,21,0.5); }
+  @keyframes tutorial-in { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .tutorial-animate { animation: tutorial-in 0.35s ease forwards; }
 </style>
 {% endblock %}
 
@@ -56,6 +66,10 @@
   <div class="text-center">
     <h1 class="text-4xl font-bold text-yellow-400 mb-2 flex items-center justify-center gap-2"><svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/></svg> Modo Entrenador</h1>
     <p class="text-gray-400 text-lg">Elige dos jugadores, selecciona a quién entrenar y dirige su estrategia durante el partido.</p>
+    <button id="btn-tutorial" class="mt-3 inline-flex items-center gap-2 px-5 py-2 bg-yellow-400/10 border border-yellow-400/40 text-yellow-400 font-semibold rounded-full hover:bg-yellow-400/20 transition text-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Guía del Modo Entrenador
+    </button>
   </div>
 
   <!-- Estado: NO logueado -->
@@ -218,6 +232,135 @@
 
 <!-- Toast -->
 <div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl"></div>
+
+<!-- TUTORIAL MODAL -->
+<div id="tutorial-overlay" class="tutorial-overlay hidden">
+  <div class="tutorial-card tutorial-animate">
+    <button id="tutorial-close" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-yellow-400 hover:bg-yellow-400/10 transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+    <div id="tutorial-body"></div>
+    <div class="tutorial-dots" id="tutorial-dots"></div>
+    <div class="flex justify-between items-center mt-5">
+      <button id="tutorial-prev" class="px-4 py-2 text-sm font-semibold text-gray-400 hover:text-yellow-400 transition rounded-lg hover:bg-yellow-400/10 disabled:opacity-30 disabled:cursor-not-allowed">
+        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>Anterior
+      </button>
+      <span id="tutorial-counter" class="text-xs text-gray-500"></span>
+      <button id="tutorial-next" class="px-5 py-2 text-sm font-bold text-black bg-yellow-400 hover:bg-yellow-500 rounded-lg transition shadow-lg shadow-yellow-400/20">
+        Siguiente<svg class="w-4 h-4 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var steps = [
+    {
+      icon: '<svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/></svg>',
+      iconBg: 'bg-yellow-400/20',
+      title: '¿Qué es el Modo Entrenador?',
+      body: 'En este modo te conviertes en el <strong class="text-yellow-400">entrenador</strong> de un jugador. Controlas su estrategia táctica punto a punto mientras se simula un partido completo. Decide cuándo ser agresivo, defensivo o mantener el equilibrio según cómo evolucione el marcador.'
+    },
+    {
+      icon: '<svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>',
+      iconBg: 'bg-blue-400/20',
+      title: 'Paso 1: Selecciona dos jugadores',
+      body: 'Elige un jugador en cada columna (<strong class="text-blue-400">Jugador 1</strong> y <strong class="text-amber-400">Jugador 2</strong>). Cada carta muestra los <strong class="text-gray-200">9 atributos</strong> del jugador y su rating general. No puedes seleccionar el mismo jugador en ambos lados.'
+    },
+    {
+      icon: '<svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>',
+      iconBg: 'bg-green-400/20',
+      title: 'Paso 2: Elige a quién entrenar',
+      body: 'Una vez seleccionados los dos jugadores, aparecerá la sección <strong class="text-yellow-400">"¿A quién quieres entrenar?"</strong>. Haz clic en el jugador que dirigirás. Este será el jugador al que podrás cambiarle la estrategia durante el partido.'
+    },
+    {
+      icon: '<svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>',
+      iconBg: 'bg-purple-400/20',
+      title: 'Paso 3: Configura el partido',
+      body: 'Ajusta las opciones del partido:<ul class="mt-2 space-y-1 text-sm text-gray-400"><li><strong class="text-gray-200">Formato:</strong> 1 Set, Mejor de 3 o Mejor de 5</li><li><strong class="text-gray-200">Superficie:</strong> Dura, Tierra o Hierba (visual)</li><li><strong class="text-gray-200">Tiebreak:</strong> Activa o desactiva el tiebreak en el último set</li></ul>'
+    },
+    {
+      icon: '<svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
+      iconBg: 'bg-red-400/20',
+      title: 'Durante el partido: Estrategias',
+      body: 'Tendrás <strong class="text-gray-200">3 estrategias</strong> disponibles:<ul class="mt-2 space-y-1.5 text-sm"><li><span class="text-red-400 font-bold">🔥 Agresiva:</span> <span class="text-gray-400">+Potencia, -Precisión. Más winners pero más errores.</span></li><li><span class="text-blue-400 font-bold">⚖️ Neutral:</span> <span class="text-gray-400">Equilibrada. Sin modificadores.</span></li><li><span class="text-green-400 font-bold">🛡️ Defensiva:</span> <span class="text-gray-400">+Precisión, -Potencia. Más consistente pero menos agresivo.</span></li></ul><p class="mt-2 text-gray-500 text-xs">Puedes cambiar de estrategia entre punto y punto.</p>'
+    },
+    {
+      icon: '<svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>',
+      iconBg: 'bg-cyan-400/20',
+      title: 'Indicadores en tiempo real',
+      body: 'Durante el partido verás:<ul class="mt-2 space-y-1.5 text-sm text-gray-400"><li><strong class="text-gray-200">Marcador:</strong> Sets, games y puntos actualizados en tiempo real</li><li><strong class="text-gray-200">Estamina:</strong> La energía de cada jugador (baja con rallies largos, se recupera entre juegos)</li><li><strong class="text-gray-200">Momentum:</strong> El impulso anímico (-50 a +50). Las rachas lo aumentan</li><li><strong class="text-gray-200">Historial:</strong> Feed con todos los puntos jugados y sus detalles</li><li><strong class="text-gray-200">Racha:</strong> Muestra puntos consecutivos ganados por un jugador</li></ul>'
+    },
+    {
+      icon: '<svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+      iconBg: 'bg-amber-400/20',
+      title: 'Controles del partido',
+      body: '<ul class="space-y-1.5 text-sm text-gray-400"><li><strong class="text-yellow-400">⏩ Jugar punto:</strong> Simula un punto manualmente</li><li><strong class="text-gray-200">▶ Autoplay:</strong> Reproduce puntos automáticamente</li><li><strong class="text-gray-200">x1/x2/x4/x8:</strong> Ajusta la velocidad del autoplay</li><li><strong class="text-gray-200">Simular Resto:</strong> Completa el partido de golpe (aparece tras 10 puntos)</li></ul><p class="mt-3 text-gray-500 text-xs">Al finalizar el partido verás el ganador y los resultados por sets.</p>'
+    }
+  ];
+
+  var current = 0;
+  var overlay = document.getElementById('tutorial-overlay');
+  var body = document.getElementById('tutorial-body');
+  var dots = document.getElementById('tutorial-dots');
+  var counter = document.getElementById('tutorial-counter');
+  var btnPrev = document.getElementById('tutorial-prev');
+  var btnNext = document.getElementById('tutorial-next');
+  var btnClose = document.getElementById('tutorial-close');
+  var btnOpen = document.getElementById('btn-tutorial');
+
+  function render() {
+    var s = steps[current];
+    body.innerHTML =
+      '<div class="tutorial-step-icon ' + s.iconBg + '">' + s.icon + '</div>' +
+      '<h3 class="text-xl font-bold text-gray-100 text-center mb-3">' + s.title + '</h3>' +
+      '<div class="text-gray-300 text-sm leading-relaxed text-center">' + s.body + '</div>';
+
+    dots.innerHTML = '';
+    for (var i = 0; i < steps.length; i++) {
+      dots.innerHTML += '<span class="tutorial-dot' + (i === current ? ' active' : '') + '" data-idx="' + i + '"></span>';
+    }
+    counter.textContent = (current + 1) + ' / ' + steps.length;
+    btnPrev.disabled = current === 0;
+    btnNext.textContent = current === steps.length - 1 ? '¡Empezar!' : 'Siguiente';
+    if (current < steps.length - 1) {
+      btnNext.innerHTML = 'Siguiente<svg class="w-4 h-4 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>';
+    } else {
+      btnNext.innerHTML = '<svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>¡Entendido!';
+    }
+
+    // dot click navigation
+    dots.querySelectorAll('.tutorial-dot').forEach(function(d) {
+      d.addEventListener('click', function() {
+        current = parseInt(d.dataset.idx, 10);
+        render();
+      });
+      d.style.cursor = 'pointer';
+    });
+  }
+
+  function open() { overlay.classList.remove('hidden'); current = 0; render(); }
+  function close() { overlay.classList.add('hidden'); }
+
+  btnOpen.addEventListener('click', open);
+  btnClose.addEventListener('click', close);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+  btnPrev.addEventListener('click', function() { if (current > 0) { current--; render(); } });
+  btnNext.addEventListener('click', function() {
+    if (current < steps.length - 1) { current++; render(); }
+    else close();
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (overlay.classList.contains('hidden')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowRight' || e.key === 'Enter') { if (current < steps.length - 1) { current++; render(); } else close(); }
+    if (e.key === 'ArrowLeft') { if (current > 0) { current--; render(); } }
+  });
+})();
+</script>
 {% endblock %}
 
 {% block scripts %}
