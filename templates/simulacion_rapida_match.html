@@ -1,0 +1,272 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Simulación Rápida - {{ match_name }} - ADAF Tennis Simulator{% endblock %}
+
+{% block head_extra %}
+<style>
+  /* Estilos básicos de simulación */
+  .player-card {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+    border: 2px solid rgba(250, 204, 21, 0.2);
+    padding: 2rem;
+    border-radius: 1rem;
+    text-align: center;
+  }
+  .player-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fbbf24;
+    margin-bottom: 0.5rem;
+  }
+  .player-stat {
+    font-size: 0.875rem;
+    color: #d1d5db;
+    margin: 0.25rem 0;
+  }
+  .stat-bar {
+    background: rgba(31, 41, 55, 0.6);
+    border-radius: 0.25rem;
+    height: 0.25rem;
+    margin: 0.5rem 0;
+    overflow: hidden;
+  }
+  .stat-fill {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    height: 100%;
+    border-radius: 0.25rem;
+  }
+  
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  .fade-in { animation: fade-in 0.5s ease-in; }
+  
+  .vs-badge {
+    background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #000;
+    font-size: 1.25rem;
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+  }
+</style>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+{% block sidebar_script %}{% endblock %}
+{% block main_class %}ml-0{% endblock %}
+
+{% block header %}
+<header class="w-full flex justify-between items-center px-10 py-4 bg-slate-950/40 backdrop-blur-sm border-b border-blue-800/30">
+  <a href="/" class="text-xl font-semibold text-yellow-400 tracking-wide hover:text-yellow-300 transition">
+    ADAF Tennis Simulator
+  </a>
+  <div class="flex items-center space-x-6">
+    <a href="/simulacion-rapida" class="text-gray-400 hover:text-yellow-400 transition text-sm">← Volver</a>
+  </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col items-center justify-center px-6 py-12">
+
+  <!-- Loading state -->
+  <div id="loading-state" class="text-center">
+    <svg class="animate-spin w-12 h-12 text-yellow-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+    <p class="text-gray-400">Cargando datos del partido...</p>
+  </div>
+
+  <!-- Match info -->
+  <div id="match-info" class="hidden text-center mb-12 fade-in">
+    <h1 id="match-title" class="text-5xl font-bold text-yellow-400 mb-4"></h1>
+    <p id="match-desc" class="text-gray-400 text-lg max-w-2xl"></p>
+  </div>
+
+  <!-- Players setup -->
+  <div id="players-section" class="hidden max-w-4xl w-full fade-in">
+    <div class="flex items-center justify-between gap-8 mb-12">
+      <!-- Player 1 -->
+      <div class="flex-1">
+        <div class="player-card">
+          <div class="player-name" id="p1-name"></div>
+          <div class="grid grid-cols-2 gap-4 mt-4 text-left">
+            <div>
+              <div class="player-stat text-xs text-gray-500">PRIMER SAQUE</div>
+              <div class="text-2xl font-bold text-yellow-400" id="p1-ps">-</div>
+            </div>
+            <div>
+              <div class="player-stat text-xs text-gray-500">DERECHA</div>
+              <div class="text-2xl font-bold text-yellow-400" id="p1-dr">-</div>
+            </div>
+            <div>
+              <div class="player-stat text-xs text-gray-500">FÍSICO</div>
+              <div class="text-2xl font-bold text-yellow-400" id="p1-fis">-</div>
+            </div>
+            <div>
+              <div class="player-stat text-xs text-gray-500">CLUTCH</div>
+              <div class="text-2xl font-bold text-yellow-400" id="p1-clc">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VS -->
+      <div class="flex flex-col items-center gap-4">
+        <div class="vs-badge">VS</div>
+        <div class="text-center">
+          <label class="text-gray-500 text-xs uppercase tracking-wider">Formato</label>
+          <select id="format-select" class="mt-2 px-4 py-2 bg-slate-900 border border-blue-800/30 rounded text-yellow-400 font-semibold">
+            <option value="1">1 Set</option>
+            <option value="3" selected>Mejor de 3</option>
+            <option value="5">Mejor de 5</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Player 2 -->
+      <div class="flex-1">
+        <div class="player-card">
+          <div class="player-name" id="p2-name"></div>
+          <div class="grid grid-cols-2 gap-4 mt-4 text-left">
+            <div>
+              <div class="player-stat text-xs text-gray-500">PRIMER SAQUE</div>
+              <div class="text-2xl font-bold text-yellow-400" id="p2-ps">-</div>
+            </div>
+            <div>
+              <div class="player-stat text-xs text-gray-500">DERECHA</div>
+              <div class="text-2xl font-bold text-yellow-400" id="p2-dr">-</div>
+            </div>
+            <div>
+              <div class="player-stat text-xs text-gray-500">FÍSICO</div>
+              <div class="text-2xl font-bold text-yellow-400" id="p2-fis">-</div>
+            </div>
+            <div>
+              <div class="player-stat text-xs text-gray-500">CLUTCH</div>
+              <div class="text-2xl font-bold text-yellow-400" id="p2-clc">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simulate button -->
+    <div class="text-center">
+      <button id="simulate-btn" class="px-12 py-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-full text-lg transition shadow-lg shadow-yellow-400/20">
+        🎾 Simular Partido
+      </button>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div id="error-state" class="hidden text-center text-red-400">
+    <p id="error-msg"></p>
+    <a href="/simulacion-rapida" class="text-yellow-400 hover:text-yellow-300 mt-4 inline-block">Volver a seleccionar</a>
+  </div>
+
+</main>
+
+{% include "partials/footer_simple.html" %}
+
+<script>
+(async function() {
+  'use strict';
+  
+  const matchName = '{{ match_name }}'.toLowerCase();
+  
+  try {
+    // Cargar datos del partido
+    const res = await fetch(`/api/quick-matches/${matchName}`);
+    if (!res.ok) {
+      throw new Error(`Partido no encontrado: ${matchName}`);
+    }
+    
+    const data = await res.json();
+    
+    // Ocultar loading
+    document.getElementById('loading-state').classList.add('hidden');
+    
+    // Mostrar info
+    document.getElementById('match-title').textContent = data.display_name;
+    document.getElementById('match-desc').textContent = data.description;
+    document.getElementById('match-info').classList.remove('hidden');
+    
+    // Llenar datos de jugadores
+    const p1 = data.player1;
+    const p2 = data.player2;
+    
+    document.getElementById('p1-name').textContent = p1.name;
+    document.getElementById('p1-ps').textContent = p1.Primer_Saque;
+    document.getElementById('p1-dr').textContent = p1.Derecha;
+    document.getElementById('p1-fis').textContent = p1.Fisico;
+    document.getElementById('p1-clc').textContent = p1.Clutch;
+    
+    document.getElementById('p2-name').textContent = p2.name;
+    document.getElementById('p2-ps').textContent = p2.Primer_Saque;
+    document.getElementById('p2-dr').textContent = p2.Derecha;
+    document.getElementById('p2-fis').textContent = p2.Fisico;
+    document.getElementById('p2-clc').textContent = p2.Clutch;
+    
+    // Mostrar sección de jugadores
+    document.getElementById('players-section').classList.remove('hidden');
+    
+    // Botón simular
+    document.getElementById('simulate-btn').addEventListener('click', async function() {
+      const btn = this;
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '⏳ Simulando...';
+      
+      try {
+        const formatSelect = document.getElementById('format-select');
+        const sets = parseInt(formatSelect.value, 10);
+        
+        // Llamar a la API de simulación
+        const simRes = await fetch('/api/simulate_match', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            player1: p1,
+            player2: p2,
+            config: {
+              best_of: sets,
+              tiebreak: true,
+              superficie: 'Dura'
+            }
+          })
+        });
+        
+        if (!simRes.ok) {
+          throw new Error('Error en la simulación');
+        }
+        
+        const result = await simRes.json();
+        sessionStorage.setItem('match_result', JSON.stringify(result));
+        sessionStorage.setItem('match_config', JSON.stringify({
+          surface: 'Dura',
+          best_of: sets,
+          tiebreak: true,
+          player1_name: p1.name,
+          player2_name: p2.name
+        }));
+        
+        window.location.href = '/simulacion2';
+      } catch (err) {
+        alert('Error: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    });
+    
+  } catch (err) {
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('error-state').classList.remove('hidden');
+    document.getElementById('error-msg').textContent = '❌ ' + err.message;
+  }
+})();
+</script>
