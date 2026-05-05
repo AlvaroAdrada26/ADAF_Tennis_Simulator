@@ -1,6 +1,6 @@
 # backend/simulator/strategy.py
 """
-Constantes de estrategia táctica para el Modo Entrenador.
+Constantes de estrategia táctica para el Modo Estratégico.
 
 Cada estrategia define multiplicadores que se aplican DESPUÉS de los cálculos
 base de las fórmulas de golpes (Serve, ReturnShot, RallyShot).

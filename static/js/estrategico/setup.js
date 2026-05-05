@@ -1,7 +1,7 @@
 /**
- * static/js/entrenador/setup.js
- * Lógica de la página de configuración del Modo Entrenador.
- * Selección de jugadores, jugador entrenado, config del partido y POST /api/coach/start.
+ * static/js/estrategico/setup.js
+ * Lógica de la página de configuración del Modo Estratégico.
+ * Selección de jugadores, jugador entrenado, config del partido y POST /api/estrategico/start.
  */
 
 document.addEventListener('auth:ready', function (e) {
@@ -290,7 +290,7 @@ document.addEventListener('auth:ready', function (e) {
       const headers = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = 'Bearer ' + token;
 
-      const res = await fetch('/api/coach/start', {
+      const res = await fetch('/api/estrategico/start', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
@@ -303,15 +303,15 @@ document.addEventListener('auth:ready', function (e) {
 
       if (!res.ok) {
         const errData = await res.json().catch(function () { return {}; });
-        showToast(errData.detail || 'Error al iniciar sesión de entrenador', true);
+        showToast(errData.detail || 'Error al iniciar sesión de Modo Estratégico', true);
         return;
       }
 
       const data = await res.json();
 
       // Guardar datos en sessionStorage para la página del partido
-      sessionStorage.setItem('coach_session_id', data.session_id);
-      sessionStorage.setItem('coach_config', JSON.stringify({
+      sessionStorage.setItem('estrategico_session_id', data.session_id);
+      sessionStorage.setItem('estrategico_config', JSON.stringify({
         coached_player: coached,
         surface: surf,
         best_of: sets,
@@ -322,7 +322,7 @@ document.addEventListener('auth:ready', function (e) {
         db_player2_id: sel2.id,
       }));
 
-      window.location.href = '/modo-entrenador/partido';
+      window.location.href = '/modo-estrategico/partido';
 
     } catch (_err) {
       showToast('Error de conexión. Inténtalo de nuevo.', true);

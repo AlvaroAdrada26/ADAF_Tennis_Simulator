@@ -1,5 +1,5 @@
-# backend/app/coach/routes.py
-"""Endpoints del Modo Entrenador (/api/coach/*)."""
+# backend/app/estrategico/routes.py
+"""Endpoints del Modo Estratégico (/api/estrategico/*)."""
 
 from __future__ import annotations
 import uuid
@@ -13,17 +13,17 @@ from backend.simulator.point import PointSimulator
 from backend.simulator.scorekeeper import MatchScorekeeper
 from backend.simulator.strategy import STRATEGY_MODIFIERS, VALID_STRATEGIES, get_modifiers
 
-from .models import CoachSession
+from .models import EstrategicoSession
 from .store import get_session, create_session, delete_session, cleanup_expired
 from .schemas import (
-    CoachStartRequest,
-    CoachNextPointRequest,
-    CoachSetStrategyRequest,
-    CoachEndRequest,
-    CoachSaveRequest,
+    EstrategicoStartRequest,
+    EstrategicoNextPointRequest,
+    EstrategicoSetStrategyRequest,
+    EstrategicoEndRequest,
+    EstrategicoSaveRequest,
 )
 
-router = APIRouter(prefix="/coach", tags=["coach"])
+router = APIRouter(prefix="/estrategico", tags=["estrategico"])
 
 
 # ── helpers ───────────────────────────────────────────────
@@ -50,10 +50,10 @@ def _build_score_response(sk: MatchScorekeeper) -> Dict[str, Any]:
 
 
 # ──────────────────────────────────────────────────────────
-# POST /api/coach/start
+# POST /api/estrategico/start
 # ──────────────────────────────────────────────────────────
 @router.post("/start")
-def coach_start(req: CoachStartRequest):
+def estrategico_start(req: EstrategicoStartRequest):
     # Limpiar sesiones expiradas (oportunista)
     cleanup_expired()
 
@@ -62,14 +62,14 @@ def coach_start(req: CoachStartRequest):
     p1.reset_dynamic_state()
     p2.reset_dynamic_state()
 
-    cfg = req.config or CoachStartRequest.__fields__["config"].default
+    cfg = req.config or EstrategicoStartRequest.__fields__["config"].default
     best_of = cfg.best_of if cfg else 3
     tiebreak = cfg.tiebreak if cfg else True
 
     sk = MatchScorekeeper(p1, p2, best_of=best_of, tiebreak=tiebreak)
 
     session_id = str(uuid.uuid4())
-    session = CoachSession(
+    session = EstrategicoSession(
         session_id=session_id,
         player1=p1,
         player2=p2,
@@ -91,10 +91,10 @@ def coach_start(req: CoachStartRequest):
 
 
 # ──────────────────────────────────────────────────────────
-# POST /api/coach/next-point
+# POST /api/estrategico/next-point
 # ──────────────────────────────────────────────────────────
 @router.post("/next-point")
-def coach_next_point(req: CoachNextPointRequest):
+def estrategico_next_point(req: EstrategicoNextPointRequest):
     session = get_session(req.session_id)
     if not session:
         raise HTTPException(404, "Sesión no encontrada")
@@ -188,10 +188,10 @@ def coach_next_point(req: CoachNextPointRequest):
 
 
 # ──────────────────────────────────────────────────────────
-# POST /api/coach/set-strategy
+# POST /api/estrategico/set-strategy
 # ──────────────────────────────────────────────────────────
 @router.post("/set-strategy")
-def coach_set_strategy(req: CoachSetStrategyRequest):
+def estrategico_set_strategy(req: EstrategicoSetStrategyRequest):
     session = get_session(req.session_id)
     if not session:
         raise HTTPException(404, "Sesión no encontrada")
@@ -201,10 +201,10 @@ def coach_set_strategy(req: CoachSetStrategyRequest):
 
 
 # ──────────────────────────────────────────────────────────
-# GET /api/coach/state/{session_id}
+# GET /api/estrategico/state/{session_id}
 # ──────────────────────────────────────────────────────────
 @router.get("/state/{session_id}")
-def coach_state(session_id: str):
+def estrategico_state(session_id: str):
     session = get_session(session_id)
     if not session:
         raise HTTPException(404, "Sesión no encontrada")
@@ -226,10 +226,10 @@ def coach_state(session_id: str):
 
 
 # ──────────────────────────────────────────────────────────
-# POST /api/coach/end
+# POST /api/estrategico/end
 # ──────────────────────────────────────────────────────────
 @router.post("/end")
-def coach_end(req: CoachEndRequest):
+def estrategico_end(req: EstrategicoEndRequest):
     session = get_session(req.session_id)
     if not session:
         raise HTTPException(404, "Sesión no encontrada")
@@ -286,10 +286,10 @@ def coach_end(req: CoachEndRequest):
 
 
 # ──────────────────────────────────────────────────────────
-# POST /api/coach/save
+# POST /api/estrategico/save
 # ──────────────────────────────────────────────────────────
 @router.post("/save")
-def coach_save(req: CoachSaveRequest):
+def estrategico_save(req: EstrategicoSaveRequest):
     session = get_session(req.session_id)
     if not session:
         raise HTTPException(404, "Sesión no encontrada")
@@ -315,10 +315,10 @@ def coach_save(req: CoachSaveRequest):
 
 
 # ──────────────────────────────────────────────────────────
-# DELETE /api/coach/session/{session_id}
+# DELETE /api/estrategico/session/{session_id}
 # ──────────────────────────────────────────────────────────
 @router.delete("/session/{session_id}")
-def coach_delete_session(session_id: str):
+def estrategico_delete_session(session_id: str):
     if delete_session(session_id):
         return {"deleted": True}
     raise HTTPException(404, "Sesión no encontrada")

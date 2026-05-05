@@ -1,5 +1,5 @@
-# backend/app/coach/models.py
-"""Modelo de sesión del Modo Entrenador."""
+# backend/app/estrategico/models.py
+"""Modelo de sesión del Modo Estratégico."""
 
 from __future__ import annotations
 from dataclasses import dataclass, field
@@ -11,7 +11,7 @@ from backend.simulator.scorekeeper import MatchScorekeeper
 
 
 @dataclass
-class CoachSession:
+class EstrategicoSession:
     session_id: str
     player1: Player
     player2: Player

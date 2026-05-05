@@ -1,6 +1,6 @@
 # backend/simulator/scorekeeper.py
 """
-MatchScorekeeper – gestión del marcador punto a punto para el Modo Entrenador.
+MatchScorekeeper – gestión del marcador punto a punto para el Modo Estratégico.
 
 Encapsula TODA la lógica de puntuación (puntos → juegos → sets → partido)
 que en el modo normal está distribuida entre TennisGame, TennisSet y TennisMatch.

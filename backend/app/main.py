@@ -18,7 +18,7 @@ from backend.app.auth.routes import router as auth_router
 from backend.app.players.routes import router as jugadores_router
 from backend.app.matches.routes import router as matches_router
 from backend.app.tournaments.routes import router as tournaments_router
-from backend.app.coach import coach_router
+from backend.app.estrategico import estrategico_router
 from backend.app.bigdata import bigdata_router
 
 
@@ -60,5 +60,5 @@ app.include_router(auth_router, prefix="/api")   # Auth bajo /api/auth
 app.include_router(jugadores_router, prefix="/api")  # Jugadores bajo /api/players
 app.include_router(matches_router, prefix="/api")    # Partidos bajo /api/matches
 app.include_router(tournaments_router, prefix="/api")  # Torneos bajo /api/tournaments
-app.include_router(coach_router, prefix="/api")          # Coach bajo /api/coach
+app.include_router(estrategico_router, prefix="/api")    # Estratégico bajo /api/estrategico
 app.include_router(bigdata_router, prefix="/api/bigdata")  # Big Data bajo /api/bigdata

@@ -1,6 +1,6 @@
 /**
- * static/js/entrenador/match.js
- * Lógica principal del partido en Modo Entrenador.
+ * static/js/estrategico/match.js
+ * Lógica principal del partido en Modo Estratégico.
  * Gestiona la comunicación con la API, el marcador, la estrategia y los indicadores.
  */
 
@@ -8,9 +8,9 @@
   'use strict';
 
   // ── Session data ────────────────────────────────────────
-  const sessionId = sessionStorage.getItem('coach_session_id');
-  const config = JSON.parse(sessionStorage.getItem('coach_config') || '{}');
-  if (!sessionId) { window.location.href = '/modo-entrenador'; return; }
+  const sessionId = sessionStorage.getItem('estrategico_session_id');
+  const config = JSON.parse(sessionStorage.getItem('estrategico_config') || '{}');
+  if (!sessionId) { window.location.href = '/modo-estrategico'; return; }
 
   const numSets = parseInt(config.best_of, 10) || 3;
   const coachedPlayer = config.coached_player || 'P1';
@@ -240,7 +240,7 @@
       updateStrategyBadge();
 
       // Also notify backend
-      fetch('/api/coach/set-strategy', {
+      fetch('/api/estrategico/set-strategy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
         body: JSON.stringify({ session_id: sessionId, strategy: currentStrategy })
@@ -271,7 +271,7 @@
   }
 
   async function playOnePoint() {
-    var res = await fetch('/api/coach/next-point', {
+    var res = await fetch('/api/estrategico/next-point', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
       body: JSON.stringify({ session_id: sessionId, strategy: currentStrategy })
@@ -378,7 +378,7 @@
     btnPlay.disabled = true;
 
     try {
-      const res = await fetch('/api/coach/end', {
+      const res = await fetch('/api/estrategico/end', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
         body: JSON.stringify({ session_id: sessionId })
@@ -428,12 +428,12 @@
   // ── Fetch initial state ────────────────────────────────
   async function fetchState() {
     try {
-      const res = await fetch('/api/coach/state/' + sessionId, {
+      const res = await fetch('/api/estrategico/state/' + sessionId, {
         headers: { 'Authorization': 'Bearer ' + getToken() }
       });
       if (!res.ok) {
         showToast('No se pudo cargar la sesión', true);
-        setTimeout(function () { window.location.href = '/modo-entrenador'; }, 2000);
+        setTimeout(function () { window.location.href = '/modo-estrategico'; }, 2000);
         return;
       }
       const data = await res.json();

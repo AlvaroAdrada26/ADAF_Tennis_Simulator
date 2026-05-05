@@ -1,24 +1,24 @@
-# backend/app/coach/store.py
-"""Almacén en memoria de sesiones del Modo Entrenador."""
+# backend/app/estrategico/store.py
+"""Almacén en memoria de sesiones del Modo Estratégico."""
 
 from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
-from .models import CoachSession
+from .models import EstrategicoSession
 
 # Diccionario global de sesiones activas
-_sessions: Dict[str, CoachSession] = {}
+_sessions: Dict[str, EstrategicoSession] = {}
 
 # Timeout: sesiones inactivas más de 2 horas se eliminan
 SESSION_TIMEOUT_HOURS = 2
 
 
-def get_session(session_id: str) -> Optional[CoachSession]:
+def get_session(session_id: str) -> Optional[EstrategicoSession]:
     return _sessions.get(session_id)
 
 
-def create_session(session: CoachSession) -> None:
+def create_session(session: EstrategicoSession) -> None:
     _sessions[session.session_id] = session
 
 
