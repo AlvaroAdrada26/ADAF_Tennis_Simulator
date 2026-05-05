@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}Modo Entrenador · Partido - ADAF Tennis Simulator{% endblock %}
+{% block title %}Modo Estratégico · Partido - ADAF Tennis Simulator{% endblock %}
 
 {% block head_extra %}
 <style>
@@ -63,7 +63,7 @@
 
   <!-- TÍTULO -->
   <section class="text-center mt-8 mb-4">
-    <h2 id="match-title" class="text-3xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/></svg> Modo Entrenador</h2>
+    <h2 id="match-title" class="text-3xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/></svg> Modo Estratégico</h2>
     <p id="match-subtitle" class="text-gray-400 text-base"></p>
     <button id="btn-match-help" class="mt-2 inline-flex items-center gap-1.5 px-4 py-1.5 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 font-medium rounded-full hover:bg-yellow-400/20 transition text-xs">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -74,10 +74,10 @@
   <script>
     (function() {
       try {
-        var cfg = JSON.parse(sessionStorage.getItem('coach_config') || '{}');
+        var cfg = JSON.parse(sessionStorage.getItem('estrategico_config') || '{}');
         var title = document.getElementById('match-title');
         var subtitle = document.getElementById('match-subtitle');
-        if (cfg.surface) title.innerHTML = '<svg class="w-8 h-8 inline-block align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/></svg> Modo Entrenador &middot; ' + cfg.surface;
+        if (cfg.surface) title.innerHTML = '<svg class="w-8 h-8 inline-block align-middle" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0121 12.615C21 17.186 16.97 21 12 21s-9-3.814-9-8.385c0-.993.21-1.948.59-2.837L12 14z"/></svg> Modo Estratégico &middot; ' + cfg.surface;
         var parts = [];
         if (cfg.best_of) parts.push(cfg.best_of == 1 ? '1 Set' : 'Al mejor de ' + cfg.best_of + ' sets');
         if (cfg.tiebreak !== undefined) parts.push(cfg.tiebreak ? 'Tie-Break' : 'Sin Tie-Break');
@@ -99,7 +99,7 @@
         </div>
         <script>
           (function() {
-            var cfg = JSON.parse(sessionStorage.getItem('coach_config') || '{}');
+            var cfg = JSON.parse(sessionStorage.getItem('estrategico_config') || '{}');
             var numSets = parseInt(cfg.best_of, 10) || 3;
             var grid = document.getElementById('scoreboard-grid');
 
@@ -287,10 +287,10 @@
         <p id="final-score-text" class="text-gray-400 text-lg"></p>
       </div>
       <div class="flex flex-wrap gap-4 justify-center mt-2">
-        <a href="/modo-entrenador"
+        <a href="/modo-estrategico"
            class="inline-flex items-center gap-2 px-6 py-2.5 bg-yellow-400/10 border border-yellow-400/40 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-400/20 transition text-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-          Nuevo Entrenamiento
+          Nueva Estrategia
         </a>
         <a href="/menu"
            class="inline-flex items-center gap-2 px-6 py-2.5 border border-blue-500/40 text-blue-400 font-semibold rounded-lg hover:bg-blue-500/10 transition text-sm">
@@ -397,5 +397,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="module" src="/static/js/entrenador/match.js"></script>
+<script type="module" src="/static/js/estrategico/match.js"></script>
 {% endblock %}

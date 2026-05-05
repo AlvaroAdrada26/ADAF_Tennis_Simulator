@@ -26,7 +26,7 @@ class Shot:
     así como un registro opcional de eventos (feed).
     
     Si se pasa un dict `strategy` con multiplicadores, estos se aplican
-    después de los cálculos base (Modo Entrenador).
+    después de los cálculos base (Modo Estratégico).
     """
 
     def __init__(self, hitter: Player, receiver: Player, feed: Optional[List[str]] = None,

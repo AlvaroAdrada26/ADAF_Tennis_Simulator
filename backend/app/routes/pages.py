@@ -112,18 +112,18 @@ def simulacion_rapida(request: Request):
     )
 
 
-# ─── Modo Entrenador ─────────────────────────────────────────────────────
-@router.get("/modo-entrenador", response_class=HTMLResponse)
-def modo_entrenador_setup(request: Request):
+# ─── Modo Estratégico ─────────────────────────────────────────────────────
+@router.get("/modo-estrategico", response_class=HTMLResponse)
+def modo_estrategico_setup(request: Request):
     return templates.TemplateResponse(
-        "modo_entrenador_setup.html", {"request": request, "active_page": "modo_entrenador"}
+        "modo_estrategico_setup.html", {"request": request, "active_page": "modo_estrategico"}
     )
 
 
-@router.get("/modo-entrenador/partido", response_class=HTMLResponse)
-def modo_entrenador_partido(request: Request):
+@router.get("/modo-estrategico/partido", response_class=HTMLResponse)
+def modo_estrategico_partido(request: Request):
     return templates.TemplateResponse(
-        "modo_entrenador_partido.html", {"request": request, "active_page": "modo_entrenador"}
+        "modo_estrategico_partido.html", {"request": request, "active_page": "modo_estrategico"}
     )
 
 

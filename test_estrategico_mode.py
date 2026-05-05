@@ -1,5 +1,5 @@
 """
-Test exhaustivo del Modo Entrenador.
+Test exhaustivo del Modo Estratégico.
 
 Ejecuta partidos completos directamente con el motor de simulación
 (sin servidor HTTP) para verificar:
@@ -307,7 +307,7 @@ if __name__ == "__main__":
     p_weak = make_player("Débil", "P2", overall=62)
 
     print("\n" + "#"*70)
-    print("#  TEST MODO ENTRENADOR — Simulación exhaustiva")
+    print("#  TEST MODO ESTRATÉGICO — Simulación exhaustiva")
     print("#"*70)
 
     # ── Test 1: Jugadores iguales, sin estrategia ─────────
