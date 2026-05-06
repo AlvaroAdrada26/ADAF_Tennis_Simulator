@@ -336,7 +336,7 @@ document.addEventListener('auth:ready', function(e) {
   function hide(id) { document.getElementById(id).classList.add('hidden'); }
 
   // ── Init ────────────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', async function() {
+  (async function init() {
     var token = getToken();
 
     if (!token) {
@@ -384,7 +384,7 @@ document.addEventListener('auth:ready', function(e) {
       hide('state-loading');
       showToast('Error de conexión al cargar jugadores.', true);
     }
-  });
+  })();
 
   // ── Render tarjetas ─────────────────────────────────────
   function renderPlayers() {
