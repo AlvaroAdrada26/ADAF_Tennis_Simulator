@@ -8,9 +8,12 @@ FastAPI backend para el ADAF Tennis Simulator.
 
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from backend.app.routes.pages import router as pages_router
 from backend.app.routes.api import router as api_router
@@ -31,6 +34,8 @@ from backend.app.bigdata import bigdata_router
 BASE_DIR = Path(__file__).resolve().parents[2]  # .../ADAF_TENNIS_SIMULATOR
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
+
+error_templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 
 # ------------------------------------------------------------
@@ -62,3 +67,31 @@ app.include_router(matches_router, prefix="/api")    # Partidos bajo /api/matche
 app.include_router(tournaments_router, prefix="/api")  # Torneos bajo /api/tournaments
 app.include_router(estrategico_router, prefix="/api")    # Estratégico bajo /api/estrategico
 app.include_router(bigdata_router, prefix="/api/bigdata")  # Big Data bajo /api/bigdata
+
+
+# ------------------------------------------------------------
+# Error handlers
+# ------------------------------------------------------------
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    # Only render HTML for browser page requests (not /api calls)
+    if request.url.path.startswith("/api"):
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+    if exc.status_code == 404:
+        return error_templates.TemplateResponse(
+            "errors/404.html", {"request": request}, status_code=404
+        )
+    return error_templates.TemplateResponse(
+        "errors/500.html", {"request": request}, status_code=exc.status_code
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    if request.url.path.startswith("/api"):
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"detail": "Internal server error"}, status_code=500)
+    return error_templates.TemplateResponse(
+        "errors/500.html", {"request": request}, status_code=500
+    )

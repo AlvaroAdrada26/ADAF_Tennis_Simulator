@@ -107,7 +107,7 @@
 
                 /* Surface & format subtitle inside scoreboard */
                 var surfLine = '<div class="text-center text-gray-400 text-sm mt-3 pt-3 border-t border-blue-800/20">';
-                if (cfg.surface) surfLine += '<span>\ud83c\udfbe ' + cfg.surface + '</span>';
+                if (cfg.surface) surfLine += '<span>' + cfg.surface + '</span>';
                 var fmtParts = [];
                 if (cfg.best_of) fmtParts.push(cfg.best_of == 1 ? '1 Set' : 'Bo' + cfg.best_of);
                 if (cfg.tiebreak !== undefined) fmtParts.push(cfg.tiebreak ? 'Tie-Break' : 'Sin TB');
@@ -136,7 +136,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="darkblue" stroke-width="2.5" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M20 4v16m-2-8l-7 8V4l7 8zm-8 0l-7 8V4l7 8z"/></svg>
             </button>
             <span class="h-6 border-l border-blue-800/30 mx-1"></span>
-            <p id="point-counter" class="text-xs text-yellow-300 font-semibold whitespace-nowrap">Punto 0 de 0</p>
+            <p id="point-counter" class="text-xs text-yellow-300 font-semibold whitespace-nowrap">Punto 0</p>
             <span class="h-6 border-l border-blue-800/30 mx-1"></span>
             <div class="flex items-center gap-1">
               <button class="speed-btn px-2.5 py-1 rounded border border-yellow-400/60 text-xs font-semibold transition bg-yellow-400 text-slate-900" data-speed="1">x1</button>
@@ -214,12 +214,12 @@
         </div>
       </section>
 
-      <!-- BARRA POST-PARTIDO — Aparece al terminar -->
+      <!-- BARRA POST-PARTIDO — Usuarios autenticados -->
       <section id="post-match-bar" class="w-full px-8 pb-10 hidden">
         <div class="bg-slate-900/50 border border-blue-800/30 rounded-2xl shadow-lg backdrop-blur-sm p-6 flex flex-col items-center gap-4">
           <p id="save-status" class="text-sm text-gray-400"></p>
           <div class="flex flex-wrap gap-4 justify-center">
-            <a href="/resumen"
+            <a id="btn-go-resumen" href="/resumen"
                class="inline-flex items-center gap-2 px-6 py-2.5 bg-yellow-400/10 border border-yellow-400/40 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-400/20 hover:border-yellow-400/60 transition-all duration-300 text-sm">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -232,6 +232,39 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
               </svg>
               Crear Otro Partido
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- BARRA POST-PARTIDO — Usuarios invitados (sin cuenta) -->
+      <section id="post-match-bar-guest" class="w-full px-8 pb-10 hidden">
+        <div class="bg-slate-900/50 border border-yellow-400/20 rounded-2xl shadow-lg backdrop-blur-sm p-6 flex flex-col items-center gap-5">
+          <!-- CTA de registro -->
+          <div class="flex flex-col items-center gap-2 text-center">
+            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-400/10 mb-1">
+              <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </div>
+            <p class="text-gray-200 font-semibold text-sm">Regístrate para ver las estadísticas completas</p>
+            <p class="text-gray-400 text-xs">Accede a gráficas, historial de partidos y mucho más.</p>
+          </div>
+          <div class="flex flex-wrap gap-3 justify-center">
+            <a href="/simulacion-rapida"
+               class="inline-flex items-center gap-2 px-5 py-2.5 border border-blue-500/40 text-blue-400 font-semibold rounded-lg hover:bg-blue-500/10 transition-all duration-300 text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              Volver a elegir partido
+            </a>
+            <a href="/login"
+               class="inline-flex items-center gap-2 px-5 py-2.5 border border-yellow-400/40 text-yellow-400 font-semibold rounded-lg hover:bg-yellow-400/10 transition-all duration-300 text-sm">
+              Iniciar sesión
+            </a>
+            <a href="/registro"
+               class="inline-flex items-center gap-2 px-5 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-lg transition-all duration-300 text-sm">
+              Registrarse gratis
             </a>
           </div>
         </div>

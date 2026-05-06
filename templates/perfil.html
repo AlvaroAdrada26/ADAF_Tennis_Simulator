@@ -795,7 +795,7 @@ document.addEventListener('auth:ready', function(ev) {
           + '<div class="flex items-center gap-4">'
           +   '<span class="text-lg font-mono font-bold text-gray-100 tracking-wide">' + escapeHtml(m.marcador_final) + '</span>'
           +   '<span class="winner-badge px-3 py-1 rounded-full text-xs font-bold text-black whitespace-nowrap">'
-          +     '🏆 ' + escapeHtml(m.ganador)
+          +     escapeHtml(m.ganador)
           +   '</span>'
           + '</div>'
           + '<div class="flex items-center gap-3">'
@@ -897,7 +897,7 @@ document.addEventListener('auth:ready', function(ev) {
             + '<div class="flex items-center gap-4">'
             +   '<span class="text-lg font-mono font-bold text-gray-100 tracking-wide">' + escapeHtml(m.marcador_final) + '</span>'
             +   '<span class="winner-badge px-3 py-1 rounded-full text-xs font-bold text-black whitespace-nowrap">'
-            +     '🏆 ' + escapeHtml(m.ganador)
+            +     escapeHtml(m.ganador)
             +   '</span>'
             + '</div>'
             + '<div class="flex items-center gap-3">'

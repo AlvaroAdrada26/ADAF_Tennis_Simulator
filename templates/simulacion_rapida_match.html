@@ -1,57 +1,70 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}Simulación Rápida - {{ match_name }} - ADAF Tennis Simulator{% endblock %}
+{% block title %}Partido Rápido · {{ match_name }} - ADAF Tennis Simulator{% endblock %}
 
 {% block head_extra %}
 <style>
-  /* Estilos básicos de simulación */
-  .player-card {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-    border: 2px solid rgba(250, 204, 21, 0.2);
-    padding: 2rem;
-    border-radius: 1rem;
-    text-align: center;
+  /* ── Card tiers ── */
+  .tier-gold   { background: linear-gradient(to bottom, #fde68a, #fbbf24, #b45309); }
+  .tier-silver { background: linear-gradient(to bottom, #e5e7eb, #9ca3af, #6b7280); }
+  .tier-bronze { background: linear-gradient(to bottom, #fdba74, #f59e0b, #92400e); }
+  .glow-gold   { box-shadow: 0 0 18px rgba(250, 204, 21, 0.3); }
+  .glow-silver { box-shadow: 0 0 18px rgba(156, 163, 175, 0.3); }
+  .glow-bronze { box-shadow: 0 0 18px rgba(217, 119, 6, 0.3); }
+
+  /* ── Radio / Surface options ── */
+  .radio-opt {
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 1px solid rgba(59, 130, 246, 0.3);
   }
-  .player-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #fbbf24;
-    margin-bottom: 0.5rem;
+  .radio-opt:hover { border-color: rgba(250, 204, 21, 0.5); }
+  .radio-opt.active {
+    border-color: #facc15;
+    background-color: rgba(250, 204, 21, 0.1);
+    color: #facc15;
   }
-  .player-stat {
-    font-size: 0.875rem;
-    color: #d1d5db;
-    margin: 0.25rem 0;
-  }
-  .stat-bar {
-    background: rgba(31, 41, 55, 0.6);
-    border-radius: 0.25rem;
-    height: 0.25rem;
-    margin: 0.5rem 0;
-    overflow: hidden;
-  }
-  .stat-fill {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
-    height: 100%;
-    border-radius: 0.25rem;
-  }
-  
-  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-  .fade-in { animation: fade-in 0.5s ease-in; }
-  
-  .vs-badge {
-    background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
+  .surface-card {
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: 2px solid rgba(59, 130, 246, 0.2);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: #000;
-    font-size: 1.25rem;
-    box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+    gap: 0.5rem;
+    padding: 1rem 0.75rem;
+    border-radius: 0.75rem;
+    flex: 1;
   }
+  .surface-card:hover {
+    border-color: rgba(250, 204, 21, 0.5);
+    transform: translateY(-2px);
+  }
+  .surface-card.active {
+    border-color: #facc15;
+    background-color: rgba(250, 204, 21, 0.08);
+    box-shadow: 0 0 15px rgba(250, 204, 21, 0.15);
+  }
+  .surface-swatch {
+    width: 36px; height: 36px;
+    border-radius: 6px; flex-shrink: 0;
+  }
+  .surface-swatch.hard  { background-color: #1e3a6e; }
+  .surface-swatch.clay  { background-color: #b85c38; }
+  .surface-swatch.grass { background-color: #2d8a4e; }
+
+  .vs-text {
+    background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
 </style>
 {% endblock %}
 
@@ -60,213 +73,302 @@
 {% block main_class %}ml-0{% endblock %}
 
 {% block header %}
-<header class="w-full flex justify-between items-center px-10 py-4 bg-slate-950/40 backdrop-blur-sm border-b border-blue-800/30">
-  <a href="/" class="text-xl font-semibold text-yellow-400 tracking-wide hover:text-yellow-300 transition">
-    ADAF Tennis Simulator
-  </a>
-  <div class="flex items-center space-x-6">
-    <a href="/simulacion-rapida" class="text-gray-400 hover:text-yellow-400 transition text-sm">← Volver</a>
-  </div>
-</header>
+  {% include "partials/header_minimal.html" %}
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col items-center justify-center px-6 py-12">
+<div class="flex-1 px-6 md:px-12 py-10 space-y-8 max-w-6xl mx-auto w-full">
 
-  <!-- Loading state -->
-  <div id="loading-state" class="text-center">
-    <svg class="animate-spin w-12 h-12 text-yellow-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+  <!-- Botón volver -->
+  <div>
+    <a href="/simulacion-rapida" class="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-yellow-400 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Volver a partidos disponibles
+    </a>
+  </div>
+
+  <!-- Banner "Inicia sesión" (solo para visitantes) -->
+  <div id="guest-banner" class="hidden bg-gradient-to-r from-blue-900/60 to-slate-900/60 border border-yellow-400/30 rounded-2xl px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
+    <div class="flex items-center gap-3">
+      <svg class="w-6 h-6 text-yellow-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <p class="text-gray-300 text-sm">
+        Estás en modo demo. <strong class="text-yellow-400">Crea una cuenta</strong> para crear tus propios jugadores, guardar partidos y acceder al simulador completo.
+      </p>
+    </div>
+    <div class="flex gap-2 flex-shrink-0">
+      <a href="/login" class="px-4 py-1.5 text-sm font-medium text-yellow-400 border border-yellow-400/40 rounded-full hover:bg-yellow-400/10 transition">Iniciar sesión</a>
+      <a href="/registro" class="px-4 py-1.5 text-sm font-semibold bg-yellow-400 hover:bg-yellow-500 text-black rounded-full transition">Registrarse</a>
+    </div>
+  </div>
+
+  <!-- Estado: cargando -->
+  <div id="state-loading" class="text-center py-24">
+    <svg class="animate-spin w-10 h-10 text-yellow-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
     </svg>
-    <p class="text-gray-400">Cargando datos del partido...</p>
+    <p class="text-gray-400">Cargando partido...</p>
   </div>
 
-  <!-- Match info -->
-  <div id="match-info" class="hidden text-center mb-12 fade-in">
-    <h1 id="match-title" class="text-5xl font-bold text-yellow-400 mb-4"></h1>
-    <p id="match-desc" class="text-gray-400 text-lg max-w-2xl"></p>
+  <!-- Estado: error -->
+  <div id="state-error" class="hidden text-center py-24">
+    <p class="text-red-400 text-lg mb-4" id="error-msg">Partido no encontrado.</p>
+    <a href="/simulacion-rapida" class="text-yellow-400 hover:text-yellow-300 underline">Volver a seleccionar</a>
   </div>
 
-  <!-- Players setup -->
-  <div id="players-section" class="hidden max-w-4xl w-full fade-in">
-    <div class="flex items-center justify-between gap-8 mb-12">
-      <!-- Player 1 -->
-      <div class="flex-1">
-        <div class="player-card">
-          <div class="player-name" id="p1-name"></div>
-          <div class="grid grid-cols-2 gap-4 mt-4 text-left">
-            <div>
-              <div class="player-stat text-xs text-gray-500">PRIMER SAQUE</div>
-              <div class="text-2xl font-bold text-yellow-400" id="p1-ps">-</div>
-            </div>
-            <div>
-              <div class="player-stat text-xs text-gray-500">DERECHA</div>
-              <div class="text-2xl font-bold text-yellow-400" id="p1-dr">-</div>
-            </div>
-            <div>
-              <div class="player-stat text-xs text-gray-500">FÍSICO</div>
-              <div class="text-2xl font-bold text-yellow-400" id="p1-fis">-</div>
-            </div>
-            <div>
-              <div class="player-stat text-xs text-gray-500">CLUTCH</div>
-              <div class="text-2xl font-bold text-yellow-400" id="p1-clc">-</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Contenido principal (oculto hasta que carga) -->
+  <div id="main-content" class="hidden space-y-8 fade-in-up">
 
-      <!-- VS -->
-      <div class="flex flex-col items-center gap-4">
-        <div class="vs-badge">VS</div>
-        <div class="text-center">
-          <label class="text-gray-500 text-xs uppercase tracking-wider">Formato</label>
-          <select id="format-select" class="mt-2 px-4 py-2 bg-slate-900 border border-blue-800/30 rounded text-yellow-400 font-semibold">
-            <option value="1">1 Set</option>
-            <option value="3" selected>Mejor de 3</option>
-            <option value="5">Mejor de 5</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Player 2 -->
-      <div class="flex-1">
-        <div class="player-card">
-          <div class="player-name" id="p2-name"></div>
-          <div class="grid grid-cols-2 gap-4 mt-4 text-left">
-            <div>
-              <div class="player-stat text-xs text-gray-500">PRIMER SAQUE</div>
-              <div class="text-2xl font-bold text-yellow-400" id="p2-ps">-</div>
-            </div>
-            <div>
-              <div class="player-stat text-xs text-gray-500">DERECHA</div>
-              <div class="text-2xl font-bold text-yellow-400" id="p2-dr">-</div>
-            </div>
-            <div>
-              <div class="player-stat text-xs text-gray-500">FÍSICO</div>
-              <div class="text-2xl font-bold text-yellow-400" id="p2-fis">-</div>
-            </div>
-            <div>
-              <div class="player-stat text-xs text-gray-500">CLUTCH</div>
-              <div class="text-2xl font-bold text-yellow-400" id="p2-clc">-</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Simulate button -->
+    <!-- Título del partido -->
     <div class="text-center">
-      <button id="simulate-btn" class="px-12 py-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-full text-lg transition shadow-lg shadow-yellow-400/20">
-        🎾 Simular Partido
-      </button>
+      <h1 id="match-title" class="text-3xl md:text-4xl font-bold text-yellow-400 mb-1"></h1>
+      <p id="match-desc" class="text-gray-400 text-base max-w-2xl mx-auto"></p>
     </div>
+
+    <!-- Tarjetas de jugadores -->
+    <div class="flex items-start gap-6">
+      <div class="flex-1 min-w-0">
+        <div id="card-p1" class="rounded-2xl shadow-xl p-4 border-[3px]"></div>
+      </div>
+      <div class="flex items-center justify-center self-center pt-2 shrink-0">
+        <span class="vs-text text-5xl font-black select-none">VS</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div id="card-p2" class="rounded-2xl shadow-xl p-4 border-[3px]"></div>
+      </div>
+    </div>
+
+    <!-- Configuración -->
+    <div class="bg-slate-900/60 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8">
+      <h2 class="text-base font-semibold text-yellow-400 mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Configuración del Partido
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Formato -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Formato (Sets)</label>
+          <div class="flex gap-3" id="opt-sets">
+            <button data-val="1" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">1 Set</button>
+            <button data-val="3" class="radio-opt active flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">Mejor de 3</button>
+            <button data-val="5" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">Mejor de 5</button>
+          </div>
+        </div>
+        <!-- Superficie -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Superficie</label>
+          <div class="flex gap-3" id="opt-surface">
+            <button data-val="Dura" class="surface-card active">
+              <div class="surface-swatch hard"></div>
+              <span class="text-sm font-medium text-gray-300">Dura</span>
+            </button>
+            <button data-val="Tierra" class="surface-card">
+              <div class="surface-swatch clay"></div>
+              <span class="text-sm font-medium text-gray-300">Tierra</span>
+            </button>
+            <button data-val="Hierba" class="surface-card">
+              <div class="surface-swatch grass"></div>
+              <span class="text-sm font-medium text-gray-300">Hierba</span>
+            </button>
+          </div>
+        </div>
+        <!-- Tiebreak -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Tiebreak último set</label>
+          <div class="flex gap-3" id="opt-tb">
+            <button data-val="true" class="radio-opt active flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">Sí</button>
+            <button data-val="false" class="radio-opt flex-1 py-2.5 rounded-lg text-center text-sm font-medium text-gray-300">No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón simular -->
+    <div class="flex flex-col items-center gap-3">
+      <button id="btn-sim" class="px-12 py-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-full text-lg transition shadow-lg shadow-yellow-400/20 flex items-center gap-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Simular Partido
+      </button>
+      <!-- Nota demo solo para visitantes -->
+      <p id="demo-note" class="hidden text-xs text-gray-500 text-center">
+        Modo demo — el partido no se guardará en ningún historial.
+        <a href="/registro" class="text-yellow-400 hover:text-yellow-300 underline ml-1">Regístrate para guardar tus resultados.</a>
+      </p>
+    </div>
+
   </div>
 
-  <!-- Error state -->
-  <div id="error-state" class="hidden text-center text-red-400">
-    <p id="error-msg"></p>
-    <a href="/simulacion-rapida" class="text-yellow-400 hover:text-yellow-300 mt-4 inline-block">Volver a seleccionar</a>
-  </div>
+</div>
 
-</main>
+<!-- Toast -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl"></div>
+{% endblock %}
 
-{% include "partials/footer_simple.html" %}
-
+{% block scripts %}
 <script>
-(async function() {
+(function() {
   'use strict';
-  
-  const matchName = '{{ match_name }}'.toLowerCase();
-  
-  try {
-    // Cargar datos del partido
-    const res = await fetch(`/api/quick-matches/${matchName}`);
-    if (!res.ok) {
-      throw new Error(`Partido no encontrado: ${matchName}`);
-    }
-    
-    const data = await res.json();
-    
-    // Ocultar loading
-    document.getElementById('loading-state').classList.add('hidden');
-    
-    // Mostrar info
-    document.getElementById('match-title').textContent = data.display_name;
-    document.getElementById('match-desc').textContent = data.description;
-    document.getElementById('match-info').classList.remove('hidden');
-    
-    // Llenar datos de jugadores
-    const p1 = data.player1;
-    const p2 = data.player2;
-    
-    document.getElementById('p1-name').textContent = p1.name;
-    document.getElementById('p1-ps').textContent = p1.Primer_Saque;
-    document.getElementById('p1-dr').textContent = p1.Derecha;
-    document.getElementById('p1-fis').textContent = p1.Fisico;
-    document.getElementById('p1-clc').textContent = p1.Clutch;
-    
-    document.getElementById('p2-name').textContent = p2.name;
-    document.getElementById('p2-ps').textContent = p2.Primer_Saque;
-    document.getElementById('p2-dr').textContent = p2.Derecha;
-    document.getElementById('p2-fis').textContent = p2.Fisico;
-    document.getElementById('p2-clc').textContent = p2.Clutch;
-    
-    // Mostrar sección de jugadores
-    document.getElementById('players-section').classList.remove('hidden');
-    
-    // Botón simular
-    document.getElementById('simulate-btn').addEventListener('click', async function() {
-      const btn = this;
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = '⏳ Simulando...';
-      
-      try {
-        const formatSelect = document.getElementById('format-select');
-        const sets = parseInt(formatSelect.value, 10);
-        
-        // Llamar a la API de simulación
-        const simRes = await fetch('/api/simulate_match', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            player1: p1,
-            player2: p2,
-            config: {
-              best_of: sets,
-              tiebreak: true,
-              superficie: 'Dura'
-            }
-          })
-        });
-        
-        if (!simRes.ok) {
-          throw new Error('Error en la simulación');
-        }
-        
-        const result = await simRes.json();
-        sessionStorage.setItem('match_result', JSON.stringify(result));
-        sessionStorage.setItem('match_config', JSON.stringify({
-          surface: 'Dura',
-          best_of: sets,
-          tiebreak: true,
-          player1_name: p1.name,
-          player2_name: p2.name
-        }));
-        
-        window.location.href = '/simulacion2';
-      } catch (err) {
-        alert('Error: ' + err.message);
-        btn.disabled = false;
-        btn.textContent = originalText;
-      }
-    });
-    
-  } catch (err) {
-    document.getElementById('loading-state').classList.add('hidden');
-    document.getElementById('error-state').classList.remove('hidden');
-    document.getElementById('error-msg').textContent = '❌ ' + err.message;
+
+  function show(id) { document.getElementById(id).classList.remove('hidden'); }
+  function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+  function getActiveVal(groupId) {
+    var el = document.querySelector('#' + groupId + ' .active[data-val]');
+    return el ? el.dataset.val : null;
   }
+
+  function showToast(msg, isErr) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 rounded-xl text-white font-semibold text-lg shadow-2xl ' + (isErr ? 'bg-red-600' : 'bg-green-600');
+    t.classList.remove('hidden');
+    setTimeout(function() { t.classList.add('hidden'); }, 3500);
+  }
+
+  function tierClasses(avg) {
+    if (avg >= 85) return { bg: 'tier-gold',   glow: 'glow-gold',   border: 'border-yellow-400', text: 'text-yellow-900', sub: 'text-slate-700' };
+    if (avg >= 70) return { bg: 'tier-silver',  glow: 'glow-silver', border: 'border-gray-400',   text: 'text-gray-800',   sub: 'text-gray-600'  };
+    return              { bg: 'tier-bronze',  glow: 'glow-bronze', border: 'border-amber-600',  text: 'text-amber-900',  sub: 'text-slate-700' };
+  }
+
+  function buildCard(p, cardEl) {
+    var keys = ['Primer_Saque','Segundo_Saque','Fisico','Estamina','Consistencia','Clutch','Momentum','Derecha','Reves','Resto','Movilidad'];
+    var sum = 0;
+    for (var i = 0; i < keys.length; i++) sum += (p[keys[i]] || 0);
+    var avg = Math.round(sum / keys.length);
+    var t = tierClasses(avg);
+
+    cardEl.className = 'rounded-2xl shadow-xl p-4 border-[3px] ' + t.bg + ' ' + t.glow + ' ' + t.border;
+
+    var labels = {
+      Primer_Saque: '1st Srv', Segundo_Saque: '2nd Srv', Fisico: 'Físico',
+      Estamina: 'Estamina', Consistencia: 'Consist.', Clutch: 'Clutch',
+      Momentum: 'Momentum', Derecha: 'Forehand', Reves: 'Backhand',
+      Resto: 'Return', Movilidad: 'Movement'
+    };
+
+    var cells = '';
+    for (var k in labels) {
+      cells += '<div><div class="text-[9px] font-semibold ' + t.sub + '">' + labels[k] + '</div>' +
+               '<div class="text-sm font-bold ' + t.text + '">' + (p[k] || 50) + '</div></div>';
+    }
+
+    cardEl.innerHTML =
+      '<div class="flex items-center justify-between mb-2">' +
+        '<div class="text-4xl font-extrabold ' + t.text + ' drop-shadow-sm leading-none">' + avg + '</div>' +
+        '<div class="text-[10px] font-semibold ' + t.sub + ' uppercase tracking-wide text-right">Demo</div>' +
+      '</div>' +
+      '<div class="text-base font-extrabold uppercase tracking-wide ' + t.text + ' truncate mb-0.5">' + p.name + '</div>' +
+      '<div class="mt-2 border-t border-current opacity-20"></div>' +
+      '<div class="mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 text-center">' + cells + '</div>' +
+      '<div class="mt-2 flex items-center justify-center">' +
+        '<span class="text-[8px] uppercase tracking-wider ' + t.sub + ' font-semibold opacity-60">ADAF Tennis Simulator</span>' +
+      '</div>';
+  }
+
+  function setupOptions(groupId) {
+    document.querySelectorAll('#' + groupId + ' [data-val]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('#' + groupId + ' [data-val]').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+      });
+    });
+  }
+
+  var matchSlug = '{{ match_name }}';
+  var matchData = null;
+
+  async function init() {
+    try {
+      var res = await fetch('/api/quick-matches/' + matchSlug);
+      if (!res.ok) throw new Error('Partido no encontrado: ' + matchSlug);
+      matchData = await res.json();
+    } catch (err) {
+      hide('state-loading');
+      document.getElementById('error-msg').textContent = '❌ ' + err.message;
+      show('state-error');
+      return;
+    }
+
+    hide('state-loading');
+    document.getElementById('match-title').textContent = matchData.display_name;
+    document.getElementById('match-desc').textContent  = matchData.description;
+
+    buildCard(matchData.player1, document.getElementById('card-p1'));
+    buildCard(matchData.player2, document.getElementById('card-p2'));
+
+    show('main-content');
+    setupOptions('opt-sets');
+    setupOptions('opt-surface');
+    setupOptions('opt-tb');
+
+    document.getElementById('btn-sim').addEventListener('click', handleSimulate);
+  }
+
+  async function handleSimulate() {
+    var btn = document.getElementById('btn-sim');
+    btn.disabled = true;
+    btn.innerHTML = '<svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Simulando...';
+
+    var sets    = parseInt(getActiveVal('opt-sets') || '3', 10);
+    var surface = getActiveVal('opt-surface') || 'Dura';
+    var tb      = getActiveVal('opt-tb') === 'true';
+
+    try {
+      var token   = localStorage.getItem('access_token');
+      var headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+
+      var simRes = await fetch('/api/simulate_match', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          player1: matchData.player1,
+          player2: matchData.player2,
+          config: { best_of: sets, tiebreak: tb, superficie: surface }
+        })
+      });
+
+      if (!simRes.ok) throw new Error('Error en la simulación (' + simRes.status + ')');
+
+      var result = await simRes.json();
+      sessionStorage.setItem('match_result', JSON.stringify(result));
+      sessionStorage.setItem('match_config', JSON.stringify({
+        surface: surface,
+        best_of: sets,
+        tiebreak: tb,
+        player1_name: matchData.player1.name,
+        player2_name: matchData.player2.name
+      }));
+
+      window.location.href = '/simulacion2';
+
+    } catch (err) {
+      showToast('Error: ' + err.message, true);
+      btn.disabled = false;
+      btn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Simular Partido';
+    }
+  }
+
+  // Banners de invitado — reaccionan al evento auth:ready del header_minimal incluido
+  document.addEventListener('auth:ready', function(e) {
+    if (!e.detail.authenticated) {
+      show('guest-banner');
+      show('demo-note');
+    }
+  });
+
+  init();
 })();
 </script>
+{% endblock %}

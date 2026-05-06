@@ -38,9 +38,9 @@ function stopAutoplay() {
 
 /** Updates the point counter display */
 function updatePointCounter() {
-  const { currentPoint, timeline } = getState();
+  const { currentPoint } = getState();
   const el = document.getElementById("point-counter");
-  if (el) el.textContent = `Punto ${currentPoint} de ${timeline.length}`;
+  if (el) el.textContent = `Punto ${currentPoint}`;
 }
 
 /** Avanza un punto con todas las actualizaciones visuales */
@@ -204,6 +204,14 @@ export function bindSimulationControls() {
    Funciones auxiliares de UI post-partido
    ========================================================== */
 function showPostMatchBar() {
+  const isGuest = !localStorage.getItem('access_token');
+
+  if (isGuest) {
+    const guestBar = document.getElementById("post-match-bar-guest");
+    if (guestBar) guestBar.classList.remove("hidden");
+    return;
+  }
+
   const bar = document.getElementById("post-match-bar");
   if (bar) bar.classList.remove("hidden");
 

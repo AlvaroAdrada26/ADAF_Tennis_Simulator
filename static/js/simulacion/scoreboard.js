@@ -164,7 +164,7 @@ export function showFinalScore() {
   const msg = document.createElement("div");
   msg.id = "winner-msg";
   msg.className = "text-3xl text-yellow-400 font-bold mt-4 animate-pulse";
-  msg.textContent = `🏆 Partido finalizado — Ganador: ${winnerName}`;
+  msg.textContent = `Partido finalizado — Ganador: ${winnerName}`;
   panel.appendChild(msg);
 }
 

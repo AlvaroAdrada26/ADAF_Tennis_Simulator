@@ -134,19 +134,19 @@ export class PointFeedGenerator {
 
     if (!realKey) {
       console.warn("⚠️ Clave no encontrada en POINT_END:", key);
-      return `🎾 Punto para ${winner}.`;
+      return `Punto para ${winner}.`;
     }
 
     const phrases = pe[realKey];
     if (!Array.isArray(phrases) || !phrases.length) {
       console.warn("⚠️ No hay frases en POINT_END para clave:", realKey);
-      return `🎾 Punto para ${winner}.`;
+      return `Punto para ${winner}.`;
     }
 
     // Si es error/fallo, el nombre en la frase es el perdedor
     const nameToUse = realKey.includes("error") || realKey === "no_llega" || realKey === "doble_falta" ? loser : winner;
     const phrase = this._pickRandom(phrases);
-    const final = phrase ? phrase.replace("{name}", nameToUse) : `🎾 Punto para ${winner}.`;
+    const final = phrase ? phrase.replace("{name}", nameToUse) : `Punto para ${winner}.`;
 
     return final;
   }
