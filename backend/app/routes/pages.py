@@ -49,13 +49,6 @@ def simulacion(request: Request):
     )
 
 
-@router.get("/simulacion-legacy", response_class=HTMLResponse)
-def simulacion_legacy(request: Request):
-    return templates.TemplateResponse(
-        "simulacionExcremento.html", {"request": request, "active_page": "simulacion"}
-    )
-
-
 @router.get("/resultados", response_class=HTMLResponse)
 def resultados(request: Request):
     return templates.TemplateResponse(
