@@ -6,7 +6,7 @@
  * Flujo principal:
  *   1. partido_rapido.html hace POST /api/simulate_match y guarda el resultado
  *      en sessionStorage("match_result").
- *   2. simulacion2.html llama a fetchMatchData(), que lee sessionStorage.
+ *   2. simulacion.html llama a fetchMatchData(), que lee sessionStorage.
  *   3. Si no hay datos en sessionStorage (acceso directo), se hace un POST
  *      con datos de demo como fallback.
  */

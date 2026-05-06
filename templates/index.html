@@ -192,13 +192,15 @@
 {% block scripts %}
   <script>
     const footer = document.getElementById('main-footer');
-    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' };
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) { footer.classList.add('footer-visible'); }
-      });
-    }, observerOptions);
-    observer.observe(footer);
+    if (footer) {
+      const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' };
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) { footer.classList.add('footer-visible'); }
+        });
+      }, observerOptions);
+      observer.observe(footer);
+    }
 
     // Mostrar CTAs según estado de autenticación
     document.addEventListener('auth:ready', function(e) {

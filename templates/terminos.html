@@ -1,0 +1,99 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Términos de Uso - ADAF Tennis Simulator{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 px-6 py-16 max-w-3xl mx-auto w-full animate-fade-up">
+
+  <h1 class="text-4xl font-bold text-yellow-400 mb-2">Términos de Uso</h1>
+  <p class="text-gray-500 text-sm mb-10">Última actualización: mayo de 2026</p>
+
+  <div class="space-y-10 text-gray-300 leading-relaxed">
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">1. Naturaleza del proyecto</h2>
+      <p>
+        ADAF Tennis Simulator es un proyecto académico desarrollado como Trabajo de Fin de Grado (TFG)
+        en la Universidad Complutense de Madrid (UCM). Su finalidad es exclusivamente educativa
+        y de investigación. No tiene ánimo de lucro ni pretende sustituir herramientas profesionales
+        de análisis deportivo.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">2. Uso permitido</h2>
+      <p>
+        El acceso a la plataforma está permitido a cualquier persona con fines personales, educativos
+        o de investigación. Queda expresamente prohibido:
+      </p>
+      <ul class="list-disc list-inside mt-3 space-y-1 text-gray-400">
+        <li>Usar la plataforma con fines comerciales sin autorización expresa del autor.</li>
+        <li>Intentar acceder de forma no autorizada a cuentas ajenas o al sistema.</li>
+        <li>Realizar scraping masivo o consumo abusivo de la API.</li>
+        <li>Distribuir o reproducir el código fuente sin respetar la licencia aplicable.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">3. Cuentas de usuario</h2>
+      <p>
+        Al registrarte, eres responsable de mantener la confidencialidad de tus credenciales.
+        El autor se reserva el derecho de suspender cuentas que incumplan estos términos o que
+        se detecten como fraudulentas.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">4. Exactitud de las simulaciones</h2>
+      <p>
+        Los resultados producidos por el simulador son de naturaleza probabilística y estadística.
+        No representan predicciones reales ni deben usarse para tomar decisiones económicas,
+        deportivas o de cualquier otra índole.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">5. Disponibilidad del servicio</h2>
+      <p>
+        Al tratarse de un proyecto en fase de desarrollo y evaluación académica, el servicio puede
+        interrumpirse, modificarse o darse de baja en cualquier momento sin previo aviso.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">6. Propiedad intelectual</h2>
+      <p>
+        Todo el código, diseño y contenido de ADAF Tennis Simulator son propiedad del autor del TFG,
+        salvo las dependencias de terceros que están sujetas a sus respectivas licencias.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">7. Contacto</h2>
+      <p>
+        Para cualquier consulta relacionada con estos términos, puedes contactar a través de
+        los canales habilitados en la Universidad Complutense de Madrid.
+      </p>
+    </section>
+
+  </div>
+
+  <div class="mt-12">
+    <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-semibold rounded-lg hover:scale-105 transition shadow-lg">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Volver al inicio
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}
