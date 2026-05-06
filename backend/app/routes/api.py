@@ -18,6 +18,127 @@ bearing = HTTPBearer(auto_error=False)
 
 
 # ------------------------------------------------------------
+# Partidos rápidos predefinidos (sin autenticación)
+# ------------------------------------------------------------
+_QUICK_MATCHES: dict[str, dict] = {
+    "nadal-federer": {
+        "slug": "nadal-federer",
+        "display_name": "Nadal vs Federer",
+        "description": "La épica definitiva. El rey de la tierra frente a la elegancia y técnica perfectas.",
+        "player1": {
+            "name": "Rafael Nadal",
+            "id": "demo-nadal",
+            "Primer_Saque": 80,
+            "Segundo_Saque": 83,
+            "Fisico": 94,
+            "Estamina": 96,
+            "Consistencia": 94,
+            "Clutch": 92,
+            "Momentum": 88,
+            "Derecha": 88,
+            "Reves": 92,
+            "Resto": 93,
+            "Movilidad": 92,
+        },
+        "player2": {
+            "name": "Roger Federer",
+            "id": "demo-federer",
+            "Primer_Saque": 90,
+            "Segundo_Saque": 82,
+            "Fisico": 87,
+            "Estamina": 85,
+            "Consistencia": 89,
+            "Clutch": 91,
+            "Momentum": 86,
+            "Derecha": 95,
+            "Reves": 90,
+            "Resto": 84,
+            "Movilidad": 88,
+        },
+    },
+    "alcaraz-sinner": {
+        "slug": "alcaraz-sinner",
+        "display_name": "Alcaraz vs Sinner",
+        "description": "Potencia pura y ritmo frenético. El duelo de las dos estrellas de la nueva generación.",
+        "player1": {
+            "name": "Carlos Alcaraz",
+            "id": "demo-alcaraz",
+            "Primer_Saque": 85,
+            "Segundo_Saque": 79,
+            "Fisico": 89,
+            "Estamina": 90,
+            "Consistencia": 83,
+            "Clutch": 87,
+            "Momentum": 91,
+            "Derecha": 93,
+            "Reves": 84,
+            "Resto": 87,
+            "Movilidad": 93,
+        },
+        "player2": {
+            "name": "Jannik Sinner",
+            "id": "demo-sinner",
+            "Primer_Saque": 86,
+            "Segundo_Saque": 80,
+            "Fisico": 88,
+            "Estamina": 91,
+            "Consistencia": 88,
+            "Clutch": 88,
+            "Momentum": 85,
+            "Derecha": 86,
+            "Reves": 93,
+            "Resto": 88,
+            "Movilidad": 88,
+        },
+    },
+    "djokovic-murray": {
+        "slug": "djokovic-murray",
+        "display_name": "Djokovic vs Murray",
+        "description": "Un muro contra otro muro. Partidos largos, táctica calculada y resistencia mental al límite.",
+        "player1": {
+            "name": "Novak Djokovic",
+            "id": "demo-djokovic",
+            "Primer_Saque": 84,
+            "Segundo_Saque": 83,
+            "Fisico": 95,
+            "Estamina": 97,
+            "Consistencia": 96,
+            "Clutch": 95,
+            "Momentum": 90,
+            "Derecha": 88,
+            "Reves": 95,
+            "Resto": 96,
+            "Movilidad": 95,
+        },
+        "player2": {
+            "name": "Andy Murray",
+            "id": "demo-murray",
+            "Primer_Saque": 80,
+            "Segundo_Saque": 78,
+            "Fisico": 88,
+            "Estamina": 91,
+            "Consistencia": 88,
+            "Clutch": 88,
+            "Momentum": 83,
+            "Derecha": 83,
+            "Reves": 88,
+            "Resto": 88,
+            "Movilidad": 90,
+        },
+    },
+}
+
+
+@router.get("/quick-matches/{match_slug}")
+def get_quick_match(match_slug: str) -> dict:
+    """Devuelve los datos de un partido rápido predefinido (sin autenticación)."""
+    match = _QUICK_MATCHES.get(match_slug.lower())
+    if not match:
+        raise HTTPException(status_code=404, detail=f"Partido no encontrado: {match_slug}")
+    return match
+
+
+# ------------------------------------------------------------
 # Modelos de entrada
 # ------------------------------------------------------------
 class PlayerData(BaseModel):

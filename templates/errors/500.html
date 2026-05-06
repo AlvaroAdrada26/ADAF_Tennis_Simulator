@@ -1,0 +1,56 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Error del servidor — ADAF Tennis Simulator{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 flex items-center justify-center px-6 py-20">
+  <div class="text-center max-w-lg">
+
+    <!-- Icon -->
+    <div class="flex items-center justify-center w-24 h-24 rounded-full bg-red-500/10 mx-auto mb-6">
+      <svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+      </svg>
+    </div>
+
+    <!-- Code -->
+    <p class="text-8xl font-black text-red-400/20 select-none leading-none mb-2">500</p>
+
+    <!-- Title -->
+    <h1 class="text-2xl font-bold text-gray-100 mb-3">Error interno del servidor</h1>
+    <p class="text-gray-400 text-sm leading-relaxed mb-8">
+      Algo ha fallado en nuestro servidor.<br>
+      Por favor inténtalo de nuevo en unos momentos.
+    </p>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <button onclick="location.reload()"
+              class="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-xl transition shadow-lg shadow-yellow-400/20">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Reintentar
+      </button>
+      <a href="/menu"
+         class="inline-flex items-center gap-2 px-6 py-3 border border-blue-500/40 text-blue-400 font-semibold rounded-xl hover:bg-blue-500/10 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        Ir al inicio
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}

@@ -54,7 +54,7 @@ var SUMMARY_T = {
     summaryMomentumTooltipPoint:  "Punto",
     summaryMomentumTooltipWinner: "Ganador",
     summaryMomentumTooltipScore:  "Marcador",
-    summaryMomentumTooltipEndSet: "🏆 Fin del Set",
+    summaryMomentumTooltipEndSet: "Fin del Set",
     summaryMomentumTooltipEndGame: "✅ Fin del Game",
   },
   en: {
@@ -103,7 +103,7 @@ var SUMMARY_T = {
     summaryMomentumTooltipPoint:  "Point",
     summaryMomentumTooltipWinner: "Winner",
     summaryMomentumTooltipScore:  "Score",
-    summaryMomentumTooltipEndSet: "🏆 Set End",
+    summaryMomentumTooltipEndSet: "Set End",
     summaryMomentumTooltipEndGame: "✅ Game End",
   },
 };

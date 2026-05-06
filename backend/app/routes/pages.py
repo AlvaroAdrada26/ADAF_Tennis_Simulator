@@ -112,6 +112,14 @@ def simulacion_rapida(request: Request):
     )
 
 
+@router.get("/simulacion-rapida/{match_name}", response_class=HTMLResponse)
+def simulacion_rapida_match(request: Request, match_name: str):
+    return templates.TemplateResponse(
+        "simulacion_rapida_match.html",
+        {"request": request, "active_page": "simulacion_rapida", "match_name": match_name},
+    )
+
+
 # ─── Modo Estratégico ─────────────────────────────────────────────────────
 @router.get("/modo-estrategico", response_class=HTMLResponse)
 def modo_estrategico_setup(request: Request):

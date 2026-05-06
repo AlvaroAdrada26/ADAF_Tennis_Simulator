@@ -23,7 +23,7 @@ async function initSimulation() {
 
     // Inicializa contador de puntos
     const counterEl = document.getElementById("point-counter");
-    if (counterEl) counterEl.textContent = `Punto 0 de ${data.timeline?.length || 0}`;
+    if (counterEl) counterEl.textContent = `Punto 0`;
 
     // Activa controles de simulación
     bindSimulationControls();

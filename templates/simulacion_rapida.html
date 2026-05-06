@@ -48,27 +48,7 @@
 {% block main_class %}ml-0{% endblock %}
 
 {% block header %}
-<!-- HEADER (solo para visitantes) -->
-<header class="w-full flex justify-between items-center px-10 py-4 bg-slate-950/40 backdrop-blur-sm border-b border-blue-800/30">
-  <div class="flex items-center space-x-3">
-    <a href="/" class="text-xl font-semibold text-yellow-400 tracking-wide hover:text-yellow-300 transition">
-      ADAF Tennis Simulator
-    </a>
-  </div>
-  <div class="flex items-center space-x-8">
-    <nav class="hidden md:flex space-x-8 text-sm">
-      <a href="/" class="hover:text-yellow-400 transition">Inicio</a>
-      <a href="/documentacion" class="hover:text-yellow-400 transition" data-i18n="headerDocumentacion">Documentación del modelo</a>
-    </nav>
-    <div class="flex items-center gap-3">
-      <a href="/login" class="px-4 py-2 text-sm font-medium text-yellow-400 hover:text-yellow-300 transition">Iniciar Sesión</a>
-      <a href="/registro" class="px-4 py-2 text-sm font-semibold bg-yellow-400 hover:bg-yellow-500 text-black rounded-full transition shadow-lg">Registrarse</a>
-    </div>
-    <div class="flex items-center gap-3">
-      <!-- LANGUAGE SELECTOR DISABLED (Solo español) -->
-    </div>
-  </div>
-</header>
+  {% include "partials/header_minimal.html" %}
 {% endblock %}
 
 {% block content %}
@@ -102,12 +82,12 @@
         <div class="flex items-center justify-center gap-4 mb-6">
           <div class="text-right">
             <p class="text-xl font-bold text-gray-100">Nadal</p>
-            <p class="text-md text-gray-400">🇪🇸</p>
+            <p class="text-xs font-mono tracking-widest text-gray-500 uppercase">ESP</p>
           </div>
           <div class="w-px h-10 bg-yellow-400/40"></div>
           <div class="text-left">
             <p class="text-xl font-bold text-gray-100">Federer</p>
-            <p class="text-md text-gray-400">🇨🇭</p>
+            <p class="text-xs font-mono tracking-widest text-gray-500 uppercase">SUI</p>
           </div>
         </div>
 
@@ -141,12 +121,12 @@
         <div class="flex items-center justify-center gap-4 mb-6">
           <div class="text-right">
             <p class="text-xl font-bold text-gray-100">Alcaraz</p>
-            <p class="text-md text-gray-400">🇪🇸</p>
+            <p class="text-xs font-mono tracking-widest text-gray-500 uppercase">ESP</p>
           </div>
           <div class="w-px h-10 bg-yellow-400/40"></div>
           <div class="text-left">
             <p class="text-xl font-bold text-gray-100">Sinner</p>
-            <p class="text-md text-gray-400">🇮🇹</p>
+            <p class="text-xs font-mono tracking-widest text-gray-500 uppercase">ITA</p>
           </div>
         </div>
 
@@ -177,12 +157,12 @@
         <div class="flex items-center justify-center gap-4 mb-6">
           <div class="text-right">
             <p class="text-xl font-bold text-gray-100">Djokovic</p>
-            <p class="text-md text-gray-400">🇷🇸</p>
+            <p class="text-xs font-mono tracking-widest text-gray-500 uppercase">SRB</p>
           </div>
           <div class="w-px h-10 bg-yellow-400/40"></div>
           <div class="text-left">
             <p class="text-xl font-bold text-gray-100">Murray</p>
-            <p class="text-md text-gray-400">🇬🇧</p>
+            <p class="text-xs font-mono tracking-widest text-gray-500 uppercase">GBR</p>
           </div>
         </div>
 

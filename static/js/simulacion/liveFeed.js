@@ -61,22 +61,31 @@ export function updatePointsFeed(pointData) {
   }
 
   // === Icon + description based on point type ===
-  let icon = "🎾";
+  // SVG icons keyed by event type
+  const SVG_ICONS = {
+    ace:        '<svg class="w-4 h-4 text-yellow-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
+    doble:      '<svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+    error_resto:'<svg class="w-4 h-4 text-orange-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>',
+    error_golpe:'<svg class="w-4 h-4 text-orange-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>',
+    no_llega:   '<svg class="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>',
+    default:    '<svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>',
+  };
+  let icon = SVG_ICONS.default;
   let desc = "";
   if (reason.includes("ace")) {
-    icon = "🎯";
+    icon = SVG_ICONS.ace;
     desc = `<span class="text-yellow-300 font-semibold">${server}</span> mete un ace por el ${Math.random() > 0.5 ? "centro" : "abierto"}.`;
   } else if (reason.includes("doble_falta")) {
-    icon = "⚠️";
+    icon = SVG_ICONS.doble;
     desc = `<span class="text-yellow-300 font-semibold">${server}</span> comete una doble falta.`;
   } else if (reason.includes("error_resto")) {
-    icon = "❌";
+    icon = SVG_ICONS.error_resto;
     desc = `<span class="text-yellow-300 font-semibold">${loser}</span> falla el resto. Punto directo para <span class="text-yellow-300 font-semibold">${winner}</span>.`;
   } else if (reason.includes("error_golpe")) {
-    icon = "😬";
+    icon = SVG_ICONS.error_golpe;
     desc = `Error no forzado de <span class="text-yellow-300 font-semibold">${loser}</span> tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
   } else if (reason.includes("no_llega")) {
-    icon = "🏃";
+    icon = SVG_ICONS.no_llega;
     desc = `<span class="text-yellow-300 font-semibold">${loser}</span> no alcanza la bola tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
   } else {
     desc = `Punto para <span class="text-yellow-300 font-semibold">${winner}</span> tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
@@ -91,7 +100,7 @@ export function updatePointsFeed(pointData) {
   li.innerHTML = `
     <div class="border border-blue-800/20 ${bgClass} border-l-2 rounded-lg px-4 py-2.5 shadow-sm">
       <div class="flex items-center gap-2">
-        <span class="text-lg leading-none">${icon}</span>
+        <span class="leading-none flex-shrink-0">${icon}</span>
         <span class="text-sm text-gray-200 flex-1">${desc}</span>
       </div>
     </div>
