@@ -236,41 +236,38 @@
   }
 
   function tierClasses(avg) {
-    if (avg >= 85) return { bg: 'tier-gold',   glow: 'glow-gold',   border: 'border-yellow-400', text: 'text-yellow-900', sub: 'text-slate-700' };
-    if (avg >= 70) return { bg: 'tier-silver',  glow: 'glow-silver', border: 'border-gray-400',   text: 'text-gray-800',   sub: 'text-gray-600'  };
+    if (avg >= 80) return { bg: 'tier-gold',   glow: 'glow-gold',   border: 'border-yellow-400', text: 'text-yellow-900', sub: 'text-slate-700' };
+    if (avg >= 55) return { bg: 'tier-silver',  glow: 'glow-silver', border: 'border-gray-400',   text: 'text-gray-800',   sub: 'text-gray-600'  };
     return              { bg: 'tier-bronze',  glow: 'glow-bronze', border: 'border-amber-600',  text: 'text-amber-900',  sub: 'text-slate-700' };
   }
 
   function buildCard(p, cardEl) {
-    var keys = ['Primer_Saque','Segundo_Saque','Fisico','Estamina','Consistencia','Clutch','Momentum','Derecha','Reves','Resto','Movilidad'];
+    var attrs = [p.Primer_Saque, p.Segundo_Saque, p.Resto, p.Derecha, p.Reves, p.Movilidad, p.Consistencia, p.Clutch, p.Fisico];
     var sum = 0;
-    for (var i = 0; i < keys.length; i++) sum += (p[keys[i]] || 0);
-    var avg = Math.round(sum / keys.length);
+    for (var i = 0; i < attrs.length; i++) sum += (attrs[i] || 0);
+    var avg = Math.round(sum / 9);
     var t = tierClasses(avg);
 
-    cardEl.className = 'rounded-2xl shadow-xl p-4 border-[3px] ' + t.bg + ' ' + t.glow + ' ' + t.border;
-
-    var labels = {
-      Primer_Saque: '1st Srv', Segundo_Saque: '2nd Srv', Fisico: 'Físico',
-      Estamina: 'Estamina', Consistencia: 'Consist.', Clutch: 'Clutch',
-      Momentum: 'Momentum', Derecha: 'Forehand', Reves: 'Backhand',
-      Resto: 'Return', Movilidad: 'Movement'
-    };
-
-    var cells = '';
-    for (var k in labels) {
-      cells += '<div><div class="text-[9px] font-semibold ' + t.sub + '">' + labels[k] + '</div>' +
-               '<div class="text-sm font-bold ' + t.text + '">' + (p[k] || 50) + '</div></div>';
-    }
+    cardEl.className = 'rounded-2xl shadow-xl p-3.5 border-[3px] ' + t.bg + ' ' + t.glow + ' ' + t.border;
 
     cardEl.innerHTML =
-      '<div class="flex items-center justify-between mb-2">' +
+      '<div class="flex items-center justify-between mb-1">' +
         '<div class="text-4xl font-extrabold ' + t.text + ' drop-shadow-sm leading-none">' + avg + '</div>' +
-        '<div class="text-[10px] font-semibold ' + t.sub + ' uppercase tracking-wide text-right">Demo</div>' +
+        '<div class="text-[11px] font-semibold ' + t.sub + ' uppercase tracking-wide text-right">Demo</div>' +
       '</div>' +
-      '<div class="text-base font-extrabold uppercase tracking-wide ' + t.text + ' truncate mb-0.5">' + p.name + '</div>' +
+      '<div class="text-base font-extrabold uppercase tracking-wide ' + t.text + ' truncate">' + p.name + '</div>' +
       '<div class="mt-2 border-t border-current opacity-20"></div>' +
-      '<div class="mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 text-center">' + cells + '</div>' +
+      '<div class="mt-2 grid grid-cols-3 gap-x-1 gap-y-1.5 text-center">' +
+        '<div><div class="text-[9px] font-semibold ' + t.sub + '">1st Srv</div><div class="text-sm font-bold ' + t.text + '">' + (p.Primer_Saque||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + t.sub + '">2nd Srv</div><div class="text-sm font-bold ' + t.text + '">' + (p.Segundo_Saque||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + t.sub + '">Return</div><div class="text-sm font-bold ' + t.text + '">' + (p.Resto||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + t.sub + '">Forehand</div><div class="text-sm font-bold ' + t.text + '">' + (p.Derecha||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + t.sub + '">Backhand</div><div class="text-sm font-bold ' + t.text + '">' + (p.Reves||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + t.sub + '">Consist.</div><div class="text-sm font-bold ' + t.text + '">' + (p.Consistencia||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + t.sub + '">Movement</div><div class="text-sm font-bold ' + t.text + '">' + (p.Movilidad||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + t.sub + '">Physical</div><div class="text-sm font-bold ' + t.text + '">' + (p.Fisico||50) + '</div></div>' +
+        '<div><div class="text-[9px] font-semibold ' + t.sub + '">Clutch</div><div class="text-sm font-bold ' + t.text + '">' + (p.Clutch||50) + '</div></div>' +
+      '</div>' +
       '<div class="mt-2 flex items-center justify-center">' +
         '<span class="text-[8px] uppercase tracking-wider ' + t.sub + ' font-semibold opacity-60">ADAF Tennis Simulator</span>' +
       '</div>';
@@ -351,7 +348,7 @@
         player2_name: matchData.player2.name
       }));
 
-      window.location.href = '/simulacion2';
+      window.location.href = '/simulacion';
 
     } catch (err) {
       showToast('Error: ' + err.message, true);

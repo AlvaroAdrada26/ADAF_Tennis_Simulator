@@ -42,17 +42,10 @@ def perfil(request: Request):
     )
 
 
-@router.get("/simulacion2", response_class=HTMLResponse)
-def simulacion2(request: Request):
+@router.get("/simulacion", response_class=HTMLResponse)
+def simulacion(request: Request):
     return templates.TemplateResponse(
-        "simulacion2.html", {"request": request, "active_page": "simulacion"}
-    )
-
-
-@router.get("/simulacion-legacy", response_class=HTMLResponse)
-def simulacion_legacy(request: Request):
-    return templates.TemplateResponse(
-        "simulacionExcremento.html", {"request": request, "active_page": "simulacion"}
+        "simulacion.html", {"request": request, "active_page": "simulacion"}
     )
 
 
@@ -244,12 +237,16 @@ def soporte(request: Request):
 
 @router.get("/privacidad", response_class=HTMLResponse)
 def privacidad(request: Request):
-    return _placeholder(request, "Política de Privacidad", "home")
+    return templates.TemplateResponse(
+        "privacidad.html", {"request": request, "active_page": "home"}
+    )
 
 
 @router.get("/terminos", response_class=HTMLResponse)
 def terminos(request: Request):
-    return _placeholder(request, "Términos de Uso", "home")
+    return templates.TemplateResponse(
+        "terminos.html", {"request": request, "active_page": "home"}
+    )
 
 
 @router.get("/licencia", response_class=HTMLResponse)

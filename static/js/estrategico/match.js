@@ -45,6 +45,19 @@
   const finalWinnerText = document.getElementById('final-winner-text');
   const finalScoreText = document.getElementById('final-score-text');
 
+  // ── Reason labels ───────────────────────────────────────
+  const REASON_LABELS = {
+    ace:         'Ace',
+    doble_falta: 'Doble falta',
+    error_resto: 'Error al resto',
+    error_golpe: 'Error de golpe',
+    no_llega:    'No llega',
+    max_rally:   'Final de rally',
+  };
+  function reasonLabel(reason) {
+    return REASON_LABELS[reason] || reason;
+  }
+
   // ── Helpers ─────────────────────────────────────────────
   function getToken() { return localStorage.getItem('access_token') || ''; }
 
@@ -184,7 +197,7 @@
     html += '<span class="text-yellow-400 font-bold"><svg class="w-4 h-4 inline-block align-middle mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M2 12c2.5 3 5 4.5 10 4.5S19.5 15 22 12M2 12c2.5-3 5-4.5 10-4.5S19.5 9 22 12"/></svg>' + winnerName + '</span>';
     html += '<span class="text-gray-500">gana el punto</span>';
     html += '</div>';
-    if (reason) html += '<p class="text-gray-400 text-xs">Razón: ' + reason + '</p>';
+    if (reason) html += '<p class="text-gray-400 text-xs">Razón: ' + reasonLabel(reason) + '</p>';
     if (serverName) html += '<p class="text-gray-500 text-xs">Saque: ' + serverName + '</p>';
     if (rallyShots) html += '<p class="text-gray-500 text-xs">Rally: ' + rallyShots + ' golpes</p>';
 
@@ -224,7 +237,7 @@
     li.className = 'py-1 px-2 rounded ' + (idx % 2 === 0 ? 'bg-slate-800/30' : '');
     li.innerHTML = '<span class="text-gray-500 text-xs mr-2">#' + (idx + 1) + '</span>' +
       '<span class="' + color + ' font-medium">' + icon + ' ' + winnerName + '</span>' +
-      '<span class="text-gray-500 text-xs ml-1">' + (pointData.reason || '') + '</span>' +
+      '<span class="text-gray-500 text-xs ml-1">' + reasonLabel(pointData.reason || '') + '</span>' +
       '<span class="text-gray-600 text-xs ml-1">' + scoreText + '</span>';
 
     pointsList.prepend(li);

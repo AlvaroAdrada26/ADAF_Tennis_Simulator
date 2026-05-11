@@ -786,7 +786,7 @@ document.addEventListener('auth:ready', function(ev) {
           +       escapeHtml(m.jugador_1) + ' <span class="text-gray-500 font-normal">vs</span> ' + escapeHtml(m.jugador_2)
           +     '</p>'
           +     '<p class="text-xs text-gray-400">'
-          +       (m.superficie_icon || '') + ' ' + escapeHtml(m.superficie)
+          +       superficieBox(m.superficie) + escapeHtml(m.superficie)
           +       ' · Bo' + m.formato_sets
           +       (m.duracion_minutos ? ' · ' + m.duracion_minutos + ' min' : '')
           +     '</p>'
@@ -888,7 +888,7 @@ document.addEventListener('auth:ready', function(ev) {
             +       escapeHtml(m.jugador_1) + ' <span class="text-gray-500 font-normal">vs</span> ' + escapeHtml(m.jugador_2)
             +     '</p>'
             +     '<p class="text-xs text-gray-400">'
-            +       (m.superficie_icon || '') + ' ' + escapeHtml(m.superficie)
+            +       superficieBox(m.superficie) + escapeHtml(m.superficie)
             +       ' · Bo' + m.formato_sets
             +       (m.duracion_minutos ? ' · ' + m.duracion_minutos + ' min' : '')
             +     '</p>'
@@ -1047,7 +1047,7 @@ document.addEventListener('auth:ready', function(ev) {
     const metaDiv = document.getElementById('modal-meta');
     metaDiv.innerHTML = '';
     const metaParts = [];
-    if (p.superficie) metaParts.push((p.superficie_icon || '') + ' ' + p.superficie);
+    if (p.superficie) metaParts.push(superficieBox(p.superficie) + p.superficie);
     metaParts.push('Bo' + p.formato_sets);
     if (p.duracion_minutos) metaParts.push(p.duracion_minutos + ' min');
     if (p.fecha_jugado) {
@@ -1135,6 +1135,12 @@ document.addEventListener('auth:ready', function(ev) {
       + '<div class="bar-p2"><div class="bar-fill bar-fill-p2" style="width:' + pct2 + '%"></div></div>';
 
     container.appendChild(row);
+  }
+
+  function superficieBox(s) {
+    var colors = { 'Dura': '#3B82F6', 'Arcilla': '#C2410C', 'Tierra': '#C2410C', 'Hierba': '#22C55E' };
+    var c = colors[s] || '#6B7280';
+    return '<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:' + c + ';vertical-align:middle;margin-right:3px;"></span>';
   }
 
   function escapeHtml(text) {

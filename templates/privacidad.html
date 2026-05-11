@@ -1,0 +1,119 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Política de Privacidad - ADAF Tennis Simulator{% endblock %}
+
+{% block header %}
+  {% include "partials/header_minimal.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 px-6 py-16 max-w-3xl mx-auto w-full animate-fade-up">
+
+  <h1 class="text-4xl font-bold text-yellow-400 mb-2">Política de Privacidad</h1>
+  <p class="text-gray-500 text-sm mb-10">Última actualización: mayo de 2026</p>
+
+  <div class="space-y-10 text-gray-300 leading-relaxed">
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">1. Responsable del tratamiento</h2>
+      <p>
+        El responsable del tratamiento de los datos es el autor de este Trabajo de Fin de Grado,
+        desarrollado en el marco de la Universidad Complutense de Madrid (UCM).
+        ADAF Tennis Simulator es un proyecto académico sin ánimo de lucro.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">2. Datos que recopilamos</h2>
+      <p>Al registrarte en la plataforma, recopilamos los siguientes datos:</p>
+      <ul class="list-disc list-inside mt-3 space-y-1 text-gray-400">
+        <li>Nombre de usuario.</li>
+        <li>Dirección de correo electrónico.</li>
+        <li>Contraseña (almacenada en forma de hash bcrypt; nunca en texto plano).</li>
+        <li>Datos opcionales del perfil: nombre, apellido, nacionalidad y género.</li>
+      </ul>
+      <p class="mt-3">
+        Adicionalmente, la plataforma guarda los registros de partidos y jugadores creados
+        por el usuario, necesarios para ofrecer el servicio.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">3. Finalidad del tratamiento</h2>
+      <p>Los datos se usan exclusivamente para:</p>
+      <ul class="list-disc list-inside mt-3 space-y-1 text-gray-400">
+        <li>Gestionar el acceso y la sesión del usuario en la plataforma.</li>
+        <li>Almacenar el historial de simulaciones y jugadores creados.</li>
+        <li>Fines de investigación académica asociados al TFG.</li>
+      </ul>
+      <p class="mt-3">
+        En ningún caso los datos se ceden a terceros ni se usan con fines comerciales o publicitarios.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">4. Base legal</h2>
+      <p>
+        El tratamiento de los datos se basa en el consentimiento del usuario, otorgado
+        en el momento del registro y la aceptación de esta política.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">5. Almacenamiento y seguridad</h2>
+      <p>
+        Los datos se almacenan en una base de datos local SQLite / PostgreSQL durante el periodo
+        de evaluación del proyecto. Se aplican medidas técnicas básicas de seguridad:
+        hashing de contraseñas con bcrypt, autenticación mediante JWT y comunicación por HTTPS
+        cuando se despliega en entorno de producción.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">6. Derechos del usuario</h2>
+      <p>Como usuario tienes derecho a:</p>
+      <ul class="list-disc list-inside mt-3 space-y-1 text-gray-400">
+        <li><span class="text-gray-300 font-medium">Acceso:</span> consultar qué datos tuyos están almacenados.</li>
+        <li><span class="text-gray-300 font-medium">Rectificación:</span> corregir datos incorrectos o desactualizados.</li>
+        <li><span class="text-gray-300 font-medium">Supresión:</span> solicitar la eliminación de tu cuenta y todos tus datos.</li>
+        <li><span class="text-gray-300 font-medium">Oposición:</span> oponerte al tratamiento de tus datos en cualquier momento.</li>
+      </ul>
+      <p class="mt-3">
+        Para ejercer cualquiera de estos derechos, contacta a través de los canales habilitados
+        en la Universidad Complutense de Madrid.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">7. Cookies y almacenamiento local</h2>
+      <p>
+        La plataforma utiliza <strong class="text-gray-200">localStorage</strong> del navegador para almacenar
+        el token de sesión JWT. No se usan cookies de rastreo ni herramientas de analítica de terceros.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-3">8. Cambios en esta política</h2>
+      <p>
+        Esta política puede actualizarse durante el desarrollo del proyecto. Los cambios relevantes
+        se comunicarán en esta misma página.
+      </p>
+    </section>
+
+  </div>
+
+  <div class="mt-12">
+    <a href="/" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-900 font-semibold rounded-lg hover:scale-105 transition shadow-lg">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Volver al inicio
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block footer %}
+  {% include "partials/footer_simple.html" %}
+{% endblock %}
