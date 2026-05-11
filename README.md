@@ -23,7 +23,7 @@ La aplicación ofrece un **Modo Estratégico**, en el que el usuario puede tomar
 ## ✨ Características Principales
 
 - **Simulación punto a punto:** Motor de juego que no se limita a generar un ganador, sino que simula el desarrollo del partido mediante fases como saque, resto y peloteo.
-- **Modo Estratégico:** Permite intervenir durante el partido seleccionando estrategias como agresiva, neutral o defensiva, modificando el desarrollo del punto siguiente.
+- **Modo Estratégico:** Permite intervenir durante el partido seleccionando una estrategia predefinida, como agresiva, neutral o defensiva, modificando el desarrollo del punto siguiente.
 - **Panel de Estadísticas y Big Data:** Historial de resultados, desglose estadístico de partidos y simulaciones masivas para analizar tendencias.
 - **Gestión de Torneos:** Creación, emparejamiento y simulación de torneos eliminatorios de 4, 8 o 16 jugadores.
 - **Gestión de Jugadores y Usuarios:** Registro e inicio de sesión, creación de tenistas personalizados y almacenamiento de resultados.
@@ -67,6 +67,26 @@ El backend necesita conectarse a una base de datos de PostgreSQL.
    ```
 
    Nota: por defecto, la aplicación asume que el usuario es `postgres` y la contraseña es `root` (`postgresql://postgres:root@localhost:5432/adaf`). Si tu configuración es distinta, configura la variable de entorno `DATABASE_URL` con tu cadena de conexión.
+
+   La aplicación no carga automáticamente un archivo `.env`; las variables deben estar definidas en el entorno del sistema antes de ejecutar Uvicorn.
+
+   Ejemplo en Windows PowerShell:
+
+   ```powershell
+   $env:DATABASE_URL="postgresql://usuario:contrasena@localhost:5432/adaf"
+   ```
+
+   Ejemplo en Windows CMD:
+
+   ```cmd
+   set DATABASE_URL=postgresql://usuario:contrasena@localhost:5432/adaf
+   ```
+
+   Ejemplo en Linux/Mac:
+
+   ```bash
+   export DATABASE_URL="postgresql://usuario:contrasena@localhost:5432/adaf"
+   ```
 
 ### 💻 2. Preparación del Entorno Virtual
 
