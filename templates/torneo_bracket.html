@@ -4,39 +4,36 @@
 
 {% block head_extra %}
 <style>
-  /* ─── Split Bracket Layout ─── */
-  .bracket-split {
+  /* ─── Linear Flow Bracket Layout ─── */
+  .bracket-flow {
     display: flex;
-    align-items: stretch;
-    justify-content: center;
+    align-items: flex-start;
     gap: 0;
-    padding: 2.5rem 1rem;
-    min-height: 600px;
+    min-width: max-content;
   }
-  .bracket-half {
-    display: flex;
-    align-items: center;
-    gap: 0;
-  }
-  .bracket-half.right { flex-direction: row-reverse; }
 
-  .bracket-round {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    gap: 1.5rem;
-    min-width: 280px;
-    position: relative;
-    padding: 0 0.5rem;
-  }
   .bracket-round-title {
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: #facc15;
-    margin-bottom: 0.75rem;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Slot: vertically centers a match card */
+  .bracket-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    box-sizing: border-box;
+  }
+  .bracket-slot .match-card {
+    min-width: unset;
+    width: 100%;
   }
 
   /* ─── Match Card (bigger) ─── */
@@ -146,15 +143,13 @@
     position: relative;
   }
 
-  /* ─── Center Column (Final + Champion) ─── */
-  .bracket-center {
+  /* ─── Champion column ─── */
+  .bracket-champion-col {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1.5rem;
-    min-width: 300px;
-    padding: 0 1rem;
+    flex-shrink: 0;
   }
 
   /* ─── Champion Box (bigger) ─── */
@@ -264,15 +259,7 @@
   }
   .match-reveal { animation: match-reveal 0.5s ease-out forwards; }
 
-  /* ─── Linear fallback (4 players) ─── */
-  .bracket-linear {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    padding: 2.5rem 1rem;
-    min-height: 500px;
-  }
+
 </style>
 {% endblock %}
 
@@ -300,6 +287,12 @@
         </button>
         <a href="/torneo" class="px-5 py-3 bg-slate-700/50 border border-blue-800/30 text-gray-300 rounded-full hover:bg-slate-700 transition text-sm font-medium flex items-center gap-2">
           Nuevo Torneo
+        </a>
+        <a id="btn-menu" href="/menu" class="hidden px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full transition shadow-lg flex items-center gap-2 text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+          Volver al Menú
         </a>
       </div>
     </div>
@@ -475,6 +468,7 @@ document.addEventListener('auth:ready', function(e) {
       btn.innerHTML = '✅ Torneo Completado';
       btn.classList.remove('bg-yellow-400', 'hover:bg-yellow-300', 'text-slate-900');
       btn.classList.add('bg-green-600/20', 'text-green-400', 'border', 'border-green-600/30', 'cursor-default');
+      document.getElementById('btn-menu').classList.remove('hidden');
     }
 
     renderBracket();
@@ -483,7 +477,6 @@ document.addEventListener('auth:ready', function(e) {
   function renderBracket() {
     const container = document.getElementById('bracket-container');
     const bracket = torneoData.bracket;
-    const numPlayers = torneoData.torneo.num_jugadores;
 
     // Group matches by round
     const rounds = {};
@@ -492,73 +485,88 @@ document.addEventListener('auth:ready', function(e) {
       rounds[m.ronda].push(m);
     });
 
+    // Descending: largest ronda = first round played (most matches)
     const sortedRoundKeys = Object.keys(rounds).map(Number).sort((a, b) => b - a);
 
-    if (numPlayers >= 8) {
-      // ─── SPLIT LAYOUT: left half + center (final+champion) + right half ───
-      // First round (highest round number) splits in half
-      const firstRound = sortedRoundKeys[0];
-      const firstRoundMatches = rounds[firstRound] || [];
-      const halfCount = Math.ceil(firstRoundMatches.length / 2);
-      const leftFirstMatches = firstRoundMatches.filter(m => m.posicion <= halfCount);
-      const rightFirstMatches = firstRoundMatches.filter(m => m.posicion > halfCount);
+    // Layout constants
+    const COL_W    = 250;  // px – round column width
+    const CONN_W   = 32;   // px – connector column width
+    const TITLE_H  = 40;   // px – round title row height
+    const SLOT_H   = 160;  // px – height of one first-round match slot
+    const numFirst = (rounds[sortedRoundKeys[0]] || []).length;
+    const BRACKET_H = numFirst * SLOT_H;
 
-      // Subsequent rounds (excluding final) also split
-      const midRounds = sortedRoundKeys.filter(r => r > 1 && r < firstRound);
-      const leftMidRounds = [];
-      const rightMidRounds = [];
-      midRounds.forEach(r => {
-        const ms = rounds[r] || [];
-        const midHalf = Math.ceil(ms.length / 2);
-        leftMidRounds.push({ round: r, matches: ms.filter(m => m.posicion <= midHalf) });
-        rightMidRounds.push({ round: r, matches: ms.filter(m => m.posicion > midHalf) });
-      });
-
-      // Build LEFT half (left-to-right: first round → mid rounds)
-      let leftHtml = '<div class="bracket-half left">';
-      leftHtml += buildRoundColumn(firstRound, leftFirstMatches);
-      leftMidRounds.forEach(lr => {
-        leftHtml += `<div class="bracket-connector"></div>`;
-        leftHtml += buildRoundColumn(lr.round, lr.matches);
-      });
-      leftHtml += '</div>';
-
-      // Build CENTER (Final + Champion)
-      const finalMatches = rounds[1] || [];
-      let centerHtml = '<div class="bracket-center">';
-      centerHtml += buildRoundColumn(1, finalMatches);
-      centerHtml += buildChampionBox();
-      centerHtml += '</div>';
-
-      // Build RIGHT half (right-to-left: first round → mid rounds, reversed visually)
-      let rightHtml = '<div class="bracket-half right">';
-      rightHtml += buildRoundColumn(firstRound, rightFirstMatches);
-      rightMidRounds.forEach(rr => {
-        rightHtml += `<div class="bracket-connector"></div>`;
-        rightHtml += buildRoundColumn(rr.round, rr.matches);
-      });
-      rightHtml += '</div>';
-
-      container.className = 'bracket-split';
-      container.innerHTML = leftHtml + `<div class="bracket-connector"></div>` + centerHtml + `<div class="bracket-connector"></div>` + rightHtml;
-
-    } else {
-      // ─── LINEAR LAYOUT (4 players): Semifinales → Final → Champion ───
-      let html = '';
-      sortedRoundKeys.forEach((roundNum, ri) => {
-        const matches = rounds[roundNum] || [];
-        html += buildRoundColumn(roundNum, matches);
-        if (ri < sortedRoundKeys.length - 1) {
-          html += `<div class="bracket-connector"></div>`;
-        }
-      });
-
-      html += `<div class="bracket-connector"></div>`;
-      html += buildChampionBox();
-
-      container.className = 'bracket-linear';
-      container.innerHTML = html;
+    /**
+     * Build an SVG connector between two adjacent round columns.
+     * For each group of 2 slots (from) → 1 slot (to), draws:
+     *   horizontal lines from each match center → vertical mid → horizontal to next column.
+     */
+    function connSVG(slotFrom, slotTo, numGroups) {
+      const totalH = numGroups * slotTo;
+      const mx = CONN_W / 2;
+      const clr = 'rgba(250,204,21,0.22)';
+      let d = '';
+      for (let i = 0; i < numGroups; i++) {
+        const y0 = i * slotTo + slotFrom / 2;       // center of top match
+        const y1 = (i + 1) * slotTo - slotFrom / 2;// center of bottom match
+        const ym = i * slotTo + slotTo / 2;         // center of output slot
+        d += `<line x1="0" y1="${y0}" x2="${mx}" y2="${y0}" stroke="${clr}" stroke-width="1.5"/>`;
+        d += `<line x1="${mx}" y1="${y0}" x2="${mx}" y2="${y1}" stroke="${clr}" stroke-width="1.5"/>`;
+        d += `<line x1="0" y1="${y1}" x2="${mx}" y2="${y1}" stroke="${clr}" stroke-width="1.5"/>`;
+        d += `<line x1="${mx}" y1="${ym}" x2="${CONN_W}" y2="${ym}" stroke="${clr}" stroke-width="1.5"/>`;
+      }
+      return `<svg width="${CONN_W}" height="${totalH}" style="display:block;flex-shrink:0">${d}</svg>`;
     }
+
+    let html = '<div class="bracket-flow">';
+
+    sortedRoundKeys.forEach((rnd, ri) => {
+      const ms = (rounds[rnd] || []).sort((a, b) => a.posicion - b.posicion);
+      const n = ms.length;
+      const slotH = BRACKET_H / n;
+      const rndName = roundNames[rnd] || `Ronda de ${rnd * 2}`;
+
+      // ── Round column ──
+      html += `<div style="width:${COL_W}px;flex-shrink:0;display:flex;flex-direction:column">`;
+      html += `<div class="bracket-round-title" style="height:${TITLE_H}px;display:flex;align-items:center;justify-content:center">${rndName}</div>`;
+      ms.forEach(m => {
+        html += `<div class="bracket-slot" style="height:${slotH}px">`;
+        html += buildMatchCard(m);
+        html += '</div>';
+      });
+      html += '</div>';
+
+      // ── Connector to next round (or to champion) ──
+      if (ri < sortedRoundKeys.length - 1) {
+        const nxtCount = (rounds[sortedRoundKeys[ri + 1]] || []).length;
+        const slotTo = BRACKET_H / nxtCount;
+        html += `<div style="flex-shrink:0;display:flex;flex-direction:column">`;
+        html += `<div style="height:${TITLE_H}px"></div>`;
+        html += connSVG(slotH, slotTo, nxtCount);
+        html += '</div>';
+      } else {
+        // After final: simple horizontal line to champion
+        html += `<div style="flex-shrink:0;display:flex;flex-direction:column">`;
+        html += `<div style="height:${TITLE_H}px"></div>`;
+        html += `<svg width="${CONN_W}" height="${BRACKET_H}" style="display:block;flex-shrink:0">`;
+        html += `<line x1="0" y1="${BRACKET_H / 2}" x2="${CONN_W}" y2="${BRACKET_H / 2}" stroke="rgba(250,204,21,0.22)" stroke-width="1.5"/>`;
+        html += '</svg>';
+        html += '</div>';
+      }
+    });
+
+    // ── Champion column ──
+    html += `<div style="flex-shrink:0;display:flex;flex-direction:column;min-width:190px">`;
+    html += `<div style="height:${TITLE_H}px"></div>`;
+    html += `<div style="height:${BRACKET_H}px;display:flex;align-items:center;justify-content:center;padding:8px;box-sizing:border-box">`;
+    html += buildChampionBox();
+    html += '</div>';
+    html += '</div>';
+
+    html += '</div>';
+
+    container.className = '';
+    container.innerHTML = html;
   }
 
   // ─── Simulate single match ─────────────────────────────
