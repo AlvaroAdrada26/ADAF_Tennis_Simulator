@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 jinja2
+starlette>=0.46.0,<1.0.0
 numpy
 # Auth & DB
 sqlalchemy

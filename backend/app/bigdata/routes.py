@@ -6,11 +6,13 @@ Endpoints del Modo Big Data.
 """
 from __future__ import annotations
 
+import asyncio
+import asyncio
 import json
 import logging
 from typing import Any, Dict
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -76,6 +78,7 @@ def bigdata_simulate(
 @router.post("/simulate_stream")
 async def bigdata_simulate_stream(
     request: BigDataRequest,
+    http_request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(bearer),
 ):
     """Simula N partidos con progreso vía Server-Sent Events."""
@@ -87,8 +90,13 @@ async def bigdata_simulate_stream(
         wins = {"P1": 0, "P2": 0}
 
         for i in range(request.num_matches):
+            # Detectar desconexion del cliente (abort)
+            if await http_request.is_disconnected():
+                return
+
             seed_i = (base_seed + i) if base_seed is not None else None
-            result = _run_single_match(request, seed_i)
+            # Ejecutar en threadpool para no bloquear el event loop
+            result = await asyncio.to_thread(_run_single_match, request, seed_i)
             results.append(result)
 
             winner_id = result.get("winner_id", "P1")

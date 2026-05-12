@@ -310,7 +310,7 @@ document.addEventListener('auth:ready', function(e) {
   'use strict';
 
   // ── Auth guard ──
-  if (!e.detail.authenticated) { window.location.href = '/'; return; }
+  if (!e.detail.authenticated) { show('state-no-auth'); return; }
 
   // ── Estado ──────────────────────────────────────────────
   let players = [];

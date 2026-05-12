@@ -80,6 +80,20 @@
 <main class="flex-1 px-8 py-10">
   <div class="max-w-5xl mx-auto">
 
+    <!-- ═══ Estado: NO logueado ═══ -->
+    <div id="state-no-auth" class="hidden text-center py-20">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
+        <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-200 mb-2">Inicia sesión para continuar</h2>
+      <p class="text-gray-400 mb-6">Necesitas una cuenta para crear un torneo.</p>
+      <a href="/login" class="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-full transition shadow-lg shadow-yellow-400/20">Iniciar Sesión</a>
+    </div>
+
+    <div id="torneo-content" class="hidden">
+
     <!-- Título -->
     <div class="mb-10 fade-in-up">
       <h1 class="text-3xl font-bold text-yellow-400 mb-2">🏆 Crear Torneo</h1>
@@ -166,12 +180,14 @@
       <p id="btn-error" class="text-red-400 text-sm mt-3 hidden"></p>
     </div>
 
+    </div><!-- /torneo-content -->
   </div>
 </main>
 
 <script>
 document.addEventListener('auth:ready', function(e) {
-  if (!e.detail.authenticated) { window.location.href = '/'; return; }
+  if (!e.detail.authenticated) { document.getElementById('state-no-auth').classList.remove('hidden'); return; }
+  document.getElementById('torneo-content').classList.remove('hidden');
   const token = localStorage.getItem('access_token');
 
   let allPlayers = [];

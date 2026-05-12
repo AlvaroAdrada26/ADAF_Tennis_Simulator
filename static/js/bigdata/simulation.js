@@ -3,9 +3,29 @@
  *
  * Conecta al endpoint streaming, actualiza la barra de progreso
  * y redirige a resultados cuando termina.
+ * Soporta abortar con AbortController (botón o salida de página).
  */
 (function () {
   'use strict';
+
+  var _abortController = null;
+  var _aborted = false;
+
+  // Expuesto globalmente para el botón y el evento beforeunload
+  window.abortBigDataSimulation = function () {
+    if (_abortController) {
+      _aborted = true;
+      _abortController.abort();
+    }
+  };
+
+  // Abortar si el usuario navega fuera de la página mientras simula
+  window.addEventListener('beforeunload', function () {
+    if (_abortController) {
+      _aborted = true;
+      _abortController.abort();
+    }
+  });
 
   window.startBigDataSimulation = async function (payload, token) {
     var progressFill = document.getElementById('progress-fill');
@@ -16,6 +36,9 @@
     var liveP1Bar = document.getElementById('live-p1-bar');
     var liveP2Bar = document.getElementById('live-p2-bar');
 
+    _aborted = false;
+    _abortController = new AbortController();
+
     try {
       var headers = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = 'Bearer ' + token;
@@ -23,7 +46,8 @@
       var response = await fetch('/api/bigdata/simulate_stream', {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: _abortController.signal
       });
 
       if (!response.ok) {
@@ -70,6 +94,7 @@
 
           } else if (msg.type === 'result') {
             // Store result & redirect
+            _abortController = null;
             sessionStorage.setItem('bigdata_result', JSON.stringify(msg.data));
             window.location.href = '/modo-big-data/resultados';
             return;
@@ -78,10 +103,18 @@
       }
 
       // If we get here without a result message, something went wrong
-      alert('La simulación terminó sin resultados.');
-      window.location.href = '/modo-big-data';
+      if (!_aborted) {
+        alert('La simulación terminó sin resultados.');
+        window.location.href = '/modo-big-data';
+      }
 
     } catch (err) {
+      _abortController = null;
+      if (_aborted) {
+        // Abort voluntario: volver al setup sin mensaje de error
+        window.location.href = '/modo-big-data';
+        return;
+      }
       alert('Error de conexión durante la simulación: ' + err.message);
       window.location.href = '/modo-big-data';
     }
