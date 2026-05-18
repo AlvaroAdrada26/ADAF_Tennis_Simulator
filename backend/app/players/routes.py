@@ -14,7 +14,7 @@ from backend.app.auth.routes import bearer_scheme
 router = APIRouter(prefix="/players", tags=["players"])
 
 
-# ─── GET /api/players ──────────────────────────────────────────
+# -- GET /api/players --
 @router.get("", response_model=List[JugadorOut])
 def listar_jugadores(
     credentials=Depends(bearer_scheme),

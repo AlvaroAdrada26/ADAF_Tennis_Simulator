@@ -23,7 +23,7 @@ class Player:
     Resto: float
     Movilidad: float
 
-    # --- Estado interno dinámico (no recibido por API) ---
+    # --- Estado interno dinamico (no recibido por API) ---
     streak: int = field(default=0, repr=False)
 
     def __post_init__(self):
@@ -55,7 +55,7 @@ class Player:
     @property
     def MOV(self): return self.Movilidad / 100
 
-    # --- Métodos auxiliares ---
+    # --- Metodos auxiliares ---
     def pick_side(self) -> tuple[str, float]:
         """Elige entre derecha (FH) o revés (BH) con ligera aleatoriedad."""
         if np.random.rand() < self.FH / (self.FH + self.BH + 1e-9):
@@ -67,7 +67,7 @@ class Player:
         """
         Reinicia las variables dinámicas del jugador antes de cada partido.
         """
-        self.Estamina = 100.0       # energía inicial completa
+        self.Estamina = 100.0       # energia inicial completa
         self.Momentum = 0.0         # sin impulso inicial
         self.streak = 0             # sin racha activa
 
@@ -94,14 +94,14 @@ class PointResult:
     feed: List[str] = field(default_factory=list)
     stats: Dict[str, Any] = field(default_factory=dict)
 
-    # NUEVOS campos opcionales (no afectan a la simulación)
+    # NUEVOS campos opcionales (no afectan a la simulacion)
     set_no: Optional[int] = None
     game_no: Optional[int] = None
     point_no: Optional[int] = None
     winner_id: Optional[str] = None
     score_after: Optional[Dict[str, Any]] = None
 
-    # --- NUEVOS CAMPOS PARA EXPORTACIÓN AL FRONTEND ---
+    # --- NUEVOS CAMPOS PARA EXPORTACION AL FRONTEND ---
     server_id: Optional[str] = None      # "P1" | "P2"
     game_end: bool = False               # True si este punto termina el game
     set_end: bool = False                # True si este punto termina el set
@@ -114,7 +114,7 @@ class PointResult:
     momentum_p2: Optional[float] = None
 
     # ============================================================
-    # Métodos útiles
+    # Metodos utiles
     # ============================================================
 
     def to_dict(self, names: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
@@ -161,7 +161,7 @@ class MatchStats:
     points_feed: List[PointResult] = field(default_factory=list)
 
     # ============================================================
-    # Métodos de agregación y exportación
+    # Metodos de agregacion y exportacion
     # ============================================================
 
     def add_point(self, res: PointResult):

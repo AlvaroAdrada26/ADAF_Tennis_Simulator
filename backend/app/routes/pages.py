@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parents[3]  # .../ADAF_TENNIS_SIMULATOR
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 
-# ─── Helpers ───────────────────────────────────────────────────────────────
+# -- Helpers --─
 def _placeholder(request: Request, title: str, active: str):
     """Render a generic 'coming soon' page."""
     return templates.TemplateResponse(
@@ -20,7 +20,7 @@ def _placeholder(request: Request, title: str, active: str):
     )
 
 
-# ─── Páginas principales ──────────────────────────────────────────────────
+# -- Paginas principales --
 @router.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse(
@@ -113,7 +113,7 @@ def simulacion_rapida_match(request: Request, match_name: str):
     )
 
 
-# ─── Modo Estratégico ─────────────────────────────────────────────────────
+# -- Modo Estrategico --
 @router.get("/modo-estrategico", response_class=HTMLResponse)
 def modo_estrategico_setup(request: Request):
     return templates.TemplateResponse(
@@ -128,7 +128,7 @@ def modo_estrategico_partido(request: Request):
     )
 
 
-# ─── Autenticación ────────────────────────────────────────────────────────
+# -- Autenticacion --
 @router.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
     return templates.TemplateResponse(
@@ -143,7 +143,7 @@ def registro_page(request: Request):
     )
 
 
-# ─── Sidebar: Estadísticas, Configuración, Historial ──────────────────────
+# -- Sidebar: Estadisticas, Configuración, Historial --
 @router.get("/estadisticas", response_class=HTMLResponse)
 def estadisticas(request: Request):
     return _placeholder(request, "Estadísticas", "estadisticas")
@@ -164,7 +164,7 @@ def historial(request: Request):
     return _placeholder(request, "Historial de Partidos", "simulacion")
 
 
-# ─── Header / Footer links ────────────────────────────────────────────────
+# -- Header / Footer links --
 @router.get("/documentacion", response_class=HTMLResponse)
 def documentacion(request: Request):
     return _placeholder(request, "Documentación", "home")
@@ -200,7 +200,7 @@ def analisis(request: Request):
     return _placeholder(request, "Análisis", "estadisticas")
 
 
-# ─── Modo Big Data ────────────────────────────────────────────────────────
+# -- Modo Big Data --
 @router.get("/modo-big-data", response_class=HTMLResponse)
 def modo_big_data(request: Request):
     return templates.TemplateResponse(

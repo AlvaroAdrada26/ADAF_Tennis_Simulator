@@ -136,11 +136,11 @@ class TennisGame:
 
             # Actualizar estamina de ambos jugadores
             for jugador in [self.server, self.returner]:
-                # Fatiga proporcional a la duración del punto e inversa al físico
+                # Fatiga proporcional a la duracion del punto e inversa al fisico
                 fatiga = (0.5 + res.stats["rally_shots"] * 0.2) * (1.5 - jugador.Fisico / 100)
                 jugador.Estamina = max(0.0, jugador.Estamina - fatiga)
 
-            # === Actualizar momentum según el resultado del punto ===
+            # === Actualizar momentum segun el resultado del punto ===
             if res.winner == SACADOR:
                 ganador, perdedor = self.server, self.returner
             else:
@@ -154,7 +154,7 @@ class TennisGame:
             ganador.Momentum *= 0.97
             perdedor.Momentum *= 0.97
 
-            # === Snapshot de momentum para exportación ===
+            # === Snapshot de momentum para exportacion ===
             res.momentum_p1 = self.p1.Momentum
             res.momentum_p2 = self.p2.Momentum
 
@@ -248,7 +248,7 @@ class TieBreakGame:
                 "server": "P1" if server == self.p1 else "P2",
             }
 
-            # === Snapshot de momentum para exportación ===
+            # === Snapshot de momentum para exportacion ===
             res.momentum_p1 = self.p1.Momentum
             res.momentum_p2 = self.p2.Momentum
 
@@ -281,7 +281,7 @@ class TennisSet:
         self.set_no = set_no
         self.games = {"P1": 0, "P2": 0}
         self.server_flag = 0  # alterna el sacador
-        self.points_timeline: List[PointResult] = []  # 🔹 todos los puntos del set
+        self.points_timeline: List[PointResult] = []  # todos los puntos del set
 
     # ------------------------------------------------------------
     def is_finished(self) -> Optional[str]:
@@ -303,7 +303,7 @@ class TennisSet:
     # ------------------------------------------------------------
     def _is_decisive_set(self) -> bool:
         """Devuelve True si este set es el último del partido (para tie-break a 10)."""
-        # Este método podría recibir info desde TennisMatch si se quiere adaptar.
+        # Este metodo podria recibir info desde TennisMatch si se quiere adaptar.
         return False
 
     # ------------------------------------------------------------
@@ -319,7 +319,7 @@ class TennisSet:
             game = TennisGame(server, returner, self.p1, self.p2, game_no=game_no)
             winner = game.play(verbose=verbose)
 
-            # Añadir puntos de este juego al timeline
+            # Anadir puntos de este juego al timeline
             for i, p in enumerate(game.feed[:-1]):
                 p.set_no = self.set_no
                 p.game_no = game_no
@@ -330,16 +330,16 @@ class TennisSet:
                     or (p.winner == RESTADOR and returner == self.p1)
                 ) else "P2"
 
-                # Nuevo: quién saca este punto
+                # Nuevo: quien saca este punto
                 p.server_id = "P1" if server == self.p1 else "P2"
 
                 # Nuevo: este punto no es de tie-break
                 p.is_tiebreak = False
 
-                # Nuevo: marcar si es el último punto del juego
+                # Nuevo: marcar si es el ultimo punto del juego
                 p.game_end = False
 
-                # (set_end se marca más adelante, al final del set)
+                # (set_end se marca mas adelante, al final del set)
                 p.set_end = False
 
                 # Marcador de juegos tras el punto
@@ -347,10 +347,10 @@ class TennisSet:
                     p.score_after = {}
                 p.score_after["set_games"] = self.games.copy()
 
-                # Añadir al timeline del set
+                # Anadir al timeline del set
                 self.points_timeline.append(p)
 
-            # Último punto del juego
+            # Ultimo punto del juego
             last_point = game.feed[-1]
             last_point.set_no = self.set_no
             last_point.game_no = game_no
@@ -361,16 +361,16 @@ class TennisSet:
                 or (last_point.winner == RESTADOR and returner == self.p1)
             ) else "P2"
 
-            # Nuevo: quién saca este punto
+            # Nuevo: quien saca este punto
             last_point.server_id = "P1" if server == self.p1 else "P2"
 
             # Nuevo: este punto no es de tie-break
             last_point.is_tiebreak = False
 
-            # Nuevo: marcar si es el último punto del juego
+            # Nuevo: marcar si es el ultimo punto del juego
             last_point.game_end = True
 
-            # (set_end se marca más adelante, al final del set)
+            # (set_end se marca mas adelante, al final del set)
             last_point.set_end = False
 
             # Marcador de juegos tras el punto
@@ -389,12 +389,12 @@ class TennisSet:
             else:
                 score_after_aux["set_games"][tag_returner] += 1
                 self.games[tag_returner] += 1
-            # Añadir al timeline del set
+            # Anadir al timeline del set
 
             last_point.score_after = score_after_aux.copy()
             self.points_timeline.append(last_point)
 
-            # --- Comprobación: Tie-break a 6–6 ---
+            # --- Comprobacion: Tie-break a 6–6 ---
             if self.tiebreak and self.games["P1"] == 6 and self.games["P2"] == 6:
                 if verbose:
                     print("\n=== TIE-BREAK ===")
@@ -403,7 +403,7 @@ class TennisSet:
                                   set_no=self.set_no, game_no=game_no + 1)
                 tb_winner, tb_points = tb.play(verbose=verbose)
 
-                # Añadir puntos del tie-break al timeline del set
+                # Anadir puntos del tie-break al timeline del set
                 for i, p in enumerate(tb_points):
                     p.set_no = self.set_no
                     p.winner_id = p.winner_id or ("P1" if p.winner == SACADOR and tb.p1 == self.p1 else "P2")
@@ -424,7 +424,7 @@ class TennisSet:
                 else:
                     self.games["P2"] += 1
 
-                # Recuperación larga tras set (post tie-break)
+                # Recuperacion larga tras set (post tie-break)
                 for jugador in [self.p1, self.p2]:
                     rec_set = 2 + 5 * (jugador.Fisico / 100)
                     jugador.Estamina = min(100.0, jugador.Estamina + rec_set)
@@ -437,11 +437,11 @@ class TennisSet:
 
             fin = self.is_finished()
             if fin:
-                # Marcar último punto como fin de set
+                # Marcar ultimo punto como fin de set
                 if self.points_timeline:
                     self.points_timeline[-1].set_end = True
 
-                # Recuperación tras set normal
+                # Recuperacion tras set normal
                 for jugador in [self.p1, self.p2]:
                     rec_set = 2 + 5 * (jugador.Fisico / 100)
                     jugador.Estamina = min(100.0, jugador.Estamina + rec_set)
@@ -492,7 +492,7 @@ class TennisMatch:
 
             self.sets[ganador] += 1
             self.resultados_sets.append(marcador)
-            full_timeline.extend(set_timeline)   # ✅ solo usamos el que devuelve el set
+            full_timeline.extend(set_timeline)   # solo usamos el que devuelve el set
 
             fin = self.is_finished()
             if fin:

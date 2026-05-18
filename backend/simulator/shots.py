@@ -16,7 +16,7 @@ from .utils import clip, rand, SACADOR, RESTADOR
 
 
 # ============================================================
-# Clase base genérica
+# Clase base generica
 # ============================================================
 
 class Shot:
@@ -96,7 +96,7 @@ class Serve(Shot):
         score = 0.6*s + 0.4*c
         base_prob = 0.86 + 0.09*score
 
-        # --- Efecto Clutch (solo en puntos de presión) ---
+        # --- Efecto Clutch (solo en puntos de presion) ---
         if self.clutch:
             k = self.hitter.K  # 0..1
             clutch_boost = (k - 0.5) * 0.20  # ±10% efecto
@@ -158,7 +158,7 @@ class Serve(Shot):
         pot *= momentum_factor
         prec *= momentum_factor
 
-        # --- Ajuste por clutch (solo si el punto es de presión) ---
+        # --- Ajuste por clutch (solo si el punto es de presion) ---
         if self.clutch:
             k = self.hitter.K
             clutch_boost = 1.0 + (k - 0.5) * 0.20  # ±10 %
@@ -259,7 +259,7 @@ class ReturnShot(Shot):
       hitter = self.receiver
       side_name, side = hitter.pick_side()
 
-      # === Cálculo base ===
+      # === Calculo base ===
       pot_base = 0.35 * hitter.RET + 0.25 * hitter.F + 0.20 * hitter.E + 0.20 * side
       prec_base = 0.40 * hitter.RET + 0.25 * hitter.C + 0.20 * side + 0.15 * hitter.MOV
 
@@ -289,7 +289,7 @@ class ReturnShot(Shot):
           k = self.hitter.K
           clutch_boost = 1.0 + (k - 0.5) * 0.20  # ±10 %
 
-      # Aplicar clutch a precisión
+      # Aplicar clutch a precision
       prec_out *= clutch_boost
 
       # === Estrategia: pot/prec ===
@@ -410,7 +410,7 @@ class RallyShot(Shot):
           k = self.hitter.K
           clutch_boost = 1.0 + (k - 0.5) * 0.20  # ±10 %
 
-      # Aplicar clutch a precisión
+      # Aplicar clutch a precision
       prec_out *= clutch_boost
 
       # === Estrategia: pot/prec ===

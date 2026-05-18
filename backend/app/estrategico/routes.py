@@ -49,12 +49,10 @@ def _build_score_response(sk: MatchScorekeeper) -> Dict[str, Any]:
     return sk.get_score_snapshot()
 
 
-# ──────────────────────────────────────────────────────────
 # POST /api/estrategico/start
-# ──────────────────────────────────────────────────────────
 @router.post("/start")
 def estrategico_start(req: EstrategicoStartRequest):
-    # Limpiar sesiones expiradas (oportunista)
+    # limpiar sesiones expiradas (oportunista)
     cleanup_expired()
 
     p1 = _player_from_schema(req.player1)
@@ -90,9 +88,7 @@ def estrategico_start(req: EstrategicoStartRequest):
     }
 
 
-# ──────────────────────────────────────────────────────────
 # POST /api/estrategico/next-point
-# ──────────────────────────────────────────────────────────
 @router.post("/next-point")
 def estrategico_next_point(req: EstrategicoNextPointRequest):
     session = get_session(req.session_id)
@@ -103,7 +99,7 @@ def estrategico_next_point(req: EstrategicoNextPointRequest):
 
     session.last_activity = datetime.utcnow()
 
-    # Cambio de estrategia en línea (opcional)
+    # cambio de estrategia en linea (opcional)
     if req.strategy:
         if req.strategy not in VALID_STRATEGIES:
             raise HTTPException(400, f"Estrategia inválida: {req.strategy}")
@@ -114,7 +110,7 @@ def estrategico_next_point(req: EstrategicoNextPointRequest):
     server_obj = sk.get_player(server_id)
     returner_obj = sk.get_player(returner_id)
 
-    # Determinar qué estrategia va a cada jugador
+    # determinar que estrategia va a cada jugador
     coached = session.coached_player
     coached_mods = get_modifiers(session.current_strategy)
     if server_id == coached:
@@ -187,9 +183,7 @@ def estrategico_next_point(req: EstrategicoNextPointRequest):
     }
 
 
-# ──────────────────────────────────────────────────────────
 # POST /api/estrategico/set-strategy
-# ──────────────────────────────────────────────────────────
 @router.post("/set-strategy")
 def estrategico_set_strategy(req: EstrategicoSetStrategyRequest):
     session = get_session(req.session_id)
@@ -200,9 +194,7 @@ def estrategico_set_strategy(req: EstrategicoSetStrategyRequest):
     return {"current_strategy": session.current_strategy}
 
 
-# ──────────────────────────────────────────────────────────
 # GET /api/estrategico/state/{session_id}
-# ──────────────────────────────────────────────────────────
 @router.get("/state/{session_id}")
 def estrategico_state(session_id: str):
     session = get_session(session_id)
@@ -225,9 +217,7 @@ def estrategico_state(session_id: str):
     }
 
 
-# ──────────────────────────────────────────────────────────
 # POST /api/estrategico/end
-# ──────────────────────────────────────────────────────────
 @router.post("/end")
 def estrategico_end(req: EstrategicoEndRequest):
     session = get_session(req.session_id)
@@ -285,9 +275,7 @@ def estrategico_end(req: EstrategicoEndRequest):
     }
 
 
-# ──────────────────────────────────────────────────────────
 # POST /api/estrategico/save
-# ──────────────────────────────────────────────────────────
 @router.post("/save")
 def estrategico_save(req: EstrategicoSaveRequest):
     session = get_session(req.session_id)
@@ -314,9 +302,7 @@ def estrategico_save(req: EstrategicoSaveRequest):
     return {"match_result": result, "message": "Datos del partido listos para guardar"}
 
 
-# ──────────────────────────────────────────────────────────
 # DELETE /api/estrategico/session/{session_id}
-# ──────────────────────────────────────────────────────────
 @router.delete("/session/{session_id}")
 def estrategico_delete_session(session_id: str):
     if delete_session(session_id):

@@ -8,7 +8,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 
 
-# ─── Registro ──────────────────────────────────────────────────
+# -- Registro --
 class RegisterRequest(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
@@ -19,13 +19,13 @@ class RegisterRequest(BaseModel):
     genero: Optional[str] = Field(None, max_length=20)
 
 
-# ─── Login ─────────────────────────────────────────────────────
+# -- Login --
 class LoginRequest(BaseModel):
     identifier: str = Field(..., description="Username o email")
     password: str
 
 
-# ─── Respuestas ────────────────────────────────────────────────
+# -- Respuestas --
 class UserOut(BaseModel):
     id: int
     username: str

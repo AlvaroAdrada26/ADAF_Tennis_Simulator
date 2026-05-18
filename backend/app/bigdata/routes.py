@@ -52,7 +52,7 @@ def _config_summary(request: BigDataRequest) -> Dict[str, Any]:
     return {"best_of": 3, "tiebreak": True, "superficie": None}
 
 
-# ── Endpoint síncrono ─────────────────────────────────────────────────────
+# -- Endpoint sincrono --
 @router.post("/simulate")
 def bigdata_simulate(
     request: BigDataRequest,
@@ -74,7 +74,7 @@ def bigdata_simulate(
     )
 
 
-# ── Endpoint con streaming SSE ────────────────────────────────────────────
+# -- Endpoint con streaming SSE --
 @router.post("/simulate_stream")
 async def bigdata_simulate_stream(
     request: BigDataRequest,
@@ -90,19 +90,19 @@ async def bigdata_simulate_stream(
         wins = {"P1": 0, "P2": 0}
 
         for i in range(request.num_matches):
-            # Detectar desconexion del cliente (abort)
+            # detectar desconexion del cliente (abort)
             if await http_request.is_disconnected():
                 return
 
             seed_i = (base_seed + i) if base_seed is not None else None
-            # Ejecutar en threadpool para no bloquear el event loop
+            # ejecutar en threadpool para no bloquear el event loop
             result = await asyncio.to_thread(_run_single_match, request, seed_i)
             results.append(result)
 
             winner_id = result.get("winner_id", "P1")
             wins[winner_id] += 1
 
-            # Enviar progreso periódicamente
+            # enviar progreso periodicamente
             if (i + 1) % progress_interval == 0 or (i + 1) == request.num_matches:
                 total_done = i + 1
                 progress = {

@@ -194,10 +194,10 @@ def _normalize_superficie(raw: str | None) -> str | None:
     canon = _SUPERFICIE_NORM.get(raw.lower())
     if canon:
         return canon
-    # Si ya es un valor válido (mayúscula correcta) devuélvelo tal cual
+    # Si ya es un valor valido (mayuscula correcta) devuelvelo tal cual
     if raw in _VALID_SUPERFICIES:
         return raw
-    # Valor desconocido → None para evitar violación del CHECK
+    # valor desconocido, usar None para evitar violacion del CHECK
     logger.warning("Superficie desconocida '%s', se guardará como NULL", raw)
     return None
 
@@ -304,10 +304,10 @@ def simulate_match(
             point["point_index"] = i
         result["timeline"] = timeline
 
-        # ── Calcular estadísticas y adjuntarlas a la respuesta ──
+        # calcular estadisticas y adjuntarlas a la respuesta
         result["player_stats"] = extract_player_stats(timeline)
 
-        # ── Extraer user_id del JWT si viene en el header ──
+        # extraer user_id del JWT si viene en el header
         user_id: Optional[int] = None
         if credentials:
             payload = decode_access_token(credentials.credentials)
@@ -317,14 +317,14 @@ def simulate_match(
                 except (KeyError, ValueError, TypeError):
                     pass
 
-        # ── Auto-guardar en BD si los IDs son enteros válidos ──
+        # auto-guardar en BD si los IDs son enteros validos
         match_id = None
         try:
             p1_db_id = int(request.player1.id)
             p2_db_id = int(request.player2.id)
             match_id = _try_save_match(result, p1_db_id, p2_db_id, request.config, db, user_id)
         except (ValueError, TypeError):
-            # IDs no numéricos (ej. "P1"/"P2" de demos) → no guardar
+            # IDs no numericos (ej. "P1"/"P2" de demos), no guardar
             pass
 
         if match_id is not None:

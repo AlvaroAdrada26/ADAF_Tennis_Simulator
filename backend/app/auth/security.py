@@ -9,15 +9,15 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-# ─── Configuración ─────────────────────────────────────────────
+# -- Configuracion --
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "adaf-tennis-super-secret-change-in-production")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))  # 7 días
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))  # 7 dias
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-# ─── Password hashing ─────────────────────────────────────────
+# -- Password hashing --
 def hash_password(plain: str) -> str:
     """Genera un hash bcrypt de la contraseña en texto plano."""
     return pwd_context.hash(plain)
@@ -28,7 +28,7 @@ def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
 
-# ─── JWT ───────────────────────────────────────────────────────
+# -- JWT --
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """Crea un JWT firmado con los datos proporcionados."""
     to_encode = data.copy()

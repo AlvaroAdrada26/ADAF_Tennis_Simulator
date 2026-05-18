@@ -36,7 +36,7 @@ class MatchScorekeeper:
         self.points: Dict[str, int] = {SACADOR: 0, RESTADOR: 0}
 
         # saque
-        self.server_flag = 0  # 0 → P1 saca, 1 → P2 saca, etc.
+        self.server_flag = 0  # 0 = P1 saca, 1 = P2 saca, etc.
 
         # tiebreak
         self.is_tiebreak = False
@@ -49,7 +49,7 @@ class MatchScorekeeper:
         self.game_no = 1
         self.point_no = 0
 
-    # ── helpers de saque ──────────────────────────────────
+    # -- helpers de saque --
     def get_server_returner(self) -> Tuple[str, str]:
         """Devuelve (server_id, returner_id) para el próximo punto."""
         if self.is_tiebreak:
@@ -69,7 +69,7 @@ class MatchScorekeeper:
     def get_player(self, pid: str) -> Player:
         return self.p1 if pid == "P1" else self.p2
 
-    # ── clutch ────────────────────────────────────────────
+    # -- clutch --
     def is_clutch_point(self) -> bool:
         if self.is_tiebreak:
             return True
@@ -80,14 +80,14 @@ class MatchScorekeeper:
             return True
         return False
 
-    # ── break point ───────────────────────────────────────
+    # -- break point --
     def is_break_point(self) -> bool:
         if self.is_tiebreak:
             return False
         s, r = self.points[SACADOR], self.points[RESTADOR]
         return r >= 3 and r > s
 
-    # ── etiqueta de puntos ────────────────────────────────
+    # -- etiqueta de puntos --
     def get_point_labels(self) -> Dict[str, str]:
         if self.is_tiebreak:
             return {
@@ -110,7 +110,7 @@ class MatchScorekeeper:
                 sl = rl = "40"
         return {server_id: sl, returner_id: rl}
 
-    # ── registro de punto ─────────────────────────────────
+    # -- registro de punto --
     def register_point(self, winner_tag: str, rally_shots: int) -> Dict[str, Any]:
         """
         Registra un punto ganado y actualiza el marcador.
@@ -139,13 +139,13 @@ class MatchScorekeeper:
             "server_id": server_id,
         }
 
-        # ── Fatiga por punto ──
+        # -- Fatiga por punto --
         for pid in ("P1", "P2"):
             p = self.get_player(pid)
             fatiga = (0.5 + rally_shots * 0.2) * (1.5 - p.Fisico / 100)
             p.Estamina = max(0.0, p.Estamina - fatiga)
 
-        # ── Momentum por punto ──
+        # -- Momentum por punto --
         g = self.get_player(winner_id)
         l = self.get_player(loser_id)
         g.streak = max(1, g.streak + 1)
@@ -162,7 +162,7 @@ class MatchScorekeeper:
 
         return events
 
-    # ── juego normal ──────────────────────────────────────
+    # -- juego normal --
     def _register_game_point(self, winner_tag: str, events: dict):
         self.points[winner_tag] += 1
         s, r = self.points[SACADOR], self.points[RESTADOR]
@@ -187,7 +187,7 @@ class MatchScorekeeper:
 
         self.games[game_winner_id] += 1
 
-        # Recuperación de estamina tras juego
+        # Recuperacion de estamina tras juego
         for pid in ("P1", "P2"):
             p = self.get_player(pid)
             rec = 0.3 + 0.8 * (p.Fisico / 100)
@@ -218,7 +218,7 @@ class MatchScorekeeper:
             self.server_flag += 1
             self.game_no += 1
 
-    # ── tiebreak ──────────────────────────────────────────
+    # -- tiebreak --
     def _register_tiebreak_point(self, winner_id: str, events: dict):
         self.tb_points[winner_id] += 1
         self.tb_server_flag += 1
@@ -234,7 +234,7 @@ class MatchScorekeeper:
             self.set_scores.append((self.games["P1"], self.games["P2"]))
             self.sets[tb_winner] += 1
 
-            # Recuperación tras set (incluido tiebreak)
+            # Recuperacion tras set (incluido tiebreak)
             for pid in ("P1", "P2"):
                 p = self.get_player(pid)
                 rec_set = 2 + 5 * (p.Fisico / 100)
@@ -252,7 +252,7 @@ class MatchScorekeeper:
             if not events["match_end"]:
                 self._start_new_set()
 
-    # ── comprobaciones de set / match ─────────────────────
+    # -- comprobaciones de set / match --
     def _check_set_end(self, events: dict):
         g1, g2 = self.games["P1"], self.games["P2"]
         set_winner: Optional[str] = None
@@ -273,7 +273,7 @@ class MatchScorekeeper:
         self.set_scores.append((self.games["P1"], self.games["P2"]))
         self.sets[set_winner] += 1
 
-        # Recuperación tras set
+        # Recuperacion tras set
         for pid in ("P1", "P2"):
             p = self.get_player(pid)
             rec_set = 2 + 5 * (p.Fisico / 100)
@@ -311,7 +311,7 @@ class MatchScorekeeper:
         self.server_flag += 1
         self.game_no = 1
 
-    # ── snapshot ──────────────────────────────────────────
+    # -- snapshot --
     def get_score_snapshot(self) -> Dict[str, Any]:
         server_id, returner_id = self.get_server_returner()
         point_labels = self.get_point_labels()

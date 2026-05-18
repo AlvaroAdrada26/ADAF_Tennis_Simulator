@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 bearer = HTTPBearer(auto_error=False)
 
 
-# ─── Schemas ───────────────────────────────────────────────────
+# -- Schemas --
 class TournamentCreateRequest(BaseModel):
     nombre: str
     jugador_ids: List[int]           # IDs de BD de los jugadores
@@ -42,7 +42,7 @@ class SimulateMatchRequest(BaseModel):
     torneo_partido_id: int
 
 
-# ─── Helpers ───────────────────────────────────────────────────
+# -- Helpers --
 _SUPERFICIE_NORM: dict[str, str] = {
     "dura": "Dura", "hard": "Dura",
     "tierra": "Arcilla", "arcilla": "Arcilla", "clay": "Arcilla",
@@ -79,7 +79,7 @@ def _player_dict(j: Jugador) -> dict:
     }
 
 
-# ─── POST /api/tournaments  — Crear torneo ────────────────────
+# -- POST /api/tournaments  -- Crear torneo --
 @router.post("")
 def crear_torneo(
     body: TournamentCreateRequest,
@@ -120,7 +120,7 @@ def crear_torneo(
     db.flush()
 
     # Crear enfrentamientos de la primera ronda
-    ronda = n // 2  # ej: 8 jugadores → ronda 4 (cuartos)
+    ronda = n // 2  # ej: 8 jugadores = ronda 4 (cuartos)
     ids = body.jugador_ids
     for i in range(0, n, 2):
         tp = TorneoPartido(
@@ -132,7 +132,7 @@ def crear_torneo(
         )
         db.add(tp)
 
-    # Pre-crear slots de rondas siguientes (vacíos)
+    # Pre-crear slots de rondas siguientes (vacios)
     ronda_actual = ronda // 2
     while ronda_actual >= 1:
         num_matches = ronda_actual
@@ -151,7 +151,7 @@ def crear_torneo(
     return {"ok": True, "torneo_id": torneo.id, "nombre": torneo.nombre}
 
 
-# ─── POST /api/tournaments/simulate-round ────────────────────
+# -- POST /api/tournaments/simulate-round --
 @router.post("/simulate-round")
 def simular_ronda(
     body: SimulateRoundRequest,
@@ -173,7 +173,7 @@ def simular_ronda(
             except (KeyError, ValueError, TypeError):
                 pass
 
-    # Encontrar la ronda pendiente más alta (la primera sin completar)
+    # encontrar la ronda pendiente mas alta (la primera sin completar)
     pendientes = (
         db.query(TorneoPartido)
         .filter(
@@ -211,7 +211,7 @@ def simular_ronda(
         winner_tag = result.get("winner_id")
         id_ganador = tp.id_jugador_1 if winner_tag == "P1" else tp.id_jugador_2
 
-        # Guardar partido en BD
+        # guardar partido en BD
         partido = Partido(
             id_jugador_1=tp.id_jugador_1,
             id_jugador_2=tp.id_jugador_2,
@@ -226,7 +226,7 @@ def simular_ronda(
         db.add(partido)
         db.flush()
 
-        # Guardar estadísticas
+        # guardar estadisticas
         player_stats = extract_player_stats(timeline)
         for tag, db_id in [("P1", tp.id_jugador_1), ("P2", tp.id_jugador_2)]:
             s = player_stats[tag]
@@ -296,7 +296,7 @@ def simular_ronda(
     }
 
 
-# ─── Helper: simular un TorneoPartido ────────────────────────
+# -- Helper: simular un TorneoPartido --
 def _simulate_tp(tp: TorneoPartido, torneo: Torneo, db: Session, user_id: int | None):
     """Simula un TorneoPartido individual. Devuelve dict de resultado."""
     j1 = db.query(Jugador).filter(Jugador.id == tp.id_jugador_1).first()
@@ -387,7 +387,7 @@ def _simulate_tp(tp: TorneoPartido, torneo: Torneo, db: Session, user_id: int | 
     }
 
 
-# ─── POST /api/tournaments/simulate-match  — Simular un partido suelto ──
+# -- POST /api/tournaments/simulate-match  -- Simular un partido suelto --
 @router.post("/simulate-match")
 def simular_partido(
     body: SimulateMatchRequest,
@@ -453,7 +453,7 @@ def simular_partido(
     }
 
 
-# ─── GET /api/tournaments/{id}  — Estado del torneo ──────────
+# -- GET /api/tournaments/{id}  -- Estado del torneo --
 @router.get("/{torneo_id}")
 def get_torneo(torneo_id: int, db: Session = Depends(get_db)):
     torneo = db.query(Torneo).filter(Torneo.id == torneo_id, Torneo.activo == True).first()
@@ -468,7 +468,7 @@ def get_torneo(torneo_id: int, db: Session = Depends(get_db)):
         .all()
     )
 
-    # Recoger IDs de jugadores únicos
+    # recoger IDs de jugadores unicos
     player_ids = set()
     for tp in tp_list:
         if tp.id_jugador_1:
@@ -521,7 +521,7 @@ def get_torneo(torneo_id: int, db: Session = Depends(get_db)):
     }
 
 
-# ─── GET /api/tournaments/{id}/match/{partido_id}  — Stats de un partido ─
+# -- GET /api/tournaments/{id}/match/{partido_id}  -- Stats de un partido --
 @router.get("/{torneo_id}/match/{partido_id}")
 def get_torneo_match_stats(torneo_id: int, partido_id: int, db: Session = Depends(get_db)):
     partido = db.query(Partido).filter(Partido.id == partido_id).first()
@@ -576,7 +576,7 @@ def get_torneo_match_stats(torneo_id: int, partido_id: int, db: Session = Depend
     }
 
 
-# ─── GET /api/tournaments — Listar torneos del usuario ───────
+# -- GET /api/tournaments -- Listar torneos del usuario --
 @router.get("")
 def listar_torneos(
     db: Session = Depends(get_db),

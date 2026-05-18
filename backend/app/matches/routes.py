@@ -17,7 +17,7 @@ router = APIRouter(prefix="/matches", tags=["matches"])
 logger = logging.getLogger(__name__)
 
 
-# ─── Schemas de entrada para guardar partido ───────────────────
+# -- Schemas de entrada para guardar partido --
 class SaveMatchConfig(BaseModel):
     surface: str = "Dura"
     best_of: int = 3
@@ -40,30 +40,30 @@ def _build_marcador(set_scores: List[List[int]]) -> str:
     return ", ".join(f"{s[0]}-{s[1]}" for s in set_scores)
 
 
-# ─── POST  /api/matches  — Guardar partido ─────────────────────
+# -- POST  /api/matches  -- Guardar partido --
 @router.post("/")
 def save_match(body: SaveMatchRequest, db: Session = Depends(get_db)):
     """
     Guarda un partido recién simulado en la base de datos.
     Crea 1 fila en `partidos` y 2 filas en `estadisticas_partido`.
     """
-    # Validar que los jugadores existen
+    # validar que los jugadores existen
     j1 = db.query(Jugador).filter(Jugador.id == body.id_jugador_1).first()
     j2 = db.query(Jugador).filter(Jugador.id == body.id_jugador_2).first()
     if not j1 or not j2:
         raise HTTPException(status_code=404, detail="Uno de los jugadores no existe en la BD")
 
-    # Determinar ganador (id de BD)
+    # determinar ganador (id de BD)
     id_ganador = body.id_jugador_1 if body.winner_id == "P1" else body.id_jugador_2
 
-    # Crear el partido
+    # crear el partido
     partido = Partido(
         id_jugador_1=body.id_jugador_1,
         id_jugador_2=body.id_jugador_2,
         id_ganador=id_ganador,
         id_usuario_creador=body.id_usuario_creador,
         marcador_final=_build_marcador(body.set_scores),
-        duracion_minutos=None,  # El simulador no calcula duración real
+        duracion_minutos=None,  # el simulador no calcula duracion real
         superficie=body.config.surface,
         formato_sets=body.config.best_of,
         tiebreak_ultimo_set=body.config.tiebreak,
@@ -71,7 +71,7 @@ def save_match(body: SaveMatchRequest, db: Session = Depends(get_db)):
     db.add(partido)
     db.flush()  # Para obtener partido.id
 
-    # Calcular y guardar estadísticas de cada jugador
+    # calcular y guardar estadisticas de cada jugador
     all_stats = extract_player_stats(body.timeline)
     for player_tag, db_player_id in [("P1", body.id_jugador_1), ("P2", body.id_jugador_2)]:
         stats = all_stats[player_tag]
@@ -94,7 +94,7 @@ def save_match(body: SaveMatchRequest, db: Session = Depends(get_db)):
     }
 
 
-# ─── GET  /api/matches/player/{player_id}  — Partidos de un jugador ──
+# -- GET  /api/matches/player/{player_id}  -- Partidos de un jugador --
 # (Must be defined before /{match_id} to avoid path conflicts)
 @router.get("/player/{player_id}")
 def get_player_matches(player_id: int, db: Session = Depends(get_db)):
@@ -136,7 +136,7 @@ def get_player_matches(player_id: int, db: Session = Depends(get_db)):
     return result
 
 
-# ─── GET  /api/matches/{id}  — Consultar partido ───────────────
+# -- GET  /api/matches/{id}  -- Consultar partido --
 @router.get("/{match_id}")
 def get_match_summary(match_id: int, db: Session = Depends(get_db)):
     """

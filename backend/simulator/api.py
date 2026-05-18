@@ -48,7 +48,7 @@ def run_match(player1_data: Dict[str, Any],
         - "timeline": lista de puntos con estructura detallada
     """
     # --------------------------------------------------------
-    # Inicialización
+    # Inicializacion
     # --------------------------------------------------------
     cfg = Config(**(config or {}))
     seed_all(cfg.seed)
@@ -57,7 +57,7 @@ def run_match(player1_data: Dict[str, Any],
     p2 = Player(**player2_data)
 
     # --------------------------------------------------------
-    # Ejecución del partido completo
+    # Ejecucion del partido completo
     # --------------------------------------------------------
     match = TennisMatch(
         p1, p2,

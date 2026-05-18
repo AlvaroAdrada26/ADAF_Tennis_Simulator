@@ -37,7 +37,7 @@ def aggregate_bigdata_stats(
     if n == 0:
         return {"error": "No hay resultados para agregar"}
 
-    # ── Contadores generales ──────────────────────────────────────────────
+    # -- Contadores generales --
     wins = {"P1": 0, "P2": 0}
     sets_won = {"P1": 0, "P2": 0}
     score_distribution: Counter = Counter()  # "2-0", "2-1", etc.
@@ -74,7 +74,7 @@ def aggregate_bigdata_stats(
     progression_step = max(10, n // 100)
     win_rate_progression: List[Dict[str, Any]] = []
 
-    # ── Iterar sobre cada resultado ───────────────────────────────────────
+    # -- Iterar sobre cada resultado --
     for i, r in enumerate(results):
         winner_id = r.get("winner_id", "P1")
         wins[winner_id] += 1
@@ -144,7 +144,7 @@ def aggregate_bigdata_stats(
                 "p2_pct": p2_pct,
             })
 
-    # ── Calcular promedios ────────────────────────────────────────────────
+    # -- Calcular promedios --
     avg_stats: Dict[str, Dict[str, float]] = {}
     for tag in ("P1", "P2"):
         avg = {}
@@ -162,7 +162,7 @@ def aggregate_bigdata_stats(
 
         avg_stats[tag] = avg
 
-    # ── Construir respuesta ───────────────────────────────────────────────
+    # -- Construir respuesta --
     avg_points = round(total_points_all / n, 1) if n > 0 else 0
     avg_sets = round(total_sets_all / n, 2) if n > 0 else 0
     avg_duration_min = round(avg_points * 35 / 60) if avg_points > 0 else 0

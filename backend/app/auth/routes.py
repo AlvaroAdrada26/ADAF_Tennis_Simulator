@@ -34,7 +34,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
-# ─── POST /api/auth/register ──────────────────────────────────
+# -- POST /api/auth/register --
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register(body: RegisterRequest, db: Session = Depends(get_db)):
     """Registra un nuevo usuario."""
@@ -52,7 +52,7 @@ def register(body: RegisterRequest, db: Session = Depends(get_db)):
             detail="El email ya está registrado.",
         )
 
-    # Crear usuario
+    # crear usuario
     user = Usuario(
         username=body.username,
         email=body.email,
@@ -68,12 +68,12 @@ def register(body: RegisterRequest, db: Session = Depends(get_db)):
     return user
 
 
-# ─── POST /api/auth/login ─────────────────────────────────────
+# -- POST /api/auth/login --
 @router.post("/login", response_model=TokenResponse)
 def login(body: LoginRequest, db: Session = Depends(get_db)):
     """Autentica al usuario por username o email y devuelve un JWT."""
 
-    # Buscar por username o email
+    # buscar por username o email
     user = (
         db.query(Usuario)
         .filter(
@@ -103,7 +103,7 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
     )
 
 
-# ─── GET /api/auth/me ─────────────────────────────────────────
+# -- GET /api/auth/me --
 @router.get("/me", response_model=UserOut)
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
@@ -134,7 +134,7 @@ def get_current_user(
     return user
 
 
-# ─── GET /api/auth/me/matches ─────────────────────────────────
+# -- GET /api/auth/me/matches --
 @router.get("/me/matches")
 def get_my_matches(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
@@ -171,7 +171,7 @@ def get_my_matches(
         nombre_j1 = f"{j1.nombre} {j1.apellido}" if j1 else "Desconocido"
         nombre_j2 = f"{j2.nombre} {j2.apellido}" if j2 else "Desconocido"
 
-        # Determinar nombre del ganador
+        # determinar nombre del ganador
         if p.id_ganador == p.id_jugador_1:
             nombre_ganador = nombre_j1
         elif p.id_ganador == p.id_jugador_2:
@@ -197,7 +197,7 @@ def get_my_matches(
     return resultado
 
 
-# ─── GET /api/auth/me/players ──────────────────────────────────
+# -- GET /api/auth/me/players --
 @router.get("/me/players")
 def get_my_players(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),

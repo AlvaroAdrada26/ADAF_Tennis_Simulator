@@ -13,11 +13,11 @@ from typing import Dict
 STRATEGY_MODIFIERS: Dict[str, Dict[str, float]] = {
     "aggressive": {
         "pot_mult": 1.12,          # +12% potencia en todos los golpes
-        "prec_mult": 0.96,         # -4% precisión
+        "prec_mult": 0.96,         # -4% precision
         "p_in_mult": 0.97,         # -3% probabilidad de meter la bola
-        "reach_mult": 1.02,        # +2% alcance (juega más adelantado)
-        "sigma_pot_mult": 1.06,    # +6% varianza en potencia (más irregular)
-        "sigma_prec_mult": 1.08,   # +8% varianza en precisión
+        "reach_mult": 1.02,        # +2% alcance (juega mas adelantado)
+        "sigma_pot_mult": 1.06,    # +6% varianza en potencia (mas irregular)
+        "sigma_prec_mult": 1.08,   # +8% varianza en precision
     },
     "neutral": {
         "pot_mult": 1.00,
@@ -29,11 +29,11 @@ STRATEGY_MODIFIERS: Dict[str, Dict[str, float]] = {
     },
     "defensive": {
         "pot_mult": 0.92,          # -8% potencia
-        "prec_mult": 1.02,         # +2% precisión
+        "prec_mult": 1.02,         # +2% precision
         "p_in_mult": 1.015,        # +1.5% probabilidad de meter la bola
-        "reach_mult": 1.03,        # +3% alcance (juega más atrás, llega a más)
-        "sigma_pot_mult": 0.94,    # -6% varianza (más regular)
-        "sigma_prec_mult": 0.93,   # -7% varianza (más consistente)
+        "reach_mult": 1.03,        # +3% alcance (juega mas atras, llega a mas)
+        "sigma_pot_mult": 0.94,    # -6% varianza (mas regular)
+        "sigma_prec_mult": 0.93,   # -7% varianza (mas consistente)
     },
 }
 
