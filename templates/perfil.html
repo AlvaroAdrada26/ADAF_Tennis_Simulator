@@ -218,7 +218,7 @@
 <main class="flex-1 px-6 md:px-8 py-10">
   <div class="max-w-5xl mx-auto">
 
-    <!-- ═══ Estado: NO logueado ═══ -->
+    <!-- Estado: NO logueado -->
     <div id="state-no-auth" class="hidden text-center py-20">
       <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
         <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -232,7 +232,7 @@
 
     <div id="perfil-content" class="hidden">
 
-    <!-- ═══════ CABECERA DEL PERFIL ═══════ -->
+    <!-- CABECERA DEL PERFIL -->
     <div class="profile-card rounded-2xl border border-blue-800/30 p-8 md:p-10 mb-8 fade-in-up">
       <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
 
@@ -291,7 +291,7 @@
       </div>
     </div>
 
-    <!-- ═══════ DATOS PERSONALES ═══════ -->
+    <!-- DATOS PERSONALES -->
     <div class="profile-card rounded-2xl border border-blue-800/30 p-8 mb-8 fade-in-up delay-1">
       <h2 class="text-xl font-bold text-gray-100 mb-6 flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-yellow-400/15 border border-yellow-400/30 flex items-center justify-center">
@@ -341,7 +341,7 @@
       </div>
     </div>
 
-    <!-- ═══════ MIS JUGADORES ═══════ -->
+    <!-- MIS JUGADORES -->
     <div class="profile-card rounded-2xl border border-blue-800/30 p-8 mb-8 fade-in-up delay-2">
       <h2 class="text-xl font-bold text-gray-100 mb-6 flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-yellow-400/15 border border-yellow-400/30 flex items-center justify-center">
@@ -382,7 +382,7 @@
       </div>
     </div>
 
-    <!-- ═══════ HISTORIAL DE PARTIDOS ═══════ -->
+    <!-- HISTORIAL DE PARTIDOS -->
     <div class="profile-card rounded-2xl border border-blue-800/30 p-8 fade-in-up delay-3">
       <h2 class="text-xl font-bold text-gray-100 mb-6 flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-yellow-400/15 border border-yellow-400/30 flex items-center justify-center">
@@ -428,7 +428,7 @@
   </div>
 </main>
 
-<!-- ═══════ MODAL UNIVERSAL (jugador-partidos + estadísticas) ═══════ -->
+<!-- MODAL UNIVERSAL (jugador-partidos + estadísticas) -->
 <div id="match-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
   <!-- Overlay -->
   <div id="modal-overlay" class="modal-overlay absolute inset-0" onclick="closeMatchModal()"></div>
@@ -460,7 +460,7 @@
       <span id="modal-loading-text" class="text-gray-400">Cargando...</span>
     </div>
 
-    <!-- ═══ VIEW 1: Player match list ═══ -->
+    <!-- VIEW 1: Player match list -->
     <div id="modal-player-view" class="hidden">
       <div class="text-center mb-6">
         <div id="modal-player-avatar" class="w-16 h-16 mx-auto rounded-full bg-yellow-400/15 border-2 border-yellow-400/30 flex items-center justify-center mb-3">
@@ -488,7 +488,7 @@
       <div id="modal-player-matches" class="player-modal-scroll space-y-3 pr-2"></div>
     </div>
 
-    <!-- ═══ VIEW 2: Match statistics (existing) ═══ -->
+    <!-- VIEW 2: Match statistics (existing) -->
     <div id="modal-content" class="hidden">
 
       <!-- Winner banner -->
@@ -551,7 +551,7 @@ document.addEventListener('auth:ready', function(ev) {
 
   document.getElementById('perfil-content').classList.remove('hidden');
 
-  // ─── Country → ISO code map (for flags via flagcdn.com) ─────
+  // -- Country → ISO code map (for flags via flagcdn.com) --
   const COUNTRIES = {
     "Afganistán":"af","Albania":"al","Alemania":"de","Andorra":"ad","Angola":"ao",
     "Antigua y Barbuda":"ag","Arabia Saudita":"sa","Argelia":"dz","Argentina":"ar",
@@ -608,7 +608,7 @@ document.addEventListener('auth:ready', function(ev) {
     return escapeHtml(countryName);
   }
 
-  // ─── Rellenar datos del perfil ───────────────────────────────
+  // -- Rellenar datos del perfil --
   const nombre = user.nombre || '';
   const apellido = user.apellido || '';
   const fullName = (nombre + ' ' + apellido).trim() || user.username;
@@ -647,7 +647,7 @@ document.addEventListener('auth:ready', function(ev) {
     document.getElementById('profile-avatar').innerHTML = '<span class="text-4xl font-bold text-yellow-400">' + initials + '</span>';
   }
 
-  // ─── Cargar jugadores del usuario ────────────────────────────
+  // -- Cargar jugadores del usuario --
   loadPlayers();
 
   async function loadPlayers() {
@@ -759,7 +759,7 @@ document.addEventListener('auth:ready', function(ev) {
     }
   }
 
-  // ─── Cargar historial de partidos ────────────────────────────
+  // -- Cargar historial de partidos --
   loadMatches();
 
   async function loadMatches() {
@@ -832,11 +832,11 @@ document.addEventListener('auth:ready', function(ev) {
     }
   }
 
-  // ─── Modal state ──────────────────────────────────────────────
+  // -- Modal state --
   let modalCurrentPlayer = null;   // player object when viewing player matches
   let modalFromPlayer = false;     // true if match stats was opened from player view
 
-  // ─── Open player match history modal ─────────────────────────
+  // -- Open player match history modal --
   window.openPlayerModal = async function(player) {
     modalCurrentPlayer = player;
     modalFromPlayer = false;
@@ -937,7 +937,7 @@ document.addEventListener('auth:ready', function(ev) {
     }
   };
 
-  // ─── Open match stats FROM player view ───────────────────────
+  // -- Open match stats FROM player view --
   async function openMatchFromPlayer(matchId) {
     modalFromPlayer = true;
 
@@ -972,7 +972,7 @@ document.addEventListener('auth:ready', function(ev) {
     }
   }
 
-  // ─── Back to player matches ──────────────────────────────────
+  // -- Back to player matches --
   window.goBackToPlayerMatches = function() {
     document.getElementById('modal-content').classList.add('hidden');
     document.getElementById('modal-back-btn').classList.add('hidden');
@@ -981,7 +981,7 @@ document.addEventListener('auth:ready', function(ev) {
     modalFromPlayer = false;
   };
 
-  // ─── Modal de estadísticas de partido (desde historial) ──────
+  // -- Modal de estadísticas de partido (desde historial) --
   window.openMatchModal = async function(matchId) {
     modalCurrentPlayer = null;
     modalFromPlayer = false;

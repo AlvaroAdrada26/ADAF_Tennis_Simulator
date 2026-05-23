@@ -80,7 +80,7 @@
 <main class="flex-1 px-8 py-10">
   <div class="max-w-5xl mx-auto">
 
-    <!-- ═══ Estado: NO logueado ═══ -->
+    <!-- Estado: NO logueado -->
     <div id="state-no-auth" class="hidden text-center py-20">
       <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
         <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -196,7 +196,7 @@ document.addEventListener('auth:ready', function(e) {
   let surface = 'Dura';
   let formatSets = 3;
 
-  // ─── Cargar jugadores ───────────────────────────────────
+  // -- Cargar jugadores --
   async function loadPlayers() {
     try {
       const res = await fetch('/api/players', {
@@ -265,13 +265,13 @@ document.addEventListener('auth:ready', function(e) {
     btn.disabled = selectedIds.length !== tournamentSize;
   }
 
-  // ─── Botones de configuración ────────────────────────────
+  // -- Botones de configuración --
   document.querySelectorAll('.size-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       tournamentSize = parseInt(btn.dataset.size);
-      // Recortar selección si excede el nuevo tamaño
+      // Recortar seleccion si excede el nuevo tamaño
       if (selectedIds.length > tournamentSize) {
         selectedIds = selectedIds.slice(0, tournamentSize);
       }
@@ -295,7 +295,7 @@ document.addEventListener('auth:ready', function(e) {
     });
   });
 
-  // ─── Crear torneo ────────────────────────────────────────
+  // -- Crear torneo --
   document.getElementById('btn-crear-torneo').addEventListener('click', async () => {
     const nombre = document.getElementById('torneo-nombre').value.trim() || 'Torneo ADAF';
     const errorEl = document.getElementById('btn-error');

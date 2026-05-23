@@ -7,19 +7,19 @@
 document.addEventListener('auth:ready', function (e) {
   'use strict';
 
-  // ── Auth guard ──────────────────────────────────────────
+  // -- Auth guard --
   if (!e.detail.authenticated) {
     show('state-no-auth');
     return;
   }
 
-  // ── State ───────────────────────────────────────────────
+  // -- State --
   let players = [];
   let sel1 = null;
   let sel2 = null;
-  let coached = null; // "P1" | "P2"
+  let coached = null; //"P1" | "P2"
 
-  // ── Helpers ─────────────────────────────────────────────
+  // -- Helpers --
   function getToken() { return localStorage.getItem('access_token'); }
 
   function getActiveVal(groupId) {
@@ -39,7 +39,7 @@ document.addEventListener('auth:ready', function (e) {
     setTimeout(function () { t.classList.add('hidden'); }, 3000);
   }
 
-  // ── Init: cargar jugadores ──────────────────────────────
+  // -- Init: cargar jugadores --
   (async function init() {
     const token = getToken();
     if (!token) { show('state-no-auth'); return; }
@@ -74,7 +74,7 @@ document.addEventListener('auth:ready', function (e) {
     }
   })();
 
-  // ── Render tarjetas ─────────────────────────────────────
+  // -- Render tarjetas --
   function renderPlayers() {
     const l1 = document.getElementById('p1-list');
     const l2 = document.getElementById('p2-list');
@@ -146,14 +146,14 @@ document.addEventListener('auth:ready', function (e) {
     return card;
   }
 
-  // ── Selección de jugador ────────────────────────────────
+  // -- Selección de jugador --
   function selectPlayer(p, slot) {
     if (slot === 1) {
       sel1 = (sel1 && sel1.id === p.id) ? null : p;
     } else {
       sel2 = (sel2 && sel2.id === p.id) ? null : p;
     }
-    coached = null; // reset coach pick on player change
+    coached = null; //reset coach pick on player change
     refreshCards();
     refreshCoachPick();
     refreshSummary();
@@ -174,7 +174,7 @@ document.addEventListener('auth:ready', function (e) {
     });
   }
 
-  // ── Coach pick ──────────────────────────────────────────
+  // -- Coach pick --
   function refreshCoachPick() {
     if (sel1 && sel2) {
       document.getElementById('cp1-initial').textContent = sel1.nombre.charAt(0);
@@ -202,7 +202,7 @@ document.addEventListener('auth:ready', function (e) {
     refreshSummary();
   });
 
-  // ── Summary ─────────────────────────────────────────────
+  // -- Summary --
   function refreshSummary() {
     if (sel1 && sel2 && coached) {
       const sets = getActiveVal('opt-sets') || '3';
@@ -217,7 +217,7 @@ document.addEventListener('auth:ready', function (e) {
       document.getElementById('s-surf').textContent = surf;
       document.getElementById('s-tb').textContent = tb === 'true' ? 'Sí' : 'No';
 
-      // Coach badge
+      //Coach badge
       const badge1 = document.getElementById('s-p1-coach');
       const badge2 = document.getElementById('s-p2-coach');
       if (coached === 'P1') {
@@ -234,7 +234,7 @@ document.addEventListener('auth:ready', function (e) {
     }
   }
 
-  // ── Radio buttons ───────────────────────────────────────
+  // -- Radio buttons --
   document.querySelectorAll('#opt-sets .radio-opt, #opt-tb .radio-opt').forEach(function (btn) {
     btn.addEventListener('click', function () {
       btn.parentElement.querySelectorAll('.radio-opt').forEach(function (b) { b.classList.remove('active'); });
@@ -251,7 +251,7 @@ document.addEventListener('auth:ready', function (e) {
     });
   });
 
-  // ── Start match ─────────────────────────────────────────
+  // -- Start match --
   document.getElementById('btn-start').addEventListener('click', async function () {
     if (!sel1 || !sel2) { showToast('Selecciona ambos jugadores', true); return; }
     if (!coached) { showToast('Selecciona a quién quieres entrenar', true); return; }
@@ -309,7 +309,7 @@ document.addEventListener('auth:ready', function (e) {
 
       const data = await res.json();
 
-      // Guardar datos en sessionStorage para la página del partido
+      //Guardar datos en sessionStorage para la pagina del partido
       sessionStorage.setItem('estrategico_session_id', data.session_id);
       sessionStorage.setItem('estrategico_config', JSON.stringify({
         coached_player: coached,

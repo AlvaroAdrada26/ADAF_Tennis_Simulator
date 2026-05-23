@@ -7,7 +7,7 @@ import pytest
 from backend.simulator.api import run_match
 
 
-# ─── Datos de jugadores compartidos ──────────────────────────────────────────
+# -- Datos de jugadores compartidos --
 
 P1 = dict(
     name="Alcaraz", id="P1",
@@ -26,7 +26,7 @@ P2 = dict(
 CFG_BO3 = {"best_of": 3, "tiebreak": True, "seed": 42}
 
 
-# ─── Estructura del resultado ─────────────────────────────────────────────────
+# -- Estructura del resultado --
 
 def test_run_match_devuelve_campos_obligatorios():
     result = run_match(P1, P2, CFG_BO3)
@@ -45,7 +45,7 @@ def test_run_match_sets_ganados_coherentes():
     """El ganador debe haber ganado más sets que el perdedor."""
     result = run_match(P1, P2, CFG_BO3)
     sw = result["sets_won"]
-    assert max(sw["P1"], sw["P2"]) == 2  # best_of=3 → necesita 2 sets
+    assert max(sw["P1"], sw["P2"]) == 2  # best_of=3 = necesita 2 sets
 
 def test_run_match_set_scores_formato():
     """Cada elemento de set_scores debe ser una tupla/lista de dos enteros."""
@@ -55,7 +55,7 @@ def test_run_match_set_scores_formato():
         assert all(isinstance(n, int) for n in score)
 
 
-# ─── Reproducibilidad ────────────────────────────────────────────────────────
+# -- Reproducibilidad --
 
 def test_misma_semilla_mismo_resultado():
     r1 = run_match(P1, P2, {"best_of": 3, "tiebreak": True, "seed": 7})
@@ -73,7 +73,7 @@ def test_distinta_semilla_puede_variar():
     assert len(resultados) == 2
 
 
-# ─── Formatos de partido ─────────────────────────────────────────────────────
+# -- Formatos de partido --
 
 def test_best_of_5_necesita_3_sets():
     result = run_match(P1, P2, {"best_of": 5, "tiebreak": True, "seed": 42})
@@ -85,7 +85,7 @@ def test_best_of_1_termina_en_un_set():
     assert len(result["set_scores"]) == 1
 
 
-# ─── Jugador débil pierde más veces ──────────────────────────────────────────
+# -- Jugador debil pierde mas veces --
 
 def test_jugador_fuerte_gana_mayoria():
     """Un jugador con todos los atributos muy superiores debe ganar la mayoría."""

@@ -133,7 +133,7 @@
     <p class="text-gray-400 text-lg">Elige dos jugadores, configura el partido y ¡a jugar!</p>
   </div>
 
-  <!-- ═══ Estado: NO logueado ═══ -->
+  <!-- Estado: NO logueado -->
   <div id="state-no-auth" class="hidden text-center py-20">
     <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
       <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -147,7 +147,7 @@
     </a>
   </div>
 
-  <!-- ═══ Estado: sin jugadores ═══ -->
+  <!-- Estado: sin jugadores -->
   <div id="state-no-players" class="hidden text-center py-20">
     <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
       <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -162,7 +162,7 @@
     </a>
   </div>
 
-  <!-- ═══ Estado: pocos jugadores (1) ═══ -->
+  <!-- Estado: pocos jugadores (1) -->
   <div id="state-few-players" class="hidden text-center py-20">
     <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
       <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -177,7 +177,7 @@
     </a>
   </div>
 
-  <!-- ═══ Estado: cargando ═══ -->
+  <!-- Estado: cargando -->
   <div id="state-loading" class="hidden text-center py-20">
     <svg class="animate-spin w-10 h-10 text-yellow-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -186,7 +186,7 @@
     <p class="text-gray-400">Cargando jugadores...</p>
   </div>
 
-  <!-- ═══ MATCH SETUP (visible con ≥2 jugadores) ═══ -->
+  <!-- MATCH SETUP (visible con ≥2 jugadores) -->
   <div id="match-setup" class="hidden space-y-10">
 
     <!-- Selección de jugadores -->
@@ -309,15 +309,15 @@
 document.addEventListener('auth:ready', function(e) {
   'use strict';
 
-  // ── Auth guard ──
+  // -- Auth guard --
   if (!e.detail.authenticated) { show('state-no-auth'); return; }
 
-  // ── Estado ──────────────────────────────────────────────
+  // -- Estado --
   let players = [];
   let sel1 = null;   // jugador 1 seleccionado
   let sel2 = null;   // jugador 2 seleccionado
 
-  // ── Helpers ─────────────────────────────────────────────
+  // -- Helpers --
   function getToken() {
     return localStorage.getItem('access_token');
   }
@@ -338,7 +338,7 @@ document.addEventListener('auth:ready', function(e) {
   function show(id) { document.getElementById(id).classList.remove('hidden'); }
   function hide(id) { document.getElementById(id).classList.add('hidden'); }
 
-  // ── Init ────────────────────────────────────────────────
+  // -- Init --
   (async function init() {
     var token = getToken();
 
@@ -389,7 +389,7 @@ document.addEventListener('auth:ready', function(e) {
     }
   })();
 
-  // ── Render tarjetas ─────────────────────────────────────
+  // -- Render tarjetas --
   function renderPlayers() {
     var l1 = document.getElementById('p1-list');
     var l2 = document.getElementById('p2-list');
@@ -460,7 +460,7 @@ document.addEventListener('auth:ready', function(e) {
     return card;
   }
 
-  // ── Selección ───────────────────────────────────────────
+  // -- Selección --
   function selectPlayer(p, slot) {
     if (slot === 1) {
       sel1 = (sel1 && sel1.id === p.id) ? null : p;
@@ -505,7 +505,7 @@ document.addEventListener('auth:ready', function(e) {
     }
   }
 
-  // ── Radio buttons ───────────────────────────────────────
+  // -- Radio buttons --
   document.querySelectorAll('#opt-sets .radio-opt, #opt-tb .radio-opt').forEach(function(btn) {
     btn.addEventListener('click', function() {
       btn.parentElement.querySelectorAll('.radio-opt').forEach(function(b) { b.classList.remove('active'); });
@@ -522,7 +522,7 @@ document.addEventListener('auth:ready', function(e) {
     });
   });
 
-  // ── Simular ─────────────────────────────────────────────
+  // -- Simular --
   document.getElementById('btn-sim').addEventListener('click', async function() {
     if (!sel1 || !sel2) { showToast('Selecciona ambos jugadores', true); return; }
 

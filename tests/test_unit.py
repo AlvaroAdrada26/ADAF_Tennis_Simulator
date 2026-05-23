@@ -9,7 +9,7 @@ from backend.simulator.models import Player, Config
 from backend.simulator.scoring import TennisGame, TennisSet
 
 
-# ─── Fixture: jugadores de prueba ────────────────────────────────────────────
+# -- Fixture: jugadores de prueba --
 
 @pytest.fixture
 def player_a():
@@ -31,7 +31,7 @@ def player_b():
     )
 
 
-# ─── Utilidades ──────────────────────────────────────────────────────────────
+# -- Utilidades --
 
 def test_clip_dentro_rango():
     assert clip(0.5, 0.0, 1.0) == 0.5
@@ -43,7 +43,7 @@ def test_clip_por_encima():
     assert clip(2.0, 0.0, 1.0) == 1.0
 
 
-# ─── Modelo Player ───────────────────────────────────────────────────────────
+# -- Modelo Player --
 
 def test_player_atributos_normalizados(player_a):
     """Las propiedades S1, S2, etc. deben devolver el valor dividido entre 100."""
@@ -55,7 +55,7 @@ def test_player_identidad(player_a):
     assert player_a.id == "P1"
 
 
-# ─── Config ──────────────────────────────────────────────────────────────────
+# -- Config --
 
 def test_config_defaults():
     cfg = Config()
@@ -70,7 +70,7 @@ def test_config_personalizada():
     assert cfg.seed == 7
 
 
-# ─── Reproducibilidad ────────────────────────────────────────────────────────
+# -- Reproducibilidad --
 
 def test_seed_produce_mismos_resultados(player_a, player_b):
     """Con la misma semilla, dos juegos deben tener el mismo ganador."""
@@ -85,7 +85,7 @@ def test_seed_produce_mismos_resultados(player_a, player_b):
     assert winner1 == winner2
 
 
-# ─── TennisGame ──────────────────────────────────────────────────────────────
+# -- TennisGame --
 
 def test_tennis_game_produce_ganador(player_a, player_b):
     seed_all(0)
@@ -100,7 +100,7 @@ def test_tennis_game_feed_no_vacio(player_a, player_b):
     assert len(game.feed) > 0
 
 
-# ─── TennisSet ───────────────────────────────────────────────────────────────
+# -- TennisSet --
 
 def test_tennis_set_produce_ganador(player_a, player_b):
     seed_all(1)

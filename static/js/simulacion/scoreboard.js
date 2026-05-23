@@ -1,7 +1,7 @@
-// frontend/assets/js/simulacion/scoreboard.js
+//frontend/assets/js/simulacion/scoreboard.js
 /* Módulo de actualización del marcador en la simulación de tenis */
 
-import { getState } from "./state.js";  // importante para acceder a matchData del estado global
+import { getState } from "./state.js";  //importante para acceder a matchData del estado global
 
 /** Número máximo de sets según la configuración del partido */
 function _getNumSets() {
@@ -20,13 +20,13 @@ export function updateScoreboard(pointData) {
   const serverId = pointData.server_id;
   const isTiebreak = pointData.is_tiebreak || false;
 
-  // === 1. Juegos por set: anteriores, actual, futuros ===
+  //=== 1. Juegos por set: anteriores, actual, futuros ===
   for (let s = 1; s <= numSets; s++) {
     const el1 = document.getElementById(`p1-set${s}`);
     const el2 = document.getElementById(`p2-set${s}`);
     if (!el1 || !el2) continue;
 
-    // Remove previous active-set highlights
+    //Remove previous active-set highlights
     el1.classList.remove("set-in-game");
     el2.classList.remove("set-in-game");
 
@@ -37,7 +37,7 @@ export function updateScoreboard(pointData) {
     } else if (s === setNum) {
       el1.textContent = games.P1;
       el2.textContent = games.P2;
-      // Highlight active set column
+      //Highlight active set column
       el1.classList.add("set-in-game");
       el2.classList.add("set-in-game");
     } else {
@@ -46,7 +46,7 @@ export function updateScoreboard(pointData) {
     }
   }
 
-  // === 2. Puntos (juego normal o tie-break) ===
+  //=== 2. Puntos (juego normal o tie-break) ===
   const ptsP1 = document.getElementById("p1-points");
   const ptsP2 = document.getElementById("p2-points");
 
@@ -66,7 +66,7 @@ export function updateScoreboard(pointData) {
     }
   }
 
-  // === 3. Indicador de saque (con animate-pulse) ===
+  //=== 3. Indicador de saque (con animate-pulse) ===
   const serveP1 = document.getElementById("serve-p1");
   const serveP2 = document.getElementById("serve-p2");
   if (serverId === "P1") {
@@ -81,7 +81,7 @@ export function updateScoreboard(pointData) {
     serveP1.classList.remove("animate-pulse");
   }
 
-  // === 4. Fin de juego: resetear puntos ===
+  //=== 4. Fin de juego: resetear puntos ===
   if (pointData.game_end && !isTiebreak) {
     ptsP1.textContent = "0";
     ptsP2.textContent = "0";
@@ -121,11 +121,11 @@ export function updateLeadingPlayer(pointData) {
 
 
 export function showFinalScore() {
-  const { matchData } = getState(); // ✅ también aquí
+  const { matchData } = getState(); //tambien aquí
   const finalSets = matchData.set_scores;
   const winnerName = matchData.winner_name;
 
-  // Poner juegos finales de cada set
+  //Poner juegos finales de cada set
   const numSets = _getNumSets();
   for (let i = 0; i < numSets; i++) {
     const p1El = document.getElementById(`p1-set${i + 1}`);
@@ -140,7 +140,7 @@ export function showFinalScore() {
     }
   }
 
-  // Reset puntos y saque
+  //Reset puntos y saque
   document.getElementById("p1-points").textContent = "0";
   document.getElementById("p2-points").textContent = "0";
   document.getElementById("serve-p1").classList.add("off");
@@ -148,15 +148,15 @@ export function showFinalScore() {
   document.getElementById("serve-p2").classList.add("off");
   document.getElementById("serve-p2").classList.remove("animate-pulse");
 
-  // Mensaje final
+  //Mensaje final
   console.log(`🏆 Partido finalizado: gana ${winnerName}`);
-  // Animate winner's name in scoreboard
+  //Animate winner's name in scoreboard
   const winnerId = matchData.winner_id || matchData.winner;
   const winnerEl = winnerId === "P1"
     ? document.getElementById("player1-name")
     : document.getElementById("player2-name");
   if (winnerEl) winnerEl.classList.add("winner-glow");
-  // Remove any existing winner message to avoid duplicates
+  //Remove any existing winner message to avoid duplicates
   const existing = document.getElementById("winner-msg");
   if (existing) existing.remove();
 

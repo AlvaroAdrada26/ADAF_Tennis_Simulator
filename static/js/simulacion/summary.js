@@ -109,7 +109,7 @@ var SUMMARY_T = {
 };
 
 function _t(key) {
-  var lang = "es"; // Siempre en español
+  var lang = "es"; //Siempre en español
   return (SUMMARY_T[lang] && SUMMARY_T[lang][key]) ? SUMMARY_T[lang][key] : key;
 }
 
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* 5. Re-apply i18n so data-i18n on dynamic elements get filled */
   if (typeof setLanguage === "function") {
-    setLanguage("es"); // Siempre en español
+    setLanguage("es"); //Siempre en espanol
   }
 
   /* 5b. Set momentum legend names */

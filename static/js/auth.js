@@ -17,8 +17,8 @@
   const token = localStorage.getItem('access_token');
 
   if (!token) {
-    // No hay sesión — nada que validar
-    // setTimeout para que los scripts de página registren sus listeners primero
+    //No hay sesion — nada que validar
+    //setTimeout para que los scripts de página registren sus listeners primero
     setTimeout(function () {
       document.dispatchEvent(new CustomEvent('auth:ready', { detail: { authenticated: false } }));
     }, 0);
@@ -33,12 +33,12 @@
       return resp.json();
     })
     .then(function (freshUser) {
-      // Actualizar datos del usuario en localStorage
+      //Actualizar datos del usuario en localStorage
       localStorage.setItem('user', JSON.stringify(freshUser));
       document.dispatchEvent(new CustomEvent('auth:ready', { detail: { authenticated: true, user: freshUser } }));
     })
     .catch(function () {
-      // Token inválido o expirado — limpiar sesión
+      //Token invalido o expirado — limpiar sesión
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
       document.dispatchEvent(new CustomEvent('auth:ready', { detail: { authenticated: false } }));

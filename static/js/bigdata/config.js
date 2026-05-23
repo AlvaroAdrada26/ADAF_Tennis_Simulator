@@ -7,18 +7,18 @@
 document.addEventListener('auth:ready', function (e) {
   'use strict';
 
-  // ── Auth guard ────────────────────────────────────────────
+  // -- Auth guard --
   if (!e.detail.authenticated) {
     document.getElementById('state-no-auth').classList.remove('hidden');
     return;
   }
 
-  // ── Estado ────────────────────────────────────────────────
+  // -- Estado --
   var players = [];
   var sel1 = null;
   var sel2 = null;
 
-  // ── Helpers ───────────────────────────────────────────────
+  // -- Helpers --
   function getToken() { return localStorage.getItem('access_token'); }
 
   function getActiveVal(groupId) {
@@ -41,15 +41,15 @@ document.addEventListener('auth:ready', function (e) {
     return parseInt(document.getElementById('num-matches-input').value) || 100;
   }
 
-  // ── Time estimate ─────────────────────────────────────────
+  // -- Time estimate --
   function updateTimeEstimate() {
     var n = getNumMatches();
-    // ~30ms per match average
+    //~30ms per match average
     var secs = Math.max(1, Math.round(n * 0.03));
     document.getElementById('est-time').textContent = secs;
   }
 
-  // ── Slider / Input sync ───────────────────────────────────
+  // -- Slider / Input sync --
   var slider = document.getElementById('num-matches-slider');
   var numInput = document.getElementById('num-matches-input');
 
@@ -70,7 +70,7 @@ document.addEventListener('auth:ready', function (e) {
     refreshSummary();
   });
 
-  // ── Presets ───────────────────────────────────────────────
+  // -- Presets --
   function updatePresetHighlight(val) {
     document.querySelectorAll('#presets .preset-btn').forEach(function (b) {
       b.classList.toggle('active', parseInt(b.dataset.val) === val);
@@ -88,7 +88,7 @@ document.addEventListener('auth:ready', function (e) {
     });
   });
 
-  // ── Init (auth:ready fires after DOMContentLoaded) ────────
+  // -- Init (auth:ready fires after DOMContentLoaded) --
   (async function () {
     var token = getToken();
     if (!token) { show('state-no-auth'); return; }
@@ -121,7 +121,7 @@ document.addEventListener('auth:ready', function (e) {
     }
   })();
 
-  // ── Render tarjetas ───────────────────────────────────────
+  // -- Render tarjetas --
   function renderPlayers() {
     var l1 = document.getElementById('p1-list');
     var l2 = document.getElementById('p2-list');
@@ -184,7 +184,7 @@ document.addEventListener('auth:ready', function (e) {
     return card;
   }
 
-  // ── Selección ─────────────────────────────────────────────
+  // -- Selección --
   function selectPlayer(p, slot) {
     if (slot === 1) { sel1 = (sel1 && sel1.id === p.id) ? null : p; }
     else { sel2 = (sel2 && sel2.id === p.id) ? null : p; }
@@ -228,7 +228,7 @@ document.addEventListener('auth:ready', function (e) {
     }
   }
 
-  // ── Radio buttons ─────────────────────────────────────────
+  // -- Radio buttons --
   document.querySelectorAll('#opt-sets .radio-opt, #opt-tb .radio-opt').forEach(function (btn) {
     btn.addEventListener('click', function () {
       btn.parentElement.querySelectorAll('.radio-opt').forEach(function (b) { b.classList.remove('active'); });
@@ -245,7 +245,7 @@ document.addEventListener('auth:ready', function (e) {
     });
   });
 
-  // ── Lanzar simulación ─────────────────────────────────────
+  // -- Lanzar simulación --
   document.getElementById('btn-start').addEventListener('click', function () {
     if (!sel1 || !sel2) { showToast('Selecciona ambos jugadores', true); return; }
 
@@ -279,20 +279,20 @@ document.addEventListener('auth:ready', function (e) {
       num_matches: numMatches
     };
 
-    // Store names for results page
+    //Store names for results page
     sessionStorage.setItem('bigdata_p1_name', sel1.nombre + ' ' + sel1.apellido);
     sessionStorage.setItem('bigdata_p2_name', sel2.nombre + ' ' + sel2.apellido);
 
-    // Update live progress names
+    //Update live progress names
     document.getElementById('live-p1-name').textContent = sel1.nombre + ' ' + sel1.apellido;
     document.getElementById('live-p2-name').textContent = sel2.nombre + ' ' + sel2.apellido;
     document.getElementById('progress-total').textContent = numMatches;
 
-    // Switch to progress view
+    //Switch to progress view
     hide('setup-section');
     show('progress-section');
 
-    // Start streaming simulation
+    //Start streaming simulation
     window.startBigDataSimulation(payload, getToken());
   });
 });

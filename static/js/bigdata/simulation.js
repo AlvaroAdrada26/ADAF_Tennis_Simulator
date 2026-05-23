@@ -11,7 +11,7 @@
   var _abortController = null;
   var _aborted = false;
 
-  // Expuesto globalmente para el botón y el evento beforeunload
+  //Expuesto globalmente para el boton y el evento beforeunload
   window.abortBigDataSimulation = function () {
     if (_abortController) {
       _aborted = true;
@@ -19,7 +19,7 @@
     }
   };
 
-  // Abortar si el usuario navega fuera de la página mientras simula
+  //Abortar si el usuario navega fuera de la página mientras simula
   window.addEventListener('beforeunload', function () {
     if (_abortController) {
       _aborted = true;
@@ -68,9 +68,9 @@
 
         buffer += decoder.decode(readResult.value, { stream: true });
 
-        // Parse SSE lines
+        //Parse SSE lines
         var lines = buffer.split('\n');
-        buffer = lines.pop(); // Keep incomplete line in buffer
+        buffer = lines.pop(); //Keep incomplete line in buffer
 
         for (var i = 0; i < lines.length; i++) {
           var line = lines[i].trim();
@@ -81,19 +81,19 @@
           try { msg = JSON.parse(jsonStr); } catch (e) { continue; }
 
           if (msg.type === 'progress') {
-            // Update progress bar
+            //Update progress bar
             progressFill.style.width = msg.pct + '%';
             progressPct.textContent = msg.pct;
             progressCurrent.textContent = msg.current;
 
-            // Update live win rate
+            //Update live win rate
             liveP1Pct.textContent = msg.p1_pct;
             liveP2Pct.textContent = msg.p2_pct;
             liveP1Bar.style.width = msg.p1_pct + '%';
             liveP2Bar.style.width = msg.p2_pct + '%';
 
           } else if (msg.type === 'result') {
-            // Store result & redirect
+            //Store result & redirect
             _abortController = null;
             sessionStorage.setItem('bigdata_result', JSON.stringify(msg.data));
             window.location.href = '/modo-big-data/resultados';
@@ -102,7 +102,7 @@
         }
       }
 
-      // If we get here without a result message, something went wrong
+      //If we get here without a result message, something went wrong
       if (!_aborted) {
         alert('La simulación terminó sin resultados.');
         window.location.href = '/modo-big-data';
@@ -111,7 +111,7 @@
     } catch (err) {
       _abortController = null;
       if (_aborted) {
-        // Abort voluntario: volver al setup sin mensaje de error
+        //Abort voluntario: volver al setup sin mensaje de error
         window.location.href = '/modo-big-data';
         return;
       }

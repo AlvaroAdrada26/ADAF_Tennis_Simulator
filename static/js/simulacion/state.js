@@ -1,18 +1,18 @@
-// frontend/assets/js/simulacion/state.js
+//frontend/assets/js/simulacion/state.js
 /* =========================================================
    STATE.JS — Estado central de la simulación de tenis
    Gestiona el partido actual, progreso de puntos, y banderas.
    ========================================================= */
 
 const state = {
-  matchData: null,     // JSON completo devuelto por el backend
-  timeline: [],        // Array de puntos (cada punto = una acción completa)
-  currentPoint: 0,     // Índice actual en el timeline
-  matchLoaded: false,  // Evita recargar el partido varias veces
-  matchEnded: false,   // Bandera de fin de partido
-  feedGenerator: null, // Instancia de PointFeedGenerator (se inicializa en liveFeed.js)
+  matchData: null,     //JSON completo devuelto por el backend
+  timeline: [],        //Array de puntos (cada punto = una accion completa)
+  currentPoint: 0,     //Índice actual en el timeline
+  matchLoaded: false,  //Evita recargar el partido varias veces
+  matchEnded: false,   //Bandera de fin de partido
+  feedGenerator: null, //Instancia de PointFeedGenerator (se inicializa en liveFeed.js)
   liveStats: { P1: { aces: 0, doubleFaults: 0, unforcedErrors: 0, pointsWon: 0 }, P2: { aces: 0, doubleFaults: 0, unforcedErrors: 0, pointsWon: 0 } },
-  recentWinners: []  // últimos 25 ganadores para momentum visual
+  recentWinners: []  //ultimos 25 ganadores para momentum visual
 };
 
 /* =========================================================
@@ -81,8 +81,8 @@ export function previousPoint() {
   if (state.currentPoint > 0) {
     state.currentPoint--;
     state.matchEnded = false;
-    // Return the point whose score_after should be displayed,
-    // i.e. the point BEFORE the new currentPoint position.
+    //Return the point whose score_after should be displayed,
+    //i.e. the point BEFORE the new currentPoint position.
     return state.currentPoint > 0 ? state.timeline[state.currentPoint - 1] : null;
   }
   return null;

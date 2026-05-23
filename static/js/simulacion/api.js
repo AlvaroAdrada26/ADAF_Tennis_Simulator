@@ -1,4 +1,4 @@
-// assets/js/simulacion/api.js
+//assets/js/simulacion/api.js
 /**
  * Módulo API del simulador ADAF
  * Responsable de obtener los datos del partido simulado.
@@ -12,7 +12,7 @@
  */
 
 export async function fetchMatchData() {
-  // ── 1. Resultado ya simulado (desde partido_rapido.html) ──
+  // -- 1. Resultado ya simulado (desde partido_rapido.html) --
   const cached = sessionStorage.getItem("match_result");
   if (cached) {
     try {
@@ -24,7 +24,7 @@ export async function fetchMatchData() {
     }
   }
 
-  // ── 2. Payload crudo para simular (desde crear_partido.html) ──
+  // -- 2. Payload crudo para simular (desde crear_partido.html) --
   const stored = sessionStorage.getItem("matchPayload");
   let inputData = null;
   if (stored) {
@@ -36,7 +36,7 @@ export async function fetchMatchData() {
     }
   }
 
-  // ── 3. Fallback: datos de demo ──
+  // -- 3. Fallback: datos de demo --
   if (!inputData) {
     console.log("⚠️ No hay partido en sessionStorage. Usando datos de demo.");
     inputData = {
@@ -58,13 +58,13 @@ export async function fetchMatchData() {
     };
   }
 
-  // ── 4. Merge surface from sessionStorage if present ──
+  // -- 4. Merge surface from sessionStorage if present --
   const storedSurface = sessionStorage.getItem("matchSurface");
   if (storedSurface && inputData.config) {
     inputData.config.superficie = storedSurface;
   }
 
-  // ── 5. Llamar al backend con el payload (include JWT if available) ──
+  // -- 5. Llamar al backend con el payload (include JWT if available) --
   const url = "/api/simulate_match";
   console.log(`📡 Solicitando simulación a ${url}`);
 
@@ -84,11 +84,11 @@ export async function fetchMatchData() {
     const data = await res.json();
     console.log("✅ Partido recibido del backend:", data);
 
-    // ── 6. Store result so refresh doesn't re-simulate ──
+    // -- 6. Store result so refresh doesn't re-simulate --
     sessionStorage.setItem("match_result", JSON.stringify(data));
     sessionStorage.removeItem("matchPayload");
 
-    // ── 7. Build match_config for the save button ──
+    // -- 7. Build match_config for the save button --
     if (inputData.player1 && inputData.player2) {
       const mc = {
         surface: inputData.config?.superficie || storedSurface || "Dura",

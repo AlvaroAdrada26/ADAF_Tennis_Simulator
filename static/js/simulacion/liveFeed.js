@@ -1,4 +1,4 @@
-// frontend/assets/js/simulacion/liveFeed.js
+//frontend/assets/js/simulacion/liveFeed.js
 /* Módulo encargado de mostrar el feed en tiempo real y el registro de puntos. */
 
 import { getState } from "./state.js";
@@ -60,8 +60,8 @@ export function updatePointsFeed(pointData) {
     marcadorJuego = `${score.server_points || "0"}-${score.returner_points || "0"}`;
   }
 
-  // === Icon + description based on point type ===
-  // SVG icons keyed by event type
+  //=== Icon + description based on point type ===
+  //SVG icons keyed by event type
   const SVG_ICONS = {
     ace:        '<svg class="w-4 h-4 text-yellow-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
     doble:      '<svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
@@ -91,7 +91,7 @@ export function updatePointsFeed(pointData) {
     desc = `Punto para <span class="text-yellow-300 font-semibold">${winner}</span> tras ${rally} golpe${rally === 1 ? "" : "s"}.`;
   }
 
-  // === Subtle background based on winner ===
+  //=== Subtle background based on winner ===
   const bgClass = winnerId === "P1"
     ? "border-l-blue-400 bg-blue-950/30"
     : "border-l-amber-400 bg-amber-950/20";
@@ -152,7 +152,7 @@ export async function playPointFeed(pointData) {
   const liveList = document.getElementById("live-feed-list");
   liveList.innerHTML = "";
 
-  // Update feed header with current set/game
+  //Update feed header with current set/game
   const header = document.getElementById("live-feed-header");
   if (header) header.textContent = `Set ${pointData.set || 1} \u00b7 Juego ${pointData.game || 1}`;
 

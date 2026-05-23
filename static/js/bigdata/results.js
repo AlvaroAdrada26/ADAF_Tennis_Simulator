@@ -30,13 +30,13 @@
     var cfg = d.meta.config || {};
     var n = d.meta.total_matches;
 
-    // ── Subtitle ──
+    // -- Subtitle --
     var surfLabel = cfg.superficie || 'Dura';
     var fmtLabel = cfg.best_of === 1 ? '1 Set' : 'Bo' + (cfg.best_of || 3);
     document.getElementById('results-subtitle').textContent =
       n.toLocaleString() + ' partidos · ' + p1 + ' vs ' + p2 + ' · ' + surfLabel + ' · ' + fmtLabel;
 
-    // ── KPIs ──
+    // -- KPIs --
     document.getElementById('kpi-p1-winrate').textContent = d.win_rate.P1.pct + '%';
     document.getElementById('kpi-p1-wins').textContent = p1 + ': ' + d.win_rate.P1.wins + ' victorias';
     document.getElementById('kpi-p2-winrate').textContent = d.win_rate.P2.pct + '%';
@@ -45,11 +45,11 @@
     document.getElementById('kpi-avg-sets').textContent = d.match_length.avg_sets;
     document.getElementById('kpi-duration').textContent = '~' + d.match_length.avg_duration_min + ' min';
 
-    // ── Player names for comparison ──
+    // -- Player names for comparison --
     document.getElementById('cmp-p1-name').textContent = p1;
     document.getElementById('cmp-p2-name').textContent = p2;
 
-    // ── Charts ──
+    // -- Charts --
     renderWinRateDonut(d, p1, p2);
     renderScoreDistribution(d);
     renderSetScores(d);
@@ -59,15 +59,13 @@
     renderRallyDistribution(d);
     renderTotals(d, p1, p2);
 
-    // ── CSV Export ──
+    // -- CSV Export --
     document.getElementById('btn-export-csv').addEventListener('click', function () {
       exportCSV(d, p1, p2);
     });
   }
 
-  // ────────────────────────────────────────────────────────────
-  // Charts
-  // ────────────────────────────────────────────────────────────
+  //Charts
   var COLORS = { p1: '#f59e0b', p2: '#3b82f6', p1bg: 'rgba(245,158,11,0.2)', p2bg: 'rgba(59,130,246,0.2)' };
 
   function chartDefaults() {
@@ -284,9 +282,7 @@
     });
   }
 
-  // ────────────────────────────────────────────────────────────
-  // Stats Table
-  // ────────────────────────────────────────────────────────────
+  //Stats Table
   function renderStatsTable(d, p1Name, p2Name) {
     var container = document.getElementById('stats-table');
     var avg1 = d.avg_stats.P1;
@@ -328,9 +324,7 @@
     container.innerHTML = html;
   }
 
-  // ────────────────────────────────────────────────────────────
-  // CSV Export
-  // ────────────────────────────────────────────────────────────
+  //CSV Export
   function exportCSV(d, p1, p2) {
     var lines = [];
     lines.push('Modo Big Data - ADAF Tennis Simulator');
@@ -339,14 +333,14 @@
     lines.push('Jugador 2,' + p2);
     lines.push('');
 
-    // Win rate
+    //Win rate
     lines.push('Win Rate');
     lines.push('Jugador,Victorias,Porcentaje');
     lines.push(p1 + ',' + d.win_rate.P1.wins + ',' + d.win_rate.P1.pct + '%');
     lines.push(p2 + ',' + d.win_rate.P2.wins + ',' + d.win_rate.P2.pct + '%');
     lines.push('');
 
-    // Avg stats
+    //Avg stats
     lines.push('Estadísticas Promedio por Partido');
     var keys = Object.keys(d.avg_stats.P1);
     lines.push('Stat,' + p1 + ',' + p2);
@@ -355,7 +349,7 @@
     });
     lines.push('');
 
-    // Match length
+    //Match length
     lines.push('Duración de Partidos');
     lines.push('Promedio puntos,' + d.match_length.avg_points);
     lines.push('Min puntos,' + d.match_length.min_points);

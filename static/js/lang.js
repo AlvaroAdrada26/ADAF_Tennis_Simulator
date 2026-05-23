@@ -1,13 +1,11 @@
-// lang.js
+//lang.js
 const translations = {
   es: {
-    // ********************************
-    // ********** INDEX.HTML **********
-    // ********************************
+    //********************************
+    //********** INDEX.HTML **********
+    //********************************
 
-    // =============================
-    // SIDEBAR Y HEADER
-    // =============================
+    //SIDEBAR Y HEADER
     sidebarMenu: "Menú",
     sidebarHome: "Inicio",
     sidebarSimulacion: "Simulación",
@@ -25,9 +23,7 @@ const translations = {
     hero_desc: "Simulador avanzado de tenis basado en atributos realistas de los jugadores.\nExplora cómo la técnica, la condición física y la fortaleza mental influyen en cada punto.",
     hero_button: "Comenzar Simulación",
 
-    // =============================
-    // SECCIÓN "CARACTERÍSTICAS"
-    // =============================
+    //SECCION "CARACTERÍSTICAS"
     caracteristicasTitle: "Características Principales",
     caracteristicasDesc: "Un simulador avanzado que combina estadística, física y psicología del tenis para recrear el juego profesional con realismo.",
     caracteristica1Title: "Análisis Estadístico",
@@ -37,9 +33,7 @@ const translations = {
     caracteristica3Title: "Simulación en Tiempo Real",
     caracteristica3Desc: "Observa cada punto, juego y set con visualizaciones dinámicas y métricas instantáneas.",
     
-    // =============================
-    // SECCIÓN "CÓMO FUNCIONA"
-    // =============================
+    //SECCION "CÓMO FUNCIONA"
     comoFuncionaTitle: "¿Cómo Funciona?",
     comoFuncionaDesc: "Tres pasos simples para crear y ejecutar tu simulación.",
     paso1Title: "Configura los Jugadores",
@@ -49,9 +43,7 @@ const translations = {
     paso3Title: "Observa y Analiza",
     paso3Desc: "Ejecuta la simulación punto a punto y consulta estadísticas detalladas al final del partido.",
 
-    // =============================
-    // SECCIÓN "ESTADÍSTICAS"
-    // =============================
+    //SECCION "ESTADÍSTICAS"
     estadisticasTitle: "Impulsado por Simulación Realista",
     estadisticasAttr: "Atributos por jugador",
     estadisticasMatches: "Partidos simulados",
@@ -59,16 +51,12 @@ const translations = {
     estadisticasConsistenciaAlta: "Alta",
     estadisticasDisponible: "Disponible en cualquier momento",
 
-    // =============================
-    // SECCIÓN "CALL TO ACTION FINAL"
-    // =============================
+    //SECCION "CALL TO ACTION FINAL"
     ctaTitle: "¿Listo para Comenzar?",
     ctaDesc: "Descubre cómo los factores técnicos, físicos y mentales influyen en cada punto del partido.",
     ctaButton: "Iniciar Simulación Ahora",
 
-    // =============================
-    // FOOTER
-    // =============================
+    //FOOTER
     footerRecursos: "Recursos",
     footerProyecto: "Proyecto",
     footerEnlaces: "Enlaces Útiles",
@@ -94,9 +82,7 @@ const translations = {
 
     footerCopyright: "© 2025 ADAF Tennis Simulator · Trabajo Fin de Grado · Universidad Complutense de Madrid",
 
-    // =============================
-    // RESUMEN DEL PARTIDO
-    // =============================
+    //RESUMEN DEL PARTIDO
     summaryChampion:         "CAMPEÓN",
     summaryWins:             "Gana el Partido",
     summaryMatchStats:       "Estadísticas del Partido",
@@ -138,9 +124,7 @@ const translations = {
     summaryNoData:           "No hay datos de partido disponibles.",
     summaryReturnToSim:      "Volver a la Simulación",
 
-    // =============================
-    // MODO BIG DATA
-    // =============================
+    //MODO BIG DATA
     sidebarBigData:          "Modo Big Data",
     bigdataTitle:            "Modo Big Data",
     bigdataSubtitle:         "Simula cientos o miles de partidos y analiza patrones estadísticos.",
@@ -176,9 +160,9 @@ function setLanguage(lang) {
       el.innerText = translations[lang][key];
     }
   });
-  localStorage.setItem("lang", "es"); // Force es
+  localStorage.setItem("lang", "es"); //Force es
   document.documentElement.lang = "es";
 }
 
-// Cargar idioma - SIEMPRE EN ESPAÑOL
+//Cargar idioma - SIEMPRE EN ESPAÑOL
 setLanguage("es");

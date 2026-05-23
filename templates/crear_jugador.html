@@ -98,7 +98,7 @@
 {% block content %}
 <div class="flex-1 px-8 py-12 space-y-14 animate-fade-up max-w-[100rem] mx-auto w-full">
 
-  <!-- ═══ Estado: NO logueado ═══ -->
+  <!-- Estado: NO logueado -->
   <div id="state-no-auth" class="hidden text-center py-20">
     <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-400/20 mb-6">
       <svg class="w-10 h-10 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -112,7 +112,7 @@
 
   <div id="jugador-content" class="hidden">
 
-  <!-- ═══════════════════════ TÍTULO ═══════════════════════ -->
+  <!-- TÍTULO -->
   <section class="text-center">
     <h2 class="text-4xl font-bold text-yellow-400 mb-3">Crear Jugador</h2>
     <p class="text-gray-400 text-lg">Define los datos personales y atributos tenísticos de tu jugador.</p>
@@ -121,7 +121,7 @@
   <!-- Layout: formulario (izquierda) + carta preview (derecha) -->
   <div class="flex flex-col lg:flex-row gap-12">
 
-    <!-- ═══════════════ FORMULARIO ═══════════════ -->
+    <!-- FORMULARIO -->
     <div class="flex-1 space-y-12">
 
       <!-- ── DATOS PERSONALES ── -->
@@ -297,7 +297,7 @@
     </div>
     <!-- FIN FORMULARIO -->
 
-    <!-- ═══════════════ CARTA PREVIEW ═══════════════ -->
+    <!-- CARTA PREVIEW -->
     <div class="lg:w-80 flex flex-col items-center lg:sticky lg:top-24 self-start gap-6">
       <h3 class="text-lg font-semibold text-yellow-400">Vista previa</h3>
 
@@ -348,13 +348,13 @@
 
 {% block scripts %}
 <script>
-// ─── Auth guard ───
+// -- Auth guard --
 document.addEventListener('auth:ready', function(e) {
   if (!e.detail.authenticated) { document.getElementById('state-no-auth').classList.remove('hidden'); return; }
   document.getElementById('jugador-content').classList.remove('hidden');
 });
 
-// ─────── Países con códigos ISO ───────
+// -- Países con códigos ISO --
 const COUNTRIES = {
   "Afganistán": "af", "Albania": "al", "Alemania": "de", "Andorra": "ad", "Angola": "ao",
   "Antigua y Barbuda": "ag", "Arabia Saudita": "sa", "Argelia": "dz", "Argentina": "ar",
@@ -403,7 +403,7 @@ const COUNTRIES = {
   "Yibuti": "dj", "Zambia": "zm", "Zimbabue": "zw"
 };
 
-// ─────── Nacionalidad autocomplete ───────
+// -- Nacionalidad autocomplete --
 const nacInput = document.getElementById('nacionalidad-input');
 const nacList  = document.getElementById('nacionalidad-list');
 
@@ -428,7 +428,7 @@ nacInput.addEventListener('input', () => {
 nacInput.addEventListener('blur', () => setTimeout(() => nacList.classList.add('hidden'), 200));
 nacInput.addEventListener('focus', () => { if (nacInput.value) nacInput.dispatchEvent(new Event('input')); });
 
-// ─────── Helpers ───────
+// -- Helpers --
 function updateAltura(id, delta) {
   const input = document.getElementById(id);
   const min = Number(input.min) || 0;
@@ -464,7 +464,7 @@ function clampAndSync(numInput) {
   updateCard();
 }
 
-// ─────── Card update ───────
+// -- Card update --
 const ATTR_IDS = ['primer_saque','segundo_saque','resto','derecha','reves','movilidad','consistencia','clutch','fisico'];
 
 function updateCard() {
@@ -474,7 +474,7 @@ function updateCard() {
   const displayName = apellidos || nombre || 'Nuevo Jugador';
   document.getElementById('card-name').textContent = displayName;
 
-  // País
+  // Pais
   const countryName = document.getElementById('nacionalidad-input').value;
   const countryEl = document.getElementById('card-country');
   if (countryName && COUNTRIES[countryName]) {
@@ -530,7 +530,7 @@ function setCardTextColor(cls) {
   });
 }
 
-// ─────── Reset ───────
+// -- Reset --
 function resetForm() {
   document.getElementById('nombre').value = '';
   document.getElementById('apellidos').value = '';
@@ -550,7 +550,7 @@ function resetForm() {
   updateCard();
 }
 
-// ─────── "Guardar" (sin BD todavía) ───────
+// -- "Guardar" (sin BD todavía) --
 /*function savePlayer() {
   const nombre = document.getElementById('nombre').value.trim();
   const apellidos = document.getElementById('apellidos').value.trim();
@@ -622,7 +622,7 @@ async function savePlayer() {
 }
 
 
-// ─────── Init ───────
+// -- Init --
 document.addEventListener('DOMContentLoaded', () => {
   // Color inicial de sliders
   document.querySelectorAll('.slider').forEach(s => updateValueColor(s, s.nextElementSibling));

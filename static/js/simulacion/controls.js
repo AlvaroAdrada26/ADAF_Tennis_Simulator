@@ -1,4 +1,4 @@
-// frontend/assets/js/simulacion/controls.js
+//frontend/assets/js/simulacion/controls.js
 /* =========================================================
    CONTROLS.JS — Panel de control completo de la simulación
    Botones: Restart, Previous, Play/Pause, Next, End
@@ -16,9 +16,9 @@ import { setMatchData } from "./state.js";
 import { initLiveFeed } from "./liveFeed.js";
 
 /* ---------- estado interno del reproductor ---------- */
-let autoplayTimer = null;   // setTimeout id
+let autoplayTimer = null;   //setTimeout id
 let isPlaying    = false;
-let speedMs      = 1200;    // ms entre puntos (x1)
+let speedMs      = 1200;    //ms entre puntos (x1)
 let speedFactor  = 1;
 
 const PLAY_PATH  = '<path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z" />';
@@ -75,7 +75,7 @@ async function autoplayLoop() {
     return;
   }
   await advanceOnePoint({ playFeed: false });
-  // Show summary phrase in feed during autoplay
+  //Show summary phrase in feed during autoplay
   const { currentPoint, timeline } = getState();
   if (currentPoint > 0 && currentPoint <= timeline.length) {
     showPointSummary(timeline[currentPoint - 1]);
@@ -186,7 +186,7 @@ export function bindSimulationControls() {
   /* ───── 🏎️ Velocidad ───── */
   document.querySelectorAll(".speed-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-      // Visual: resaltar botón activo
+      //Visual: resaltar botón activo
       document.querySelectorAll(".speed-btn").forEach(b => {
         b.classList.remove("bg-yellow-400", "text-slate-900");
         b.classList.add("text-yellow-300");
@@ -215,7 +215,7 @@ function showPostMatchBar() {
   const bar = document.getElementById("post-match-bar");
   if (bar) bar.classList.remove("hidden");
 
-  // Show auto-save status from backend
+  //Show auto-save status from backend
   const result = JSON.parse(sessionStorage.getItem("match_result") || "{}");
   const statusEl = document.getElementById("save-status");
   if (statusEl) {

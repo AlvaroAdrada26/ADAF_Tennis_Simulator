@@ -138,7 +138,7 @@
   <div class="bg-slate-900/60 backdrop-blur-sm border border-blue-800/30 rounded-2xl p-8 shadow-2xl">
     <form id="register-form" onsubmit="handleRegister(event)" novalidate>
 
-      <!-- =================== PASO 1: Cuenta =================== -->
+      <!-- PASO 1: Cuenta -->
       <div id="step-1">
         <h3 class="text-lg font-semibold text-yellow-400 mb-6 text-center">Datos de la cuenta</h3>
 
@@ -206,7 +206,7 @@
         <button type="button" onclick="nextStep(2)" class="btn-primary">Siguiente</button>
       </div>
 
-      <!-- =================== PASO 2: Datos personales =================== -->
+      <!-- PASO 2: Datos personales -->
       <div id="step-2" class="hidden">
         <h3 class="text-lg font-semibold text-yellow-400 mb-6 text-center">Datos personales</h3>
 
@@ -257,7 +257,7 @@
         </div>
       </div>
 
-      <!-- =================== PASO 3: Confirmación =================== -->
+      <!-- PASO 3: Confirmación -->
       <div id="step-3" class="hidden">
         <h3 class="text-lg font-semibold text-yellow-400 mb-6 text-center">Confirmar registro</h3>
 
@@ -348,7 +348,7 @@
 
 {% block scripts %}
 <script>
-// ─────── Países con códigos ISO ───────
+// -- Países con códigos ISO --
 const COUNTRIES = {
   "Afganistán": "af", "Albania": "al", "Alemania": "de", "Andorra": "ad", "Angola": "ao",
   "Antigua y Barbuda": "ag", "Arabia Saudita": "sa", "Argelia": "dz", "Argentina": "ar",
@@ -397,7 +397,7 @@ const COUNTRIES = {
   "Yibuti": "dj", "Zambia": "zm", "Zimbabue": "zw"
 };
 
-// ─────── Nacionalidad autocomplete ───────
+// -- Nacionalidad autocomplete --
 const regNacInput = document.getElementById('reg-nacionalidad');
 const regNacList = document.getElementById('reg-nacionalidad-list');
 
@@ -420,7 +420,7 @@ regNacInput.addEventListener('input', () => {
 regNacInput.addEventListener('blur', () => setTimeout(() => regNacList.classList.add('hidden'), 200));
 regNacInput.addEventListener('focus', () => { if (regNacInput.value) regNacInput.dispatchEvent(new Event('input')); });
 
-// ─────── Password toggle & strength ───────
+// -- Password toggle & strength --
 function togglePassword(inputId, btn) {
   const input = document.getElementById(inputId);
   const isPassword = input.type === 'password';
@@ -457,7 +457,7 @@ function checkPasswordStrength(pw) {
   }
 }
 
-// ─────── Steps ───────
+// -- Steps --
 let currentStep = 1;
 
 function showStep(n) {
@@ -531,7 +531,7 @@ function hideStepError() {
   document.getElementById('register-error').classList.add('hidden');
 }
 
-// ─────── Toast ───────
+// -- Toast --
 function showToast(message, isError = false) {
   const toast = document.getElementById('toast');
   toast.textContent = message;
@@ -540,7 +540,7 @@ function showToast(message, isError = false) {
   setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
-// ─────── Submit ───────
+// -- Submit --
 async function handleRegister(e) {
   e.preventDefault();
   const errorEl = document.getElementById('register-error');

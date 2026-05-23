@@ -7,7 +7,7 @@
 (function () {
   'use strict';
 
-  // ── Session data ────────────────────────────────────────
+  // -- Session data --
   const sessionId = sessionStorage.getItem('estrategico_session_id');
   const config = JSON.parse(sessionStorage.getItem('estrategico_config') || '{}');
   if (!sessionId) { window.location.href = '/modo-estrategico'; return; }
@@ -16,13 +16,13 @@
   const coachedPlayer = config.coached_player || 'P1';
   const playerNames = { P1: config.player1_name || 'Jugador 1', P2: config.player2_name || 'Jugador 2' };
 
-  // ── State ───────────────────────────────────────────────
+  // -- State --
   let currentStrategy = 'neutral';
   let pointIndex = 0;
   let matchFinished = false;
   let streak = { player: null, count: 0 };
 
-  // ── Autoplay state ─────────────────────────────────────
+  // -- Autoplay state --
   let autoplayTimer = null;
   let isAutoPlaying = false;
   let speedFactor = 1;
@@ -30,7 +30,7 @@
   const PLAY_PATH = '<path stroke-linecap="round" stroke-linejoin="round" d="M8 5v14l11-7z"/>';
   const PAUSE_PATH = '<path stroke-linecap="round" stroke-linejoin="round" d="M6 4h4v16H6zM14 4h4v16h-4z"/>';
 
-  // ── DOM refs ────────────────────────────────────────────
+  // -- DOM refs --
   const btnPlay = document.getElementById('btn-play-point');
   const btnAutoFinish = document.getElementById('btn-auto-finish');
   const btnAutoplay = document.getElementById('btn-autoplay');
@@ -45,7 +45,7 @@
   const finalWinnerText = document.getElementById('final-winner-text');
   const finalScoreText = document.getElementById('final-score-text');
 
-  // ── Reason labels ───────────────────────────────────────
+  // -- Reason labels --
   const REASON_LABELS = {
     ace:         'Ace',
     doble_falta: 'Doble falta',
@@ -58,7 +58,7 @@
     return REASON_LABELS[reason] || reason;
   }
 
-  // ── Helpers ─────────────────────────────────────────────
+  // -- Helpers --
   function getToken() { return localStorage.getItem('access_token') || ''; }
 
   function showToast(msg, isErr) {
@@ -70,33 +70,33 @@
     setTimeout(function () { t.classList.add('hidden'); }, 3000);
   }
 
-  // ── Init: set player names ──────────────────────────────
+  // -- Init: set player names --
   function initUI() {
     document.getElementById('player1-name').textContent = playerNames.P1;
     document.getElementById('player2-name').textContent = playerNames.P2;
     coachedNameEl.textContent = playerNames[coachedPlayer];
 
-    // Indicator names
+    //Indicator names
     document.getElementById('stam-p1-name').textContent = playerNames.P1;
     document.getElementById('stam-p2-name').textContent = playerNames.P2;
     document.getElementById('mom-p1-name').textContent = playerNames.P1;
     document.getElementById('mom-p2-name').textContent = playerNames.P2;
   }
 
-  // ── Scoreboard update ──────────────────────────────────
+  // -- Scoreboard update --
   function updateScoreboard(score) {
-    // Points
+    //Points
     const p1Pts = document.getElementById('p1-points');
     const p2Pts = document.getElementById('p2-points');
     if (p1Pts) p1Pts.textContent = score.points.P1 || '0';
     if (p2Pts) p2Pts.textContent = score.points.P2 || '0';
 
-    // Games in current set
+    //Games in current set
     for (let s = 1; s <= numSets; s++) {
       const p1Cell = document.getElementById('p1-set' + s);
       const p2Cell = document.getElementById('p2-set' + s);
       if (s < score.current_set && score.set_scores[s - 1]) {
-        // Finished set
+        //Finished set
         if (p1Cell) {
           p1Cell.textContent = score.set_scores[s - 1][0];
           p1Cell.className = score.set_scores[s - 1][0] > score.set_scores[s - 1][1] ? 'text-4xl font-bold set-winner' : 'text-4xl font-bold set-loser';
@@ -114,13 +114,13 @@
       }
     }
 
-    // Serve indicator
+    //Serve indicator
     const serveP1 = document.getElementById('serve-p1');
     const serveP2 = document.getElementById('serve-p2');
     if (serveP1) serveP1.className = 'serve-ball' + (score.server_id === 'P1' ? '' : ' off');
     if (serveP2) serveP2.className = 'serve-ball' + (score.server_id === 'P2' ? '' : ' off');
 
-    // Leading player color
+    //Leading player color
     const n1 = document.getElementById('player1-name');
     const n2 = document.getElementById('player2-name');
     if (n1 && n2) {
@@ -135,9 +135,9 @@
     }
   }
 
-  // ── Indicators update ──────────────────────────────────
+  // -- Indicators update --
   function updateIndicators(data) {
-    // Stamina (0-100 scale)
+    //Stamina (0-100 scale)
     const s1 = data.stamina_p1 != null ? data.stamina_p1 : 100;
     const s2 = data.stamina_p2 != null ? data.stamina_p2 : 100;
     document.getElementById('stam-p1-val').textContent = Math.round(s1) + '%';
@@ -145,13 +145,13 @@
     document.getElementById('stam-p1-bar').style.width = Math.max(0, Math.min(100, s1)) + '%';
     document.getElementById('stam-p2-bar').style.width = Math.max(0, Math.min(100, s2)) + '%';
 
-    // Momentum (can be negative or positive; map to 0-100 for bar)
+    //Momentum (can be negative or positive; map to 0-100 for bar)
     const m1 = data.momentum_p1 != null ? data.momentum_p1 : 0;
     const m2 = data.momentum_p2 != null ? data.momentum_p2 : 0;
     document.getElementById('mom-p1-val').textContent = (m1 >= 0 ? '+' : '') + m1.toFixed(1);
     document.getElementById('mom-p2-val').textContent = (m2 >= 0 ? '+' : '') + m2.toFixed(1);
 
-    // Map momentum to a 0-100 bar (clamp ±50 → 0-100%)
+    //Map momentum to a 0-100 bar (clamp ±50 = 0-100%)
     const momBar1 = Math.max(0, Math.min(100, (m1 + 50) / 100 * 100));
     const momBar2 = Math.max(0, Math.min(100, (m2 + 50) / 100 * 100));
     const bar1 = document.getElementById('mom-p1-bar');
@@ -162,7 +162,7 @@
     bar2.className = 'bar-fill h-full rounded-full ' + (m2 >= 0 ? 'bg-amber-500' : 'bg-red-500');
   }
 
-  // ── Streak ──────────────────────────────────────────────
+  // -- Streak --
   function updateStreak(winnerId) {
     if (winnerId === streak.player) {
       streak.count++;
@@ -180,7 +180,7 @@
     }
   }
 
-  // ── Last point card ────────────────────────────────────
+  // -- Last point card --
   function showLastPoint(pointData) {
     lastPointCard.classList.remove('hidden');
     lastPointCard.classList.add('bounce-in');
@@ -213,7 +213,7 @@
     setTimeout(function() { lastPointCard.classList.remove('bounce-in'); }, 500);
   }
 
-  // ── Points feed ────────────────────────────────────────
+  // -- Points feed --
   function addToFeed(pointData, idx) {
     const winnerName = pointData.winner_name || playerNames[pointData.winner] || pointData.winner;
     const li = document.createElement('li');
@@ -243,7 +243,7 @@
     pointsList.prepend(li);
   }
 
-  // ── Strategy cards ─────────────────────────────────────
+  // -- Strategy cards --
   document.querySelectorAll('#strat-cards .strat-card').forEach(function (card) {
     card.addEventListener('click', function () {
       if (matchFinished) return;
@@ -252,7 +252,7 @@
       card.classList.add('active');
       updateStrategyBadge();
 
-      // Also notify backend
+      //Also notify backend
       fetch('/api/estrategico/set-strategy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
@@ -268,7 +268,7 @@
     stratBadge.className = 'text-xs font-mono px-3 py-1 rounded-full border ' + (colors[currentStrategy] || colors.neutral);
   }
 
-  // ── Autoplay helpers ────────────────────────────────────
+  // -- Autoplay helpers --
   function setAutoplayIcon(playing) {
     var icon = document.getElementById('icon-autoplay');
     if (icon) icon.innerHTML = playing ? PAUSE_PATH : PLAY_PATH;
@@ -336,7 +336,7 @@
     }
   }
 
-  // ── Autoplay button ───────────────────────────────────
+  // -- Autoplay button --
   if (btnAutoplay) {
     btnAutoplay.addEventListener('click', function () {
       if (matchFinished) return;
@@ -351,7 +351,7 @@
     });
   }
 
-  // ── Speed buttons ─────────────────────────────────────
+  // -- Speed buttons --
   document.querySelectorAll('.coach-speed-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       document.querySelectorAll('.coach-speed-btn').forEach(function (b) {
@@ -364,7 +364,7 @@
     });
   });
 
-  // ── Play point ─────────────────────────────────────────
+  // -- Play point --
   btnPlay.addEventListener('click', async function () {
     if (matchFinished || isAutoPlaying) return;
     btnPlay.disabled = true;
@@ -382,7 +382,7 @@
     }
   });
 
-  // ── Auto finish ────────────────────────────────────────
+  // -- Auto finish --
   btnAutoFinish.addEventListener('click', async function () {
     if (matchFinished) return;
     stopAutoplay();
@@ -412,7 +412,7 @@
     }
   });
 
-  // ── Match end ──────────────────────────────────────────
+  // -- Match end --
   function handleMatchEnd(winner, score) {
     matchFinished = true;
     stopAutoplay();
@@ -424,13 +424,13 @@
     const winnerName = playerNames[winner] || winner;
     finalWinnerText.innerHTML = '<svg class="w-8 h-8 inline-block align-middle mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>' + winnerName + ' gana el partido';
 
-    // Format score
+    //Format score
     if (score && score.set_scores) {
       const setsStr = score.set_scores.map(function (s) { return s[0] + '-' + s[1]; }).join(', ');
       finalScoreText.textContent = setsStr;
     }
 
-    // Winner glow on scoreboard
+    //Winner glow on scoreboard
     const winRow = document.getElementById(winner === 'P1' ? 'player1-name' : 'player2-name');
     if (winRow) winRow.classList.add('winner-glow');
 
@@ -438,7 +438,7 @@
     postMatchBar.scrollIntoView({ behavior: 'smooth' });
   }
 
-  // ── Fetch initial state ────────────────────────────────
+  // -- Fetch initial state --
   async function fetchState() {
     try {
       const res = await fetch('/api/estrategico/state/' + sessionId, {
@@ -467,7 +467,7 @@
     }
   }
 
-  // ── Boot ───────────────────────────────────────────────
+  // -- Boot --
   initUI();
   fetchState();
 })();

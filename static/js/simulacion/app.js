@@ -5,27 +5,27 @@ import { initLiveFeed, updateLiveStatsPanel, updateMomentumBar } from "./liveFee
 
 async function initSimulation() {
   try {
-    // Inicializa el generador de texto dinámico
+    //Inicializa el generador de texto dinámico
     await initLiveFeed();
 
-    // Llama al backend local
+    //Llama al backend local
     const data = await fetchMatchData();
 
-    // Guarda el estado global
+    //Guarda el estado global
     setMatchData(data);
 
-    // Pinta nombres
+    //Pinta nombres
     setPlayerNames(data.players);
 
-    // Inicializa paneles en tiempo real
+    //Inicializa paneles en tiempo real
     updateLiveStatsPanel();
     updateMomentumBar();
 
-    // Inicializa contador de puntos
+    //Inicializa contador de puntos
     const counterEl = document.getElementById("point-counter");
     if (counterEl) counterEl.textContent = `Punto 0`;
 
-    // Activa controles de simulación
+    //Activa controles de simulacion
     bindSimulationControls();
 
     console.log("Simulación lista para comenzar");

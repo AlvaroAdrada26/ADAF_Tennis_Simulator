@@ -1,4 +1,4 @@
-// frontend/assets/js/simulacion/feed/PointFeedGenerator.js
+//frontend/assets/js/simulacion/feed/PointFeedGenerator.js
 /* ==============================================================
    Generador de frases legibles a partir de acciones del punto.
    Compatible con JSONs de estructura:
@@ -27,15 +27,15 @@ export class PointFeedGenerator {
       if (text) feed.push(text);
     }
 
-    // 🏁 Frase final según la razón del punto
+    //Frase final según la razon del punto
     const endReason = pointData.reason?.toLowerCase() || "";
 
-    // Compatibilidad: winner_id (nuevo) o winner (antiguo, ej. "P1")
+    //Compatibilidad: winner_id (nuevo) o winner (antiguo, ej. "P1")
     const winnerId = pointData.winner_id || pointData.winner;
     const winnerName =
       players[winnerId] || pointData.winner_name || "Jugador";
 
-    // Si gana el sacador, perdedor es el otro; si gana el restador, perdedor es el servidor
+    //Si gana el sacador, perdedor es el otro; si gana el restador, perdedor es el servidor
     const loserId =
       pointData.server_id === winnerId
         ? this._otherId(winnerId)
@@ -96,7 +96,7 @@ export class PointFeedGenerator {
   const phrase = this._pickRandom(section);
   const finalText = phrase ? phrase.replace("{name}", name) : null;
 
-  // 🪄 DEBUG LOG: muestra qué frase se eligió para cada acción
+  //DEBUG LOG: muestra qué frase se eligio para cada acción
   console.log(
     `🧩 Acción: ${type} (${shotType || "-"}) | Outcome: ${outcome} | Jugador: ${name}`,
     "\n→ Frase elegida:",
@@ -127,7 +127,7 @@ export class PointFeedGenerator {
     else if (r.includes("no_llega")) key = "no_llega";
 
 
-    // Si no hay clave exacta, buscar ignorando mayúsculas
+    //Si no hay clave exacta, buscar ignorando mayusculas
     const realKey = Object.keys(pe).find(
       k => k.toLowerCase().trim() === key?.toLowerCase().trim()
     );
@@ -143,7 +143,7 @@ export class PointFeedGenerator {
       return `Punto para ${winner}.`;
     }
 
-    // Si es error/fallo, el nombre en la frase es el perdedor
+    //Si es error/fallo, el nombre en la frase es el perdedor
     const nameToUse = realKey.includes("error") || realKey === "no_llega" || realKey === "doble_falta" ? loser : winner;
     const phrase = this._pickRandom(phrases);
     const final = phrase ? phrase.replace("{name}", nameToUse) : `Punto para ${winner}.`;
